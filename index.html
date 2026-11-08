@@ -113,13 +113,13 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .dline{height:1px;width:100%;background:#fff}
 .dc{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;margin-top:2vh}
 .dcol{padding:0 2vw;display:flex;flex-direction:column;min-height:0}.dcol+.dcol{border-left:1px solid var(--bd)}
-.dcol h2{font-family:"Chakra Petch",sans-serif;letter-spacing:.2em;text-align:center;font-size:clamp(14px,2vw,26px);margin:0 0 2vh;color:#fff}
+.dcol h2{font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-weight:700;letter-spacing:.2em;text-align:center;font-size:clamp(14px,2vw,26px);margin:0 0 2vh;color:#fff}
 .dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),210px));gap:12px;align-content:start;overflow:auto;flex:1;min-height:0}
 .dt{border-radius:14px;padding:10px 16px;text-align:center;border:2px solid;overflow-wrap:anywhere}
 .dt b{display:block;font-family:"Chakra Petch",sans-serif;font-size:clamp(22px,3vw,44px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dt span{display:block;font-size:clamp(13px,1.6vw,22px);opacity:.85;margin-top:4px}
 .dt.sv{border-color:#34d399;color:#bbf7d0;background:rgba(52,211,153,.12)}.dt.pp{border-color:#fbbf24;color:#fde68a;background:rgba(251,191,36,.1)}
 @media(max-width:700px){.dc{grid-template-columns:1fr}.dcol+.dcol{border-left:0;border-top:1px solid var(--bd);padding-top:2vh}}
-</style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb" style="display:none" onclick="go({role:null,stn:null,oid:null,modal:null})">Switch section</button><button id="hrs" class="hb ib" aria-label="Reset" title="Reset" onclick="resetView()"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
+</style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
 const SB_ON=!SB_URL.startsWith("PASTE");
@@ -181,7 +181,7 @@ const tfmt=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return k<60?k+
 const tmr=t=>`<span class="tm ${tcl(t)}" data-t="${t}">${tfmt(t)}</span>`;
 const swf=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return Math.floor(k/60)+"hrs "+k%60+"min"};
 function render(){const k={};document.querySelectorAll(".sc[id]").forEach(e=>k[e.id]=e.scrollTop);const a=$("app");k.app=a.scrollTop;render0();
- document.body.classList.toggle("nohd",V.splash||!V.auth||V.role==="display");$("hn").textContent=S.name;$("hu").textContent=V.user||"";$("hsw").style.display=(V.auth&&V.role&&V.role!=="display")?"":"none";$("hrs").innerHTML=SV("refresh",18);sbBadge();
+ document.body.classList.toggle("nohd",V.splash||!V.auth||V.role==="display");$("hn").textContent=S.name;$("hu").textContent=V.user||"";$("hsw").style.display=(V.auth&&V.role&&V.role!=="display")?"inline-flex":"none";$("hsw").innerHTML=SV("refresh",18);sbBadge();
  a.scrollTop=k.app;document.querySelectorAll(".sc[id]").forEach(e=>{if(k[e.id]!=null)e.scrollTop=k[e.id]});if(V.sb){const e=$("ls");if(e)e.scrollTop=e.scrollHeight;V.sb=0}}
 let CT=null,CL=0,XT=null,DSIG="";
 function cpd(){CL=0;clearTimeout(CT);CT=setTimeout(()=>{CL=1;go({role:"display",modal:null})},700)}
