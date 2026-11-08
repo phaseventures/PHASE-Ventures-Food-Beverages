@@ -57,7 +57,7 @@ button.p,button.on{background:linear-gradient(135deg,#e11d2e,#5a0b14)!important;
 .in{width:100%;letter-spacing:0!important;text-align:left!important;font-size:16px!important;font-family:Inter,system-ui,sans-serif;background:#0b0b0b;border:1px solid #2a2a2e;border-radius:12px;padding:15px 16px}
 .pwb{position:relative}.pwb .eye{position:absolute;right:6px;top:4px;border:0;background:none;color:#9ca3af;font-size:18px}
 button.big{width:100%;margin-top:26px;padding:15px;font-family:"Chakra Petch",sans-serif;letter-spacing:3px;font-size:15px}.er{color:var(--bad);min-height:24px;text-align:center;margin-top:12px;font-size:14px}
-.sec{display:grid;grid-template-columns:repeat(3,200px);gap:14px;justify-content:center}.sb{width:200px;height:110px;font-size:20px;font-weight:700;text-align:center;justify-content:center}
+.sec{display:grid;grid-template-columns:repeat(4,200px);gap:14px;justify-content:center}.sb{width:200px;height:110px;font-size:20px;font-weight:700;text-align:center;justify-content:center}
 @media(max-width:700px){.sec,.sec[style]{grid-template-columns:200px!important}}
 .floor{position:relative;height:calc(100vh - 290px);min-height:420px;border:1px dashed var(--bd);border-radius:14px;background:rgba(255,255,255,.03)}
 .floor.edit{border-color:var(--warn);background-image:radial-gradient(var(--bd) 1px,transparent 1px);background-size:24px 24px}
@@ -95,6 +95,7 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .tm.ok{color:#34d399;background:rgba(52,211,153,.14)}.tm.wn{color:#fbbf24;background:rgba(251,191,36,.14)}.t .tm{font-size:16px;font-weight:700;padding:3px 12px}
 .qh{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}.qn{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.14);font-weight:800;font-size:16px;flex:none}
 .card.first{box-shadow:0 0 0 2px var(--warn)}.card.first .qn{background:var(--warn);color:#241500}.qf{font-style:normal;font-size:11px;letter-spacing:1px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--warn);color:#241500}
+.sm{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:rgba(251,191,36,.12);color:#fde68a;font-size:15px}.tk.rdy{border-left-color:#34d399}.tag.rd{background:rgba(52,211,153,.2);color:#6ee7b7}.tag.pr2{background:rgba(251,191,36,.18);color:#fde68a}
 .tm.bd{color:#fb7185;background:rgba(251,113,133,.16)}
 .tp{display:flex;flex-direction:column;height:100%}.tp .floor{flex:1;min-height:0;height:auto!important;overflow:auto}
 .ft.sel{outline:4px solid var(--warn);outline-offset:2px}.ft.mrg .fn{color:#fde68a}
@@ -120,6 +121,7 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),150px));gap:10px;align-content:start;overflow:auto;flex:1;min-height:0}
 .dt{border-radius:12px;padding:6px 12px;text-align:center;border:2px solid;overflow-wrap:anywhere}
 .dt b{display:block;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-weight:700;font-size:clamp(16px,1.8vw,26px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dt b i{font-style:normal;font-size:.5em;font-weight:700;opacity:.8;margin-left:8px;letter-spacing:1px}.dt span{display:block;font-size:clamp(11px,1vw,15px);opacity:.85;margin-top:4px}
+@keyframes dflick{0%,100%{opacity:1}50%{opacity:.12}}.dt.new{animation:dflick .5s ease-in-out 10}
 .dt.sv{border-color:#34d399;color:#bbf7d0;background:rgba(52,211,153,.12)}.dt.pp{border-color:#fbbf24;color:#fde68a;background:rgba(251,191,36,.1)}
 @media(max-width:700px){.dc{grid-template-columns:1fr}.dcol+.dcol{border-left:0;border-top:1px solid var(--bd);padding-top:2vh}}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
@@ -196,12 +198,19 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&V.role==="display")
 function dispData(){const now=Date.now(),prep=[],srv=[];
  S.orders.forEach(o=>{if(!o.takeout)return;if(o.status!=="open"&&o.status!=="paid")return;const it=live(o).filter(i=>i.s);if(!it.length)return;
   const l=o.takeout?"#"+o.id:tgrp(o.tables),sub=o.cust||"",pg=o.takeout?[it.filter(i=>i.done).reduce((a,i)=>a+i.q,0),it.reduce((a,i)=>a+i.q,0)]:null;
-  if(it.some(i=>!i.done)){if(o.status==="open")prep.push({l,s:sub,p:pg,t:Math.min(...it.map(i=>i.s))})}
-  else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000)srv.push({l,s:sub,t:d})}});
+  if(it.some(i=>!i.done)){if(o.status==="open")prep.push({id:o.id,l,s:sub,p:pg,t:Math.min(...it.map(i=>i.s))})}
+  else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000)srv.push({id:o.id,l,s:sub,t:d})}});
  prep.sort((a,b)=>a.t-b.t);srv.sort((a,b)=>b.t-a.t);return{prep,srv}}
-function dispPage(){const d=dispData(),tile=(x,c)=>`<div class="dt ${c}"><b>${esc(x.l)}${x.p?`<i>${x.p[0]}/${x.p[1]}</i>`:""}</b>${x.s?`<span>${esc(x.s)}</span>`:""}</div>`;DSIG=JSON.stringify(d);
+function dispPage(){DPREV=null;
  return `<div class="disp"><div class="dh"><div class="dlogo" onpointerdown="xpd()" onpointerup="xpu()" onpointerleave="xpu()" onpointercancel="xpu()" oncontextmenu="return false">${LOGO()}</div><div class="dline"></div></div>
- <div class="dc"><div class="dcol"><h2>NOW SERVING</h2><div class="dg">${d.srv.map(x=>tile(x,"sv")).join("")}</div></div><div class="dcol"><h2>NOW PREPARING</h2><div class="dg">${d.prep.map(x=>tile(x,"pp")).join("")}</div></div></div></div>`}
+ <div class="dc"><div class="dcol"><h2>NOW SERVING</h2><div class="dg" id="dsrv"></div></div><div class="dcol"><h2>NOW PREPARING</h2><div class="dg" id="dprep"></div></div></div></div>`}
+let DPREV=null,DNEW={};
+function dispTile(x,c,col){const nu=(DNEW[col+x.id]||0)>Date.now();return `<div class="dt ${c} ${nu?"new":""}"><b>${esc(x.l)}${x.p?`<i>${x.p[0]}/${x.p[1]}</i>`:""}</b>${x.s?`<span>${esc(x.s)}</span>`:""}</div>`}
+function dispFill(){const d=dispData(),now=Date.now();DSIG=JSON.stringify(d);
+ const cur={srv:new Set(d.srv.map(x=>x.id)),prep:new Set(d.prep.map(x=>x.id))};
+ if(DPREV)["srv","prep"].forEach(c=>cur[c].forEach(id=>{if(!DPREV[c].has(id))DNEW[c+id]=now+5000}));
+ DPREV=cur;
+ $("dsrv").innerHTML=d.srv.map(x=>dispTile(x,"sv","srv")).join("");$("dprep").innerHTML=d.prep.map(x=>dispTile(x,"pp","prep")).join("")}
 setInterval(()=>{if(V.auth&&V.role==="display"){const g=JSON.stringify(dispData());if(g!==DSIG)render()}},3000);
 function render0(){
  const a=$("app");
@@ -210,13 +219,13 @@ function render0(){
  <label class="fl">NAME</label><input class="in" id="un" placeholder="Enter name" autocomplete="off" autocapitalize="off">
  <label class="fl">PASSWORD</label><div class="pwb"><input class="in" id="pw" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"><button class="eye" onclick="const p=$('pw');p.type=p.type==='password'?'text':'password'">${SV('eye',20)}</button></div>
  <button class="p big" onclick="login()">ENTER POS</button><div class="er">${V.bad===2?"All data has been reset.":V.bad?"Wrong name or password.":""}</div></div></div>`;setTimeout(()=>$("un")&&$("un").focus(),0);return}
- if(V.role==="display"){a.innerHTML=dispPage();return}
+ if(V.role==="display"){if(!$("dsrv"))a.innerHTML=dispPage();dispFill();return}
  if(!V.role){a.innerHTML=`<div class="c"><h2>Choose your section</h2><div class="sec">
- <button class="sb" onpointerdown="cpd()" onpointerup="cpu()" onpointerleave="cpu()" onpointercancel="cpu()" oncontextmenu="return false" onclick="cclick()">Counter</button><button class="sb" onclick="go({role:'kitchen'})">Kitchen</button><button class="sb" onclick="go({role:'bar',stn:'bar'})">Bar</button></div>
+ <button class="sb" onpointerdown="cpd()" onpointerup="cpu()" onpointerleave="cpu()" onpointercancel="cpu()" oncontextmenu="return false" onclick="cclick()">Counter</button><button class="sb" onclick="go({role:'kitchen'})">Kitchen</button><button class="sb" onclick="go({role:'bar',stn:'bar'})">Bar</button><button class="sb" onclick="go({role:'serve'})">Serve</button></div>
  <button onclick="go({auth:false,user:null})">Lock POS</button></div>`;return}
  if(V.role==="kitchen"&&!V.stn){a.innerHTML=`<div class="c"><h2>Which kitchen?</h2><div class="sec" style="grid-template-columns:repeat(2,200px)">
  <button class="sb" onclick="go({stn:'main'})">Main Kitchen</button><button class="sb" onclick="go({stn:'app'})">Appetizer Kitchen</button></div><button onclick="go({role:null})">Back</button></div>`;return}
- a.innerHTML=(V.role==="counter"?counter():station())+(V.modal?modal():"");
+ a.innerHTML=(V.role==="counter"?counter():V.role==="serve"?serve():station())+(V.modal?modal():"");
 }
 const ALARM_MIN=8,ALARMED=new Map(),ALARM_STN=new Set();let ALARM_AUDIO=null;
 function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("PHASEALARM.MP3");ALARM_AUDIO.preload="auto"}return ALARM_AUDIO}
@@ -456,9 +465,20 @@ function station(){const s=V.stn,isB=V.role==="bar",tabs=`<button class="${V.fin
  ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${q.i.n}</span>${isB||!V.fin?"":""}${V.fin?`<span class="mut">done ${tm(q.i.done)}</span>`:`<button class="p" onclick="ready(${z.o.id},${q.x})">Ready</button>`}</div></div>`).join("")}</div>`).join("");
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
  return `<div class="pg">`+head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div></div>`}
+function serve(){const now=Date.now();
+ const os=S.orders.filter(o=>o.status==="open").map(o=>{const it=live(o).map((i,x)=>({i,x})).filter(z=>z.i.s),miss=it.filter(z=>!z.i.done),dn=it.filter(z=>z.i.done);
+  return{o,it,miss,dn,t:miss.length?Math.min(...miss.map(z=>z.i.s)):Math.max(0,...dn.map(z=>+z.i.done||0))}})
+  .filter(z=>z.it.length&&(z.miss.length||now-z.t<600000));
+ os.sort((a,b)=>(!!a.miss.length===!!b.miss.length)?(a.miss.length?a.t-b.t:b.t-a.t):(a.miss.length?-1:1));
+ const cards=os.map(z=>{const p=z.miss.length,sum=z.miss.reduce((a,q)=>a+q.i.q,0),tot=z.it.reduce((a,q)=>a+q.i.q,0);
+  return `<div class="card tk ${p?"":"rdy"}"><div class="row"><b style="font-size:18px">${esc(lab(z.o))}</b>${p?tmr(z.t):`<span class="tag rd">ALL READY</span>`}</div>
+ <div class="mut" style="margin:4px 0 8px">${tot-sum}/${tot} ready</div>
+ ${p?`<div class="sm"><b>Still missing:</b> ${z.miss.map(q=>q.i.q+"x "+esc(q.i.n)).join(", ")}</div>`:""}
+ ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:17px"><b>${q.i.q}x</b> ${esc(q.i.n)}</span><span class="tag ${q.i.done?"rd":"pr2"}">${q.i.done?"Ready":"Preparing - "+(STN[q.i.st]||"")}</span></div></div>`).join("")}</div>`}).join("");
+ return `<div class="pg">`+head("Serve","")+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${cards}</div>${cards?"":`<div class="mut" style="padding:30px;text-align:center">Nothing being prepared right now.</div>`}</div></div>`}
 function ready(oid,x){ord(oid).items[x].done=Date.now();save();render()}
 setInterval(()=>{if(SB_ON){sbPull(false);return}
- if(V.auth&&(V.role==="kitchen"||V.role==="bar"||V.role==="display")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},2000);
+ if(V.auth&&(V.role==="kitchen"||V.role==="bar"||V.role==="serve"||V.role==="display")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},2000);
 setInterval(()=>{document.querySelectorAll("[data-t]").forEach(e=>{const t=+e.dataset.t;e.textContent=tfmt(t);e.classList.remove("ok","wn","bd");e.classList.add(tcl(t))});document.querySelectorAll("[data-sw]").forEach(e=>e.textContent=swf(+e.dataset.sw))},5000);
 $("hl").innerHTML=LOGO();render();
 </script></body></html>
