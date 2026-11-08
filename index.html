@@ -104,6 +104,22 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .lw .logo{transform:translateX(1.3px)}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span></header><div id="app"></div>
 <script>
+const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
+const SB_ON=!SB_URL.startsWith("PASTE");
+let REV=0,DIRTY=false,PUSHING=false,PT=null,SYNC="local";
+const sbH={apikey:SB_KEY,"Content-Type":"application/json"};if(SB_KEY.startsWith("eyJ"))sbH.Authorization="Bearer "+SB_KEY;
+async function sbPush(){if(!SB_ON||PUSHING)return;PUSHING=true;DIRTY=false;
+ try{REV=Date.now();S.rev=REV;const r=await fetch(SB_URL+"/rest/v1/pos_state?on_conflict=id",{method:"POST",headers:{...sbH,Prefer:"resolution=merge-duplicates"},body:JSON.stringify({id:KEY(),data:S,rev:REV})});SYNC=r.ok?"live":"error"}catch(e){SYNC="offline";DIRTY=true}
+ PUSHING=false;if(DIRTY)sbQueue();sbBadge()}
+function sbQueue(){if(!SB_ON)return;DIRTY=true;clearTimeout(PT);PT=setTimeout(sbPush,250)}
+async function sbPull(first){if(!SB_ON||!V.auth||PUSHING||DIRTY)return;
+ try{const r=await fetch(SB_URL+"/rest/v1/pos_state?id=eq."+encodeURIComponent(KEY())+"&select=data,rev",{headers:sbH});if(!r.ok){SYNC="error";sbBadge();return}
+  const a=await r.json();SYNC="live";
+  if(!a.length){if(first)sbQueue();sbBadge();return}
+  const row=a[0];if(+row.rev>REV){const busy=V.modal||D||(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName));if(busy&&!first){return}
+   S=row.data;REV=+row.rev;S.exp=S.exp||[];S.house=S.house||[];try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}render()}
+  sbBadge()}catch(e){SYNC="offline";sbBadge()}}
+function sbBadge(){const e=document.getElementById("hu");if(e&&V.user)e.textContent=V.user+(SB_ON?" \u2022 "+SYNC:" \u2022 local only")}
 const PASS="PH1S3",CUR="SR ",TAX=0.10;
 const MENU=[
 {id:1,n:"Spring Rolls",p:6,c:2,st:"app",cat:"Appetizers"},{id:2,n:"Garlic Bread",p:5,c:1.2,st:"app",cat:"Appetizers"},
@@ -118,7 +134,7 @@ const fresh=()=>({tables:[1,2,3,4,5,6,7,8].map((n,i)=>({n:""+n,name:"",seats:4,g
 let S=fresh();
 const KEY=()=>"dpos_"+(V.user||"x");
 function loadS(){S=fresh();try{const x=localStorage.getItem(KEY());if(x)S=JSON.parse(x)}catch(e){}S.tables.forEach((t,i)=>{if(t.gx==null){t.gx=2+(i%4)*9;t.gy=2+Math.floor(i/4)*7}});S.exp=S.exp||[];S.house=S.house||[]}
-const save=()=>{try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}sbQueue()};
 const USERS=["resto1","resto2"];
 const tname=n=>{const t=S.tables.find(z=>z.n===n);return t&&t.name?t.name:"Table "+n};
 let V={auth:false,splash:false,role:null,stn:null,tab:"home",user:null,edit:false,kp:"",pm:"Cash",oid:null,cat:null,q:"",rt:"summary",armed:0,fin:false,modal:null,cal:new Date(),sel:null,bad:false};
@@ -142,7 +158,7 @@ const tfmt=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return k<60?k+
 const tmr=t=>`<span class="tm ${tcl(t)}" data-t="${t}">${tfmt(t)}</span>`;
 const swf=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return Math.floor(k/60)+"hrs "+k%60+"min"};
 function render(){const k={};document.querySelectorAll(".sc[id]").forEach(e=>k[e.id]=e.scrollTop);const a=$("app");k.app=a.scrollTop;render0();
- document.body.classList.toggle("nohd",V.splash||!V.auth);$("hn").textContent=S.name;$("hu").textContent=V.user||"";
+ document.body.classList.toggle("nohd",V.splash||!V.auth);$("hn").textContent=S.name;$("hu").textContent=V.user||"";sbBadge();
  a.scrollTop=k.app;document.querySelectorAll(".sc[id]").forEach(e=>{if(k[e.id]!=null)e.scrollTop=k[e.id]});if(V.sb){const e=$("ls");if(e)e.scrollTop=e.scrollHeight;V.sb=0}}
 function render0(){
  const a=$("app");
@@ -158,7 +174,7 @@ function render0(){
  <button class="sb" onclick="go({stn:'main'})">Main Kitchen</button><button class="sb" onclick="go({stn:'app'})">Appetizer Kitchen</button></div><button onclick="go({role:null})">Back</button></div>`;return}
  a.innerHTML=(V.role==="counter"?counter():station())+(V.modal?modal():"");
 }
-function login(){const u=$("un").value.trim().toLowerCase();if(USERS.includes(u)&&$("pw").value===PASS){V.user=u;loadS();go({auth:true,bad:false})}else go({bad:true})}
+function login(){const u=$("un").value.trim().toLowerCase();if(USERS.includes(u)&&$("pw").value===PASS){V.user=u;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)}else go({bad:true})}
 function head(t,tabs){return `<div class="bar"><span class="tag">${t}</span>${tabs||""}<span class="sp"></span><button onclick="go({role:null,stn:null,oid:null})">Switch section</button></div>`}
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function counter(){
@@ -216,7 +232,7 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  if(t==="eod"){const P=S.orders.filter(q=>q.status==="paid"&&dk(new Date(q.paidAt))===td),s=k=>P.reduce((a,q)=>a+(q[k]||0),0),cs=P.reduce((a,q)=>a+(q.pays||[{m:q.method,a:q.total}]).filter(p=>p.m==="Cash").reduce((x,p)=>x+p.a,0),0);
   return W(`<h3>End of day ${td}</h3><div class="line row"><span>Orders</span><b>${P.length}</b></div><div class="line row"><span>Net sales</span><b>${m(s("sub"))}</b></div><div class="line row"><span>Tax</span><b>${m(s("tax"))}</b></div><div class="line row"><span>Voids</span><b>${m(s("vd"))}</b></div><div class="line row"><span>Cash sales</span><b>${m(cs)}</b></div><div class="line row"><span>Expected in drawer</span><b>${m(cs+(S.till?S.till.f:0))}</b></div>
   <button class="p" style="width:100%;margin-top:10px" onclick="S.till=null;S.closed=S.closed||[];S.closed.push('${td}');save();go({modal:null})">Close the day</button>`)}
- if(t==="sync"){save();return W(`<h3>Sync data</h3><div>Saved on this device at ${tm(Date.now())}. Counter, kitchen and bar share it when open in the same browser.</div>`)}
+ if(t==="sync"){sbPull(false);return W(`<h3>Sync data</h3><div>${SB_ON?"Cloud sync: "+SYNC+". All devices logged in with the same name share this data.":"Supabase is not configured. Data stays on this device."}</div>`)}
  if(t==="diag"){let sz=0;try{sz=(localStorage.getItem(KEY())||"").length}catch(e){}return W(`<h3>Diagnostics</h3><div class="line row"><span>Orders stored</span><b>${S.orders.length}</b></div><div class="line row"><span>Tables</span><b>${S.tables.length}</b></div><div class="line row"><span>Storage used</span><b>${(sz/1024).toFixed(1)} KB</b></div><div class="line row"><span>Menu items</span><b>${MENU.length}</b></div>`)}
  if(t==="dev")return W(`<h3>Devices</h3>${[["Receipt printer","Use Print on the order screen"],["Appetizer Kitchen display","Section screen"],["Main Kitchen display","Section screen"],["Bar display","Section screen"]].map(d=>`<div class="line row"><span>${d[0]}</span><span class="mut">${d[1]}</span></div>`).join("")}`);
  if(t==="disc")return W(`<h3>Discount</h3><div class="grid">${[0,5,10,15,20,50].map(p=>`<button class="${(o.disc||0)===p?"on":""}" onclick="ord(V.oid).disc=${p};save();go({modal:null})">${p?p+"% off":"No discount"}</button>`).join("")}</div>`);
@@ -329,7 +345,8 @@ function station(){const s=V.stn,isB=V.role==="bar",tabs=`<button class="${V.fin
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
  return `<div class="pg">`+head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div></div>`}
 function ready(oid,x){ord(oid).items[x].done=Date.now();save();render()}
-setInterval(()=>{if(V.auth&&(V.role==="kitchen"||V.role==="bar")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},4000);
+setInterval(()=>{if(SB_ON){sbPull(false);return}
+ if(V.auth&&(V.role==="kitchen"||V.role==="bar")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},2000);
 setInterval(()=>{document.querySelectorAll("[data-t]").forEach(e=>{const t=+e.dataset.t;e.textContent=tfmt(t);e.classList.remove("ok","wn","bd");e.classList.add(tcl(t))});document.querySelectorAll("[data-sw]").forEach(e=>e.textContent=swf(+e.dataset.sw))},5000);
 $("hl").innerHTML=LOGO();render();
 </script></body></html>
