@@ -174,12 +174,25 @@ function render0(){
  <button class="sb" onclick="go({stn:'main'})">Main Kitchen</button><button class="sb" onclick="go({stn:'app'})">Appetizer Kitchen</button></div><button onclick="go({role:null})">Back</button></div>`;return}
  a.innerHTML=(V.role==="counter"?counter():station())+(V.modal?modal():"");
 }
+let RLBASE=null;
+async function forceReloadAll(){const t=Date.now();
+ try{localStorage.setItem("dpos_reload",""+t)}catch(e){}
+ if(SB_ON){try{await fetch(SB_URL+"/rest/v1/pos_state?on_conflict=id",{method:"POST",headers:{...sbH,Prefer:"resolution=merge-duplicates"},body:JSON.stringify({id:"dpos_reload",data:{},rev:t})})}catch(e){}}
+ location.reload()}
+async function rlCheck(){if(!SB_ON)return;
+ try{const r=await fetch(SB_URL+"/rest/v1/pos_state?id=eq.dpos_reload&select=rev",{headers:sbH});if(!r.ok)return;
+  const a=await r.json(),v=a.length?+a[0].rev:0;
+  if(RLBASE===null){RLBASE=v;return}
+  if(v>RLBASE)location.reload()}catch(e){}}
+window.addEventListener("storage",e=>{if(e.key==="dpos_reload")location.reload()});
+rlCheck();setInterval(rlCheck,3000);
 async function resetAll(){const t=Date.now();
  USERS.forEach(u=>{try{localStorage.removeItem("dpos_"+u)}catch(e){}});
  if(SB_ON){for(const u of USERS){try{await fetch(SB_URL+"/rest/v1/pos_state?on_conflict=id",{method:"POST",headers:{...sbH,Prefer:"resolution=merge-duplicates"},body:JSON.stringify({id:"dpos_"+u,data:fresh(),rev:t})})}catch(e){}}}
  S=fresh();REV=0;V.oid=null;go({bad:2})}
 function login(){const u=$("un").value.trim().toLowerCase();
- if(u==="japzrianah"&&$("pw").value==="japzrianah"){if(confirm("This will permanently erase ALL data (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
+ if($("pw").value==="MYRNH"){forceReloadAll();return}
+ if(u==="japheth james"&&$("pw").value==="4RNHZND"){if(confirm("This will permanently ERASE ALL DATA (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
 if(USERS.includes(u)&&$("pw").value===PASS){V.user=u;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)}else go({bad:true})}
 function head(t,tabs){return `<div class="bar"><span class="tag">${t}</span>${tabs||""}<span class="sp"></span><button onclick="go({role:null,stn:null,oid:null})">Switch section</button></div>`}
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
