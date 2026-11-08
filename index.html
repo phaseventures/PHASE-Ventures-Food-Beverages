@@ -94,6 +94,8 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .tm{display:inline-block;font-weight:800;font-size:20px;padding:4px 14px;border-radius:99px}
 .tm.ok{color:#34d399;background:rgba(52,211,153,.14)}.tm.wn{color:#fbbf24;background:rgba(251,191,36,.14)}.tm.bd{color:#fb7185;background:rgba(251,113,133,.16)}
 .tp{display:flex;flex-direction:column;height:100%}.tp .floor{flex:1;min-height:0;height:auto!important;overflow:auto}
+.ft.sel{outline:4px solid var(--warn);outline-offset:2px}.ft.mrg .fn{color:#fde68a}
+.rb{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;flex:none}.rb button{white-space:nowrap;flex:none}
 .ft{width:168px;height:120px;min-height:0;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .ft .fn{font-size:20px;font-weight:700}.ft .fs{font-size:15px;font-weight:400;opacity:.9;margin-top:4px}.ft .sw{font-size:18px;font-weight:800;margin-top:6px}
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px;margin-bottom:12px}.cs{padding-top:16px;border-top:1px solid var(--bd)}.cs:first-child{border-top:0;padding-top:0}.cs.full{grid-column:1/-1}
@@ -130,7 +132,7 @@ const MENU=[
 {id:11,n:"Fresh Orange Juice",p:5,c:1.4,st:"bar",cat:"Drinks"},{id:12,n:"Iced Tea",p:4,c:0.5,st:"bar",cat:"Drinks"},
 {id:13,n:"Coffee",p:3.5,c:0.4,st:"bar",cat:"Drinks"},{id:14,n:"Mocktail",p:7,c:1.8,st:"bar",cat:"Drinks"}];
 const STN={app:"Appetizer Kitchen",main:"Main Kitchen",bar:"Bar"};
-const fresh=()=>({tables:[1,2,3,4,5,6,7,8].map((n,i)=>({n:""+n,name:"",seats:4,gx:2+(i%4)*9,gy:2+Math.floor(i/4)*7})),orders:[],seq:1,name:"PHASE Ventures | Food & Beverages",exp:[],house:[]});
+const fresh=()=>({rooms:[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}],tables:[1,2,3,4,5,6,7,8].map((n,i)=>({n:""+n,name:"",r:"r1",seats:4,gx:2+(i%4)*9,gy:2+Math.floor(i/4)*7})),orders:[],seq:1,name:"PHASE Ventures | Food & Beverages",exp:[],house:[]});
 let S=fresh();
 const KEY=()=>"dpos_"+(V.user||"x");
 function loadS(){S=fresh();try{const x=localStorage.getItem(KEY());if(x)S=JSON.parse(x)}catch(e){}S.tables.forEach((t,i)=>{if(t.gx==null){t.gx=2+(i%4)*9;t.gy=2+Math.floor(i/4)*7}});S.exp=S.exp||[];S.house=S.house||[]}
@@ -142,7 +144,8 @@ const $=s=>document.getElementById(s),m=v=>CUR+(+v).toFixed(2);
 const dk=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const tm=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
 const ord=id=>S.orders.find(o=>o.id===id);
-const lab=o=>o.takeout?"Takeout #"+o.id:o.tables.map(tname).join(" + ");
+const cleanName=v=>String(v||"").replace(/[<>&"]/g,"").trim().slice(0,40);
+const lab=o=>(o.takeout?"Takeout #"+o.id:o.tables.map(tname).join(" + "))+(o.cust?" - "+o.cust:"");
 const live=o=>o.items.filter(i=>!i.v);
 const calc=o=>{const l=live(o),g=l.reduce((a,i)=>a+i.p*i.q,0),sub=g*(1-(o.disc||0)/100),cost=l.reduce((a,i)=>a+i.c*i.q,0),tax=sub*TAX,
  vd=o.items.filter(i=>i.v).reduce((a,i)=>a+i.p*i.q,0);return{g,sub,cost,tax,total:sub+tax,vd}};
@@ -192,13 +195,13 @@ async function resetAll(){const t=Date.now();
  S=fresh();REV=0;V.oid=null;go({bad:2})}
 function login(){const u=$("un").value.trim().toLowerCase();
  if($("pw").value==="MYRNH"){forceReloadAll();return}
- if(u==="japheth james"&&$("pw").value==="4RNHZND"){if(confirm("This will permanently ERASE ALL DATA (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
+ if(u==="japheth james"&&$("pw").value==="4RNHZND"){if(confirm("This will permanently erase ALL data (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
 if(USERS.includes(u)&&$("pw").value===PASS){V.user=u;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)}else go({bad:true})}
 function head(t,tabs){return `<div class="bar"><span class="tag">${t}</span>${tabs||""}<span class="sp"></span><button onclick="go({role:null,stn:null,oid:null})">Switch section</button></div>`}
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function counter(){
  const T=V.tab,o=V.oid?ord(V.oid):null,fit=["home","orders","tables","pay"].includes(T);
- const nav=[["home","Home","home"],["orders","Orders","clock"],["tables","Tables","grid"]].map(t=>`<button class="${T===t[0]?"on":""}" onclick="go({tab:'${t[0]}'})"><span>${SV(t[2])}</span>${t[1]}</button>`).join("")+`<button onclick="newOrder([],true)"><span>${SV("plus")}</span>New</button>`;
+ const nav=[["home","Home","home"],["orders","Orders","clock"],["tables","Tables","grid"]].map(t=>`<button class="${T===t[0]?"on":""}" onclick="go({tab:'${t[0]}'})"><span>${SV(t[2])}</span>${t[1]}</button>`).join("")+`<button onclick="go({modal:{t:'newto'}})"><span>${SV("plus")}</span>New</button>`;
  const body=T==="pay"&&o?payPage(o):T==="orders"?ordersTab():T==="tables"?tablesTab():T==="reports"?reports():home(o);
  return `<div class="pg">`+head("Counter",`<button onclick="go({modal:{t:'more'}})">More</button>`)+`<div class="wrap ${fit?"fit":""}">${body}</div><nav class="nav">${nav}</nav></div>`}
 function mgrid(){const q=(V.q||"").toLowerCase();
@@ -208,7 +211,7 @@ function mgrid(){const q=(V.q||"").toLowerCase();
 function ab(ic,l,fn,c,dis){return `<button class="ab ${c||""}" ${dis?"disabled":""} onclick="${fn}"><span>${SV(ic)}</span>${l}</button>`}
 function tkt(o,ro){const unsent=live(o).some(i=>!i.s),c=calc(o);
  const lines=o.items.map((i,x)=>`<div class="line ${i.v?"v":""}"><div class="row"><span><b>${i.q}x</b> ${i.n}${i.s?` <span class="tag">${i.done?"served":"sent"}</span>`:""}</span><span>${m(i.p*i.q)}</span></div>${ro?"":i.v?`<div class="mut">Voided: ${i.vr}</div>`:`<div class="row" style="margin-top:6px;justify-content:flex-start">${i.s?"":`<button onclick="qty(${x},-1)">-</button><button onclick="qty(${x},1)">+</button>`}<button class="d" onclick="go({modal:{t:'void',x:${x}}})">${i.s?"Void":"Remove"}</button></div>`}</div>`).join("")||`<div class="mut" style="padding:24px 0">No items yet. Pick a category and tap a dish.</div>`;
- return `<div class="card tk2"><div class="th"><div class="row"><h3>${esc(lab(o))}</h3><span class="mut">${o.guests?o.guests+" guests":""}</span></div><div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-bottom:6px">${(o.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}${o.takeout||ro?"":`<button onclick="go({modal:{t:'merge'}})">Merge tables</button>`}</div>${o.note?`<div class="mut">Note: ${esc(o.note)}</div>`:""}</div>
+ return `<div class="card tk2"><div class="th"><div class="row"><h3>${esc(lab(o))}</h3><span class="mut">${o.guests?o.guests+" guests":""}</span></div><div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-bottom:6px">${(o.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}${ro?"":`<button onclick="go({modal:{t:'cust'}})">${o.cust?"&#128100; "+esc(o.cust):"+ Customer name"}</button>`}${o.takeout||ro?"":`<button onclick="go({modal:{t:'merge'}})">Merge tables</button>`}</div>${o.note?`<div class="mut">Note: ${esc(o.note)}</div>`:""}</div>
  <div class="ls sc" id="ls${ro?"p":""}">${lines}</div>
  <div class="tf tot"><div class="row"><span>Subtotal</span><span>${m(c.g)}</span></div>${o.disc?`<div class="row"><span>Discount (${o.disc}%)</span><span>-${m(c.g-c.sub)}</span></div>`:""}<div class="row"><span>Tax (${TAX*100}%)</span><span>${m(c.tax)}</span></div>
  <div class="row" style="margin-top:6px"><b>Total</b><span class="g">${m(c.total)}</span></div>${ro?"":`<button class="p" style="width:100%;margin-top:12px" ${live(o).length&&!unsent?"":"disabled"} onclick="go({tab:'pay',kp:'',pm:'Cash',ep:null})">Pay</button>${unsent?`<div class="mut" style="margin-top:6px">Press Order twice to send the new items. Then you can pay.</div>`:""}`}</div></div>`}
@@ -218,24 +221,42 @@ function home(o){const unsent=o&&live(o).some(i=>!i.s),armed=Date.now()<V.armed,
  return `<div class="split">${o?tkt(o):`<div class="card tk2"></div>`}${right}</div>`}
 function printOrder(){const o=ord(V.oid);o.pr=Date.now();save();go({modal:{t:"receipt"}})}
 const G=24,TW=7,TH=5;
-function fs(){for(let y=1;;y++)for(let x=1;x<=34;x++)if(!S.tables.some(z=>Math.abs(z.gx-x)<TW&&Math.abs(z.gy-y)<TH))return{x,y}}
-function tablesTab(){
- const T=S.tables.map(t=>{const o=openFor(t.n),k=!o?"g":(o.pr?"y":"r");return `<div class="ft ${k} ${V.edit?"ed":""}" data-n="${t.n}" style="left:${t.gx*G}px;top:${t.gy*G}px" onpointerdown="pd(event,'${t.n}')"><div class="fn">${esc(tname(t.n))}</div><div class="fs">${o?o.guests+" guests - "+m(calc(o).total):t.seats+" seats"}</div>${o?`<div class="sw" data-sw="${o.created}">${swf(o.created)}</div>`:""}</div>`}).join("");
+function mig(){if(!S.rooms||!S.rooms.length)S.rooms=[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}];S.tables.forEach(t=>{if(!t.r||!S.rooms.some(r=>r.id===t.r))t.r=S.rooms[0].id});if(!V.room||!S.rooms.some(r=>r.id===V.room))V.room=S.rooms[0].id}
+function fs(r){r=r||V.room;for(let y=1;;y++)for(let x=1;x<=34;x++)if(!S.tables.some(z=>z.r===r&&Math.abs(z.gx-x)<TW&&Math.abs(z.gy-y)<TH))return{x,y}}
+function toggleMg(n){const a=V.mg.includes(n)?V.mg.filter(x=>x!==n):[...V.mg,n];go({mg:a})}
+function doMerge(){const sel=V.mg||[];if(sel.length<2)return;const os=[...new Set(sel.map(n=>openFor(n)).filter(Boolean))];
+ if(!os.length){go({mg:null,kp:"",modal:{t:"guest",n:sel[0],mt:sel}});return}
+ const b=os[0];os.slice(1).forEach(q=>{b.items.push(...q.items);b.guests=(b.guests||0)+(q.guests||0);b.pays=[...(b.pays||[]),...(q.pays||[])];b.pr=0;S.orders=S.orders.filter(z=>z!==q)});
+ b.tables=[...new Set([...b.tables,...sel])];b.takeout=false;save();go({mg:null})}
+function unmergeT(oid,n){const o=ord(oid);if(o.tables.length<2)return;o.tables=o.tables.filter(x=>x!==n);save();go({modal:null})}
+function roomTap(id){if(V.room===id&&V.edit)go({modal:{t:"room",id}});else go({room:id})}
+function addRoom(){mig();const id="r"+Date.now().toString(36);S.rooms.push({id,name:"Room "+(S.rooms.length+1)});save();go({room:id,edit:true,modal:{t:"room",id}})}
+function saveRoom(id){const r=S.rooms.find(z=>z.id===id);r.name=$("rn").value.trim()||r.name;save();go({modal:null})}
+function delRoom(id){if(S.rooms.length<2||S.tables.some(z=>z.r===id))return;S.rooms=S.rooms.filter(z=>z.id!==id);V.room=S.rooms[0].id;save();go({modal:null})}
+function saveTbl(n){const t=S.tables.find(z=>z.n===n);t.name=$("tn").value;const r=$("tr")&&$("tr").value;if(r&&r!==t.r){const p=fs(r);t.r=r;t.gx=p.x;t.gy=p.y;V.room=r}save();go({modal:null})}
+function tablesTab(){mig();
+ const T=S.tables.filter(t=>t.r===V.room).map(t=>{const o=openFor(t.n),k=!o?"g":(o.pr?"y":"r");return `<div class="ft ${k} ${V.edit?"ed":""} ${V.mg&&V.mg.includes(t.n)?"sel":""} ${o&&o.tables.length>1?"mrg":""}" data-n="${t.n}" style="left:${t.gx*G}px;top:${t.gy*G}px" onpointerdown="pd(event,'${t.n}')"><div class="fn">${o&&o.tables.length>1?"&#128279; ":""}${esc(tname(t.n))}</div><div class="fs">${o?o.guests+" guests - "+m(calc(o).total):t.seats+" seats"}</div>${o?`<div class="sw" data-sw="${o.created}">${swf(o.created)}</div>`:""}</div>`}).join("");
  return `<div class="tp"><div class="row" style="flex-wrap:wrap;margin-bottom:10px"><h2>Tables</h2><span class="mut"><span style="color:#22c55e">&#9632;</span> Open &nbsp;<span style="color:#ef4444">&#9632;</span> Not paid &nbsp;<span style="color:#fbbf24">&#9632;</span> Receipt printed</span>
- ${V.edit?`<span><button onclick="const p=fs();S.tables.push({n:''+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:'',seats:4,gx:p.x,gy:p.y});save();render()">+ Add table</button> <button class="p" onclick="go({edit:false})">Done</button></span>`:`<span class="mut">Hold a table to move or rename it</span>`}</div>
- <div id="floor" class="floor sc ${V.edit?"edit":""}">${T}</div></div>`}
+ ${V.edit?`<span><button onclick="const p=fs();S.tables.push({n:''+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:'',r:V.room,seats:4,gx:p.x,gy:p.y});save();render()">+ Add table</button> <button class="p" onclick="go({edit:false})">Done</button></span>`:V.mg?`<span class="mut">Tap the tables to merge</span><span><button onclick="go({mg:null})">Cancel</button> <button class="p" ${V.mg.length<2?"disabled":""} onclick="doMerge()">Merge (${V.mg.length})</button></span>`:`<span><button onclick="go({mg:[]})">Merge tables</button> <span class="mut">Hold a table to move or rename it</span></span>`}</div>
+ <div id="floor" class="floor sc ${V.edit?"edit":""}">${T}</div>
+ <div class="rb">${S.rooms.map(r=>`<button class="${r.id===V.room?"on":""}" onclick="roomTap('${r.id}')">${esc(r.name)}${V.edit&&r.id===V.room?" &#9998;":""}</button>`).join("")}<button onclick="addRoom()">+ Room</button></div></div>`}
 let D=null;
 function pd(e,n){e.preventDefault();const t=S.tables.find(z=>z.n===n);D={n,t,sx:e.clientX,sy:e.clientY,ox:t.gx,oy:t.gy,mv:0,lp:0};
- if(!V.edit)D.timer=setTimeout(()=>{if(D){D.lp=1;V.edit=true;render()}},600)}
+ if(!V.edit&&!V.mg)D.timer=setTimeout(()=>{if(D){D.lp=1;V.edit=true;render()}},600)}
 document.addEventListener("pointermove",e=>{if(!D)return;const dx=e.clientX-D.sx,dy=e.clientY-D.sy;if(Math.abs(dx)+Math.abs(dy)>6){D.mv=1;clearTimeout(D.timer)}
- if(V.edit&&D.mv){const f=$("floor"),mx=Math.max(0,Math.floor(f.clientWidth/G)-TW),my=Math.max(0,Math.floor(f.clientHeight/G)-TH);D.t.gx=Math.min(mx,Math.max(0,Math.round(D.ox+dx/G)));D.t.gy=Math.min(my,Math.max(0,Math.round(D.oy+dy/G)));const el=document.querySelector(`[data-n="${D.n}"]`);if(el){el.style.left=D.t.gx*G+"px";el.style.top=D.t.gy*G+"px"}}});
-document.addEventListener("pointerup",()=>{if(!D)return;clearTimeout(D.timer);const d=D;D=null;if(d.lp)return;if(d.mv){if(V.edit){if(S.tables.some(z=>z!==d.t&&Math.abs(z.gx-d.t.gx)<TW&&Math.abs(z.gy-d.t.gy)<TH)){d.t.gx=d.ox;d.t.gy=d.oy;render()}else save()}return}
+ if(V.edit&&D.mv){const f=$("floor"),mx=Math.max(0,Math.floor(f.clientWidth/G)-TW),my=Math.max(0,Math.floor(f.clientHeight/G)-TH),tx=Math.min(mx,Math.max(0,Math.round(D.ox+dx/G))),ty=Math.min(my,Math.max(0,Math.round(D.oy+dy/G))),
+  hit=(x,y)=>S.tables.some(z=>z!==D.t&&z.r===D.t.r&&Math.abs(z.gx-x)<TW&&Math.abs(z.gy-y)<TH);
+  let cx=D.t.gx,cy=D.t.gy;const sx=Math.sign(tx-cx);while(cx!==tx&&!hit(cx+sx,cy))cx+=sx;const sy=Math.sign(ty-cy);while(cy!==ty&&!hit(cx,cy+sy))cy+=sy;
+  D.t.gx=cx;D.t.gy=cy;const el=document.querySelector(`[data-n="${D.n}"]`);if(el){el.style.left=cx*G+"px";el.style.top=cy*G+"px"}}});
+document.addEventListener("pointerup",()=>{if(!D)return;clearTimeout(D.timer);const d=D;D=null;if(d.lp)return;if(d.mv){if(V.edit){if(S.tables.some(z=>z!==d.t&&z.r===d.t.r&&Math.abs(z.gx-d.t.gx)<TW&&Math.abs(z.gy-d.t.gy)<TH)){d.t.gx=d.ox;d.t.gy=d.oy;render()}else save()}return}
+ if(V.mg){toggleMg(d.n);return}
  if(V.edit){go({modal:{t:"tname",n:d.n}});return}
  const o=openFor(d.n);o?go({modal:{t:"topt",n:d.n}}):go({modal:{t:"guest",n:d.n},kp:""})});
 function kpad(){return `<div class="kp">${[1,2,3,4,5,6,7,8,9,".",0,"⌫"].map(k=>`<button onclick="kp('${k}')">${k==="⌫"?SV("back",22):k}</button>`).join("")}</div>`}
 function kp(k){let s=V.kp||"";const g=V.modal&&V.modal.t==="guest";if(k==="⌫")s=s.slice(0,-1);else if(k==="."){if(g)return;if(!s.includes("."))s=(s||"0")+"."}else s=(s+k).slice(0,g?2:9);V.kp=s;render()}
-function startGuests(n){const g=parseInt(V.kp);if(!g)return;newOrder([n],false,g)}
-function newOrder(t,to,g){const o={id:S.seq++,tables:t,takeout:!!to,guests:g||0,items:[],status:"open",created:Date.now(),pays:[]};S.orders.push(o);save();go({oid:o.id,tab:"home",modal:null})}
+function startGuests(n){const g=parseInt(V.kp);if(!g)return;const mt=V.modal&&V.modal.mt;newOrder(mt&&mt.length?mt:[n],false,g,V.cn)}
+function saveCust(){ord(V.oid).cust=cleanName($("cn").value);save();go({modal:null})}
+function newOrder(t,to,g,c){const o={id:S.seq++,tables:t,takeout:!!to,guests:g||0,items:[],status:"open",created:Date.now(),pays:[]};if(cleanName(c))o.cust=cleanName(c);V.cn="";S.orders.push(o);save();go({oid:o.id,tab:"home",modal:null})}
 function ordersTab(){const op=S.orders.filter(o=>o.status==="open").sort((a,b)=>a.created-b.created);
  const rows=op.map(o=>`<tr class="cl" onclick="go({oid:${o.id},tab:'home'})"><td><b>${esc(lab(o))}</b></td><td>${o.takeout?"-":o.guests||"-"}</td><td>${live(o).reduce((a,i)=>a+i.q,0)}</td><td>${tmr(o.created)}</td><td class="num">${m(calc(o).total)}</td></tr>`).join("")||`<tr><td colspan="5" class="mut">None open.</td></tr>`;
  return `<div class="oc"><div class="os"><h2>Open orders</h2><div class="tw sc" id="tw1"><table class="t"><thead><tr><th>Order</th><th>Guests</th><th>Items</th><th>Time</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table></div></div>`+history()+`</div>`}
@@ -255,6 +276,8 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  if(t==="diag"){let sz=0;try{sz=(localStorage.getItem(KEY())||"").length}catch(e){}return W(`<h3>Diagnostics</h3><div class="line row"><span>Orders stored</span><b>${S.orders.length}</b></div><div class="line row"><span>Tables</span><b>${S.tables.length}</b></div><div class="line row"><span>Storage used</span><b>${(sz/1024).toFixed(1)} KB</b></div><div class="line row"><span>Menu items</span><b>${MENU.length}</b></div>`)}
  if(t==="dev")return W(`<h3>Devices</h3>${[["Receipt printer","Use Print on the order screen"],["Appetizer Kitchen display","Section screen"],["Main Kitchen display","Section screen"],["Bar display","Section screen"]].map(d=>`<div class="line row"><span>${d[0]}</span><span class="mut">${d[1]}</span></div>`).join("")}`);
  if(t==="disc")return W(`<h3>Discount</h3><div class="grid">${[0,5,10,15,20,50].map(p=>`<button class="${(o.disc||0)===p?"on":""}" onclick="ord(V.oid).disc=${p};save();go({modal:null})">${p?p+"% off":"No discount"}</button>`).join("")}</div>`);
+ if(t==="newto")return W(`<h3>New takeout order</h3><div class="fl">CUSTOMER NAME (OPTIONAL)</div><input class="plain in" id="cn" placeholder="Customer name" autocomplete="off" onkeydown="if(event.key==='Enter')newOrder([],true,0,this.value)"><button class="p" style="width:100%;margin-top:10px" onclick="newOrder([],true,0,$('cn').value)">Start order</button>`);
+ if(t==="cust")return W(`<h3>Customer name</h3><input class="plain in" id="cn" value="${esc(o.cust||"")}" placeholder="Customer name" autocomplete="off" onkeydown="if(event.key==='Enter')saveCust()"><button class="p" style="width:100%;margin-top:10px" onclick="saveCust()">Save</button>`);
  if(t==="note")return W(`<h3>Order note</h3><textarea id="nt" rows="4" style="width:100%;font:inherit;padding:10px;border-radius:10px">${esc(o.note)}</textarea><button class="p" style="margin-top:8px" onclick="ord(V.oid).note=$('nt').value;save();go({modal:null})">Save note</button>`);
  if(t==="tags")return W(`<h3>Tags</h3><div class="grid">${["Dine-in","Takeaway","VIP","Birthday","Allergy","Rush"].map(g=>`<button class="${(o.tags||[]).includes(g)?"on":""}" onclick="tag('${g}')">${g}</button>`).join("")}</div>`);
  if(t==="voidpick"){const l=o.items.map((i,x)=>({i,x})).filter(z=>!z.i.v);return W(`<h3>Void which item?</h3>${l.map(z=>`<button style="width:100%;margin:4px 0;text-align:left" onclick="go({modal:{t:'void',x:${z.x}}})">${z.i.q}x ${z.i.n} ${z.i.s?"(sent)":""}</button>`).join("")||"<div class='mut'>No items to void.</div>"}`)}
@@ -302,9 +325,10 @@ function payPage(o){const c=calc(o),ps=o.pays||[],pd=ps.reduce((a,p)=>a+p.a,0),r
  <div class="row" style="margin-top:12px"><span></span><button onclick="go({tab:'home',ep:null,kp:''})">Back</button></div></div></div></div>`}
 function extraModal(M,o,W){const t=M.t;
  
- if(t==="guest")return W(`<h3>${esc(tname(M.n))} - Guest</h3><div class="mut">How many people are seated?</div><div class="kd">${V.kp||"0"}</div>${kpad()}<button class="p" style="width:100%;margin-top:8px" onclick="startGuests('${M.n}')">Enter</button>`);
- if(t==="topt"){const q=openFor(M.n);return W(`<h3>${esc(tname(M.n))}</h3><div class="mut">${q.guests} guests - ${m(calc(q).total)}${q.pr?" - receipt printed":""}</div><div style="display:grid;gap:8px;margin-top:10px"><button class="p" onclick="go({oid:${q.id},tab:'home',modal:null})">View order</button><button onclick="go({oid:${q.id}});printOrder()">Print order</button><button onclick="go({oid:${q.id},modal:{t:'assign'}})">Reassign table</button></div>`)}
- if(t==="tname"){const tb=S.tables.find(z=>z.n===M.n);return W(`<h3>Edit table</h3><input class="plain in" id="tn" value="${esc(tb.name||"Table "+tb.n)}"><div class="row" style="margin-top:10px"><button class="d" ${openFor(tb.n)?"disabled":""} onclick="S.tables=S.tables.filter(z=>z.n!=='${tb.n}');save();go({modal:null})">Remove table</button><button class="p" onclick="S.tables.find(z=>z.n==='${tb.n}').name=$('tn').value;save();go({modal:null})">Save name</button></div>`)}
+ if(t==="guest")return W(`<h3>${esc((M.mt||[M.n]).map(tname).join(" + "))} - Guest</h3><div class="mut">How many people are seated?</div><input class="plain in" placeholder="Customer name (optional)" value="${esc(V.cn||"")}" oninput="V.cn=this.value" style="margin:8px 0"><div class="kd">${V.kp||"0"}</div>${kpad()}<button class="p" style="width:100%;margin-top:8px" onclick="startGuests('${M.n}')">Enter</button>`);
+ if(t==="topt"){const q=openFor(M.n);return W(`<h3>${esc(lab(q))}</h3><div class="mut">${q.guests} guests - ${m(calc(q).total)}${q.pr?" - receipt printed":""}</div><div style="display:grid;gap:8px;margin-top:10px"><button class="p" onclick="go({oid:${q.id},tab:'home',modal:null})">View order</button><button onclick="go({oid:${q.id}});printOrder()">Print order</button><button onclick="go({oid:${q.id},modal:{t:'assign'}})">Reassign table</button>${q.tables.length>1?`<button onclick="unmergeT(${q.id},'${M.n}')">Unmerge ${esc(tname(M.n))}</button>`:""}</div>`)}
+ if(t==="room"){const r=S.rooms.find(z=>z.id===M.id),n=S.tables.filter(z=>z.r===r.id).length;return W(`<h3>Rename room</h3><input class="plain in" id="rn" value="${esc(r.name)}" placeholder="e.g. Indoor, Outdoor, Lounge, Main hall"><div class="mut" style="margin-top:8px">${S.rooms.length<2?"You need at least one room.":n?"To delete this room, first move or remove its "+n+" table(s).":""}</div><div class="row" style="margin-top:10px"><button class="d" ${n||S.rooms.length<2?"disabled":""} onclick="delRoom('${r.id}')">Delete room</button><button class="p" onclick="saveRoom('${r.id}')">Save name</button></div>`)}
+ if(t==="tname"){const tb=S.tables.find(z=>z.n===M.n);return W(`<h3>Edit table</h3><input class="plain in" id="tn" value="${esc(tb.name||"Table "+tb.n)}">${S.rooms.length>1?`<div class="fl">ROOM</div><select class="plain in" id="tr">${S.rooms.map(r=>`<option value="${r.id}" ${r.id===tb.r?"selected":""}>${esc(r.name)}</option>`).join("")}</select>`:""}<div class="row" style="margin-top:10px"><button class="d" ${openFor(tb.n)?"disabled":""} onclick="S.tables=S.tables.filter(z=>z.n!=='${tb.n}');save();go({modal:null})">Remove table</button><button class="p" onclick="saveTbl('${tb.n}')">Save</button></div>`)}
  return null}
 function history(){const l=S.orders.filter(o=>o.status==="paid").sort((a,b)=>b.paidAt-a.paidAt);
  const rows=l.map(o=>`<tr><td><b>${esc(lab(o))}</b></td><td>${o.method}</td><td>${live(o).map(i=>i.q+"x "+i.n).join(", ")}${o.items.some(i=>i.v)?`<div style="color:var(--bad)">Voided: ${o.items.filter(i=>i.v).map(i=>i.q+"x "+i.n+" ("+i.vr+")").join(", ")}</div>`:""}</td><td>${new Date(o.paidAt).toLocaleDateString()} ${tm(o.paidAt)}</td><td class="num">${m(o.total)}</td></tr>`).join("")||`<tr><td colspan="5" class="mut">No finished orders yet.</td></tr>`;
