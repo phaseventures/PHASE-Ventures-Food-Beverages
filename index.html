@@ -92,7 +92,8 @@ body.nohd .top{display:none}body.nohd #app{top:0}
 table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;background:#1d0b12;text-align:left;font-size:13px;font-weight:500;color:var(--mut);padding:12px 16px;z-index:1}
 .t td{padding:14px 16px;border-top:1px solid var(--bd);font-size:16px}.t .num{text-align:right}.t tr.cl{cursor:pointer}.t tr.cl:hover td{background:rgba(255,255,255,.05)}
 .tm{display:inline-block;font-weight:800;font-size:20px;padding:4px 14px;border-radius:99px}
-.tm.ok{color:#34d399;background:rgba(52,211,153,.14)}.tm.wn{color:#fbbf24;background:rgba(251,191,36,.14)}.tm.bd{color:#fb7185;background:rgba(251,113,133,.16)}
+.tm.ok{color:#34d399;background:rgba(52,211,153,.14)}.tm.wn{color:#fbbf24;background:rgba(251,191,36,.14)}.t .tm{font-size:16px;font-weight:700;padding:3px 12px}
+.tm.bd{color:#fb7185;background:rgba(251,113,133,.16)}
 .tp{display:flex;flex-direction:column;height:100%}.tp .floor{flex:1;min-height:0;height:auto!important;overflow:auto}
 .ft.sel{outline:4px solid var(--warn);outline-offset:2px}.ft.mrg .fn{color:#fde68a}
 .rb{display:flex;overflow-x:auto;padding:10px 0 2px;flex:none}.seg{display:inline-flex;margin:0 auto;border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:var(--card)}.seg button{white-space:nowrap;flex:none;border:0;border-radius:0;border-right:1px solid var(--bd);font-size:15px;min-height:42px;padding:8px 22px;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}.seg button:last-child{border-right:0}
@@ -116,7 +117,7 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .dcol h2{font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-weight:700;letter-spacing:.2em;text-align:center;font-size:clamp(14px,2vw,26px);margin:0 0 2vh;color:#fff}
 .dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),210px));gap:12px;align-content:start;overflow:auto;flex:1;min-height:0}
 .dt{border-radius:14px;padding:10px 16px;text-align:center;border:2px solid;overflow-wrap:anywhere}
-.dt b{display:block;font-family:"Chakra Petch",sans-serif;font-size:clamp(22px,3vw,44px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dt span{display:block;font-size:clamp(13px,1.6vw,22px);opacity:.85;margin-top:4px}
+.dt b{display:block;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-weight:700;font-size:clamp(22px,3vw,44px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dt b i{font-style:normal;font-size:.5em;font-weight:700;opacity:.8;margin-left:8px;letter-spacing:1px}.dt span{display:block;font-size:clamp(13px,1.6vw,22px);opacity:.85;margin-top:4px}
 .dt.sv{border-color:#34d399;color:#bbf7d0;background:rgba(52,211,153,.12)}.dt.pp{border-color:#fbbf24;color:#fde68a;background:rgba(251,191,36,.1)}
 @media(max-width:700px){.dc{grid-template-columns:1fr}.dcol+.dcol{border-left:0;border-top:1px solid var(--bd);padding-top:2vh}}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
@@ -192,11 +193,11 @@ function xpu(){clearTimeout(XT)}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&V.role==="display")go({role:null})});
 function dispData(){const now=Date.now(),prep=[],srv=[];
  S.orders.forEach(o=>{if(o.status!=="open"&&o.status!=="paid")return;const it=live(o).filter(i=>i.s);if(!it.length)return;
-  const l=o.takeout?"#"+o.id:o.tables.map(tname).join(" + "),sub=o.cust||"";
-  if(it.some(i=>!i.done)){if(o.status==="open")prep.push({l,s:sub,t:Math.min(...it.map(i=>i.s))})}
+  const l=o.takeout?"#"+o.id:tgrp(o.tables),sub=o.cust||"",pg=o.takeout?[it.filter(i=>i.done).reduce((a,i)=>a+i.q,0),it.reduce((a,i)=>a+i.q,0)]:null;
+  if(it.some(i=>!i.done)){if(o.status==="open")prep.push({l,s:sub,p:pg,t:Math.min(...it.map(i=>i.s))})}
   else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000)srv.push({l,s:sub,t:d})}});
  prep.sort((a,b)=>a.t-b.t);srv.sort((a,b)=>b.t-a.t);return{prep,srv}}
-function dispPage(){const d=dispData(),tile=(x,c)=>`<div class="dt ${c}"><b>${esc(x.l)}</b>${x.s?`<span>${esc(x.s)}</span>`:""}</div>`;DSIG=JSON.stringify(d);
+function dispPage(){const d=dispData(),tile=(x,c)=>`<div class="dt ${c}"><b>${esc(x.l)}${x.p?`<i>${x.p[0]}/${x.p[1]}</i>`:""}</b>${x.s?`<span>${esc(x.s)}</span>`:""}</div>`;DSIG=JSON.stringify(d);
  return `<div class="disp"><div class="dh"><div class="dlogo" onpointerdown="xpd()" onpointerup="xpu()" onpointerleave="xpu()" onpointercancel="xpu()" oncontextmenu="return false">${LOGO()}</div><div class="dline"></div></div>
  <div class="dc"><div class="dcol"><h2>NOW SERVING</h2><div class="dg">${d.srv.map(x=>tile(x,"sv")).join("")}</div></div><div class="dcol"><h2>NOW PREPARING</h2><div class="dg">${d.prep.map(x=>tile(x,"pp")).join("")}</div></div></div></div>`}
 setInterval(()=>{if(V.auth&&V.role==="display"){const g=JSON.stringify(dispData());if(g!==DSIG)render()}},3000);
@@ -215,6 +216,19 @@ function render0(){
  <button class="sb" onclick="go({stn:'main'})">Main Kitchen</button><button class="sb" onclick="go({stn:'app'})">Appetizer Kitchen</button></div><button onclick="go({role:null})">Back</button></div>`;return}
  a.innerHTML=(V.role==="counter"?counter():station())+(V.modal?modal():"");
 }
+const ALARM_MIN=10,ALARMED=new Map(),ALARM_STN=new Set();let ACTX=null;
+function actx(){try{if(!ACTX){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ACTX=new C()}if(ACTX.state==="suspended")ACTX.resume();return ACTX}catch(e){return null}}
+document.addEventListener("pointerdown",actx);
+function sirenPlay(){const c=actx();if(!c)return;const t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type="sawtooth";
+ o.frequency.setValueAtTime(700,t);for(let k=1;k<=4;k++)o.frequency.linearRampToValueAtTime(k%2?1100:700,t+k*.5);
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.25,t+.05);g.gain.setValueAtTime(.25,t+1.9);g.gain.linearRampToValueAtTime(0,t+2);
+ o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+2.05)}
+function alarmCheck(){if(!V.auth||!V.stn||(V.role!=="kitchen"&&V.role!=="bar"))return;const now=Date.now(),first=!ALARM_STN.has(V.stn);ALARM_STN.add(V.stn);let fire=false;
+ S.orders.forEach(o=>{const it=o.items.filter(i=>i.st===V.stn&&i.s&&!i.done&&!i.v);if(!it.length)return;const t=it[0].s,k=o.id+"_"+V.stn+"_"+t,mins=Math.floor((now-t)/6e4);
+  if(!ALARMED.has(k))ALARMED.set(k,first?mins:ALARM_MIN-1);
+  if(mins>=ALARM_MIN&&mins>ALARMED.get(k)){ALARMED.set(k,mins);fire=true}});
+ if(fire)sirenPlay()}
+setInterval(alarmCheck,1000);
 let RLBASE=null;
 async function forceReloadAll(){const t=Date.now();
  try{localStorage.setItem("dpos_reload",""+t)}catch(e){}
@@ -258,13 +272,13 @@ function mgrid(){const q=(V.q||"").toLowerCase();
  return `<button class="tile" onclick="go({cat:null,q:''})">&larr; Categories</button>`+l.map(i=>`<button class="item" onclick="add(${i.id})"><b>${i.n}</b><span class="mut">${m(i.p)}</span></button>`).join("")}
 function ab(ic,l,fn,c,dis){return `<button class="ab ${c||""}" ${dis?"disabled":""} onclick="${fn}"><span>${SV(ic)}</span>${l}</button>`}
 function tkt(o,ro){const unsent=live(o).some(i=>!i.s),c=calc(o);
- const lines=o.items.map((i,x)=>`<div class="line ${i.v?"v":""}"><div class="row"><span><b>${i.q}x</b> ${i.n}${i.s?` <span class="tag">${i.done?"served":"sent"}</span>`:""}</span><span>${m(i.p*i.q)}</span></div>${ro?"":i.v?`<div class="mut">Voided: ${i.vr}</div>`:`<div class="row" style="margin-top:6px;justify-content:flex-start">${i.s?"":`<button onclick="qty(${x},-1)">-</button><button onclick="qty(${x},1)">+</button>`}<button class="d" onclick="go({modal:{t:'void',x:${x}}})">${i.s?"Void":"Remove"}</button></div>`}</div>`).join("")||`<div class="mut" style="padding:24px 0">No items yet. Pick a category and tap a dish.</div>`;
+ const lines=o.items.map((i,x)=>`<div class="line ${i.v?"v":""}"><div class="row"><span><b>${i.q}x</b> ${i.n}${i.s?` <span class="tag">${i.done?"served":"sent"}</span>`:""}</span><span>${m(i.p*i.q)}</span></div>${ro?"":i.v?`<div class="mut">Voided: ${i.vr}</div>`:`<div class="row" style="margin-top:6px;justify-content:flex-start">${i.s?"":`<button onclick="qty(${x},-1)">-</button><button onclick="qty(${x},1)">+</button>`}<button class="d" onclick="go({modal:{t:'void',x:${x}}})">${i.s?"Void":"Remove"}</button></div>`}</div>`).join("")||"";
  return `<div class="card tk2"><div class="th"><div class="row"><h3>${esc(lab(o))}</h3><span class="mut">${o.guests?o.guests+" guests":""}</span></div><div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-bottom:6px">${(o.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}${ro?"":`<button onclick="go({modal:{t:'cust'}})">${o.cust?"&#128100; "+esc(o.cust):"+ Customer name"}</button>`}${o.takeout||ro?"":`<button onclick="go({modal:{t:'merge'}})">Merge tables</button>`}</div>${o.note?`<div class="mut">Note: ${esc(o.note)}</div>`:""}</div>
  <div class="ls sc" id="ls${ro?"p":""}">${lines}</div>
  <div class="tf tot"><div class="row"><span>Subtotal</span><span>${m(c.g)}</span></div>${o.disc?`<div class="row"><span>Discount (${o.disc}%)</span><span>-${m(c.g-c.sub)}</span></div>`:""}<div class="row"><span>Tax (${TAX*100}%)</span><span>${m(c.tax)}</span></div>
- <div class="row" style="margin-top:6px"><b>Total</b><span class="g">${m(c.total)}</span></div>${ro?"":`<button class="p" style="width:100%;margin-top:12px" ${live(o).length&&!unsent?"":"disabled"} onclick="go({tab:'pay',kp:'',pm:'Cash',ep:null})">Pay</button>${unsent?`<div class="mut" style="margin-top:6px">Press Order twice to send the new items. Then you can pay.</div>`:""}`}</div></div>`}
+ <div class="row" style="margin-top:6px"><b>Total</b><span class="g">${m(c.total)}</span></div>${ro?"":`<button class="p" style="width:100%;margin-top:12px" ${live(o).length&&!unsent?"":"disabled"} onclick="go({tab:'pay',kp:'',pm:'Cash',ep:null})">Pay</button>`}</div></div>`}
 function home(o){const unsent=o&&live(o).some(i=>!i.s),armed=Date.now()<V.armed,n=!o;
- const right=`<div class="rt"><div class="acts">${ab("printer","Print","printOrder()","",n||!live(o).length)}${ab("order",armed?"Tap again":"Order","send()",(unsent?"hot ":"")+(armed?"arm":""),n||!unsent)}${ab("void","Void","go({modal:{t:'voidpick'}})","",n)}${ab("percent","Discount","go({modal:{t:'disc'}})","",n)}${ab("pencil","Notes","go({modal:{t:'note'}})","",n)}${ab("tag","Tags","go({modal:{t:'tags'}})","",n)}${ab("more","More","go({modal:{t:'more'}})")}</div>
+ const right=`<div class="rt"><div class="acts">${ab("printer","Print","printOrder()","",n||!live(o).length)}${ab("order","Order","send()",(unsent?"hot ":"")+(armed?"arm":""),n||!unsent)}${ab("void","Void","go({modal:{t:'voidpick'}})","",n)}${ab("percent","Discount","go({modal:{t:'disc'}})","",n)}${ab("pencil","Notes","go({modal:{t:'note'}})","",n)}${ab("tag","Tags","go({modal:{t:'tags'}})","",n)}${ab("more","More","go({modal:{t:'more'}})")}</div>
  <div class="search"><input id="sq" placeholder="Search products" value="${esc(V.q)}" oninput="V.q=this.value;$('mg').innerHTML=mgrid()"></div><div id="mg" class="grid sc">${mgrid()}</div></div>`;
  return `<div class="split">${o?tkt(o):`<div class="card tk2"></div>`}${right}</div>`}
 function printOrder(){const o=ord(V.oid);o.pr=Date.now();save();go({modal:{t:"receipt"}})}
@@ -345,7 +359,7 @@ function add(id){if(!V.oid){go({tab:"tables"});return}const o=ord(V.oid);o.pr=0;
  if(e)e.q++;else o.items.push({k:Math.random(),id,n:d.n,p:d.p,c:d.c,st:d.st,q:1,s:0,done:0,v:0});V.sb=1;save();render()}
 function qty(x,d){const i=ord(V.oid).items[x];i.q+=d;if(i.q<1)ord(V.oid).items.splice(x,1);save();render()}
 function send(){const o=ord(V.oid);if(Date.now()<V.armed){o.items.forEach(i=>{if(!i.v&&!i.s){i.s=Date.now()}});V.armed=0;save();render();return}
- V.armed=Date.now()+3000;render();setTimeout(render,3100)}
+ V.armed=Date.now()+300000;render();setTimeout(render,300100)}
 function modal0(){const M=V.modal,o=V.oid?ord(V.oid):null;let h="";
  const x=`<div class="row" style="margin-top:12px"><span></span><button onclick="go({modal:null})">Close</button></div>`;
  if(M.t==="void"){const i=o.items[M.x];h=`<h3>${i.s?"Void":"Remove"} ${i.n}?</h3><div class="mut">${i.s?"This item was already sent. Choose a reason:":"Choose a reason:"}</div><div style="display:grid;gap:8px;margin-top:10px">
