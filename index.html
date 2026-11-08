@@ -222,7 +222,7 @@ function home(o){const unsent=o&&live(o).some(i=>!i.s),armed=Date.now()<V.armed,
  return `<div class="split">${o?tkt(o):`<div class="card tk2"></div>`}${right}</div>`}
 function printOrder(){const o=ord(V.oid);o.pr=Date.now();save();go({modal:{t:"receipt"}})}
 const G=24,TW=7,TH=5;
-function mig(){if(!S.rooms||!S.rooms.length)S.rooms=[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}];S.tables.forEach(t=>{if(!t.r||!S.rooms.some(r=>r.id===t.r))t.r=S.rooms[0].id});if(!V.room||!S.rooms.some(r=>r.id===V.room))V.room=S.rooms[0].id}
+function mig(){if(!S.rooms||!S.rooms.length)S.rooms=[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}];const seen=new Set();S.tables.forEach(t=>{t.n=String(t.n);if(seen.has(t.n)){t.n=""+(Math.max(0,...S.tables.map(z=>+z.n||0))+1);t.gx=NaN}seen.add(t.n);t.gx=Math.round(+t.gx);t.gy=Math.round(+t.gy);if(!isFinite(t.gx))t.gx=2;if(!isFinite(t.gy))t.gy=2;if(!t.r||!S.rooms.some(r=>r.id===t.r))t.r=S.rooms[0].id});if(!V.room||!S.rooms.some(r=>r.id===V.room))V.room=S.rooms[0].id}
 function fs(r){r=r||V.room;for(let y=1;;y++)for(let x=1;x<=34;x++)if(!S.tables.some(z=>z.r===r&&Math.abs(z.gx-x)<TW&&Math.abs(z.gy-y)<TH))return{x,y}}
 function toggleMg(n){const a=V.mg.includes(n)?V.mg.filter(x=>x!==n):[...V.mg,n];go({mg:a})}
 function doMerge(){const sel=V.mg||[];if(sel.length<2)return;const os=[...new Set(sel.map(n=>openFor(n)).filter(Boolean))];
@@ -248,11 +248,11 @@ function tablesTab(){mig();
  <div id="floor" class="floor sc ${V.edit?"edit":""}">${T}</div>
  <div class="rb"><div class="seg">${S.rooms.map(r=>`<button class="${r.id===V.room?"on":""}" onpointerdown="rpd('${r.id}')" onpointerup="rpu()" onpointerleave="rpu()" onpointercancel="rpu()" oncontextmenu="return false" onclick="roomTap('${r.id}')">${esc(r.name)}</button>`).join("")}</div></div></div>`}
 let D=null;
-function pd(e,n){e.preventDefault();const t=S.tables.find(z=>z.n===n);D={n,t,sx:e.clientX,sy:e.clientY,ox:t.gx,oy:t.gy,mv:0,lp:0};
+function pd(e,n){e.preventDefault();mig();const t=S.tables.find(z=>String(z.n)===String(n));if(!t)return;D={n,t,el:e.currentTarget,sx:e.clientX,sy:e.clientY,ox:+t.gx,oy:+t.gy,mv:0,lp:0};
  if(!V.edit&&!V.mg)D.timer=setTimeout(()=>{if(D){D.lp=1;V.edit=true;render()}},600)}
 document.addEventListener("pointermove",e=>{if(!D)return;const dx=e.clientX-D.sx,dy=e.clientY-D.sy;if(Math.abs(dx)+Math.abs(dy)>6){D.mv=1;clearTimeout(D.timer)}
  if(V.edit&&D.mv){const f=$("floor"),mx=Math.max(0,Math.floor(f.clientWidth/G)-TW),my=Math.max(0,Math.floor(f.clientHeight/G)-TH),cx=Math.min(mx,Math.max(0,Math.round(D.ox+dx/G))),cy=Math.min(my,Math.max(0,Math.round(D.oy+dy/G)));
-  D.t.gx=cx;D.t.gy=cy;const el=document.querySelector(`[data-n="${D.n}"]`);if(el){el.style.left=cx*G+"px";el.style.top=cy*G+"px";el.style.zIndex=5}}});
+  D.t.gx=cx;D.t.gy=cy;const el=D.el;if(el){el.style.left=cx*G+"px";el.style.top=cy*G+"px";el.style.zIndex=5}}});
 document.addEventListener("pointerup",()=>{if(!D)return;clearTimeout(D.timer);const d=D;D=null;if(d.lp)return;if(d.mv){if(V.edit){save();render()}return}
  if(V.mg){toggleMg(d.n);return}
  if(V.edit){go({modal:{t:"tname",n:d.n}});return}
