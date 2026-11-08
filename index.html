@@ -93,6 +93,8 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .t td{padding:14px 16px;border-top:1px solid var(--bd);font-size:16px}.t .num{text-align:right}.t tr.cl{cursor:pointer}.t tr.cl:hover td{background:rgba(255,255,255,.05)}
 .tm{display:inline-block;font-weight:800;font-size:20px;padding:4px 14px;border-radius:99px}
 .tm.ok{color:#34d399;background:rgba(52,211,153,.14)}.tm.wn{color:#fbbf24;background:rgba(251,191,36,.14)}.t .tm{font-size:16px;font-weight:700;padding:3px 12px}
+.qh{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}.qn{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.14);font-weight:800;font-size:16px;flex:none}
+.card.first{box-shadow:0 0 0 2px var(--warn)}.card.first .qn{background:var(--warn);color:#241500}.qf{font-style:normal;font-size:11px;letter-spacing:1px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--warn);color:#241500}
 .tm.bd{color:#fb7185;background:rgba(251,113,133,.16)}
 .tp{display:flex;flex-direction:column;height:100%}.tp .floor{flex:1;min-height:0;height:auto!important;overflow:auto}
 .ft.sel{outline:4px solid var(--warn);outline-offset:2px}.ft.mrg .fn{color:#fde68a}
@@ -216,13 +218,10 @@ function render0(){
  <button class="sb" onclick="go({stn:'main'})">Main Kitchen</button><button class="sb" onclick="go({stn:'app'})">Appetizer Kitchen</button></div><button onclick="go({role:null})">Back</button></div>`;return}
  a.innerHTML=(V.role==="counter"?counter():station())+(V.modal?modal():"");
 }
-const ALARM_MIN=10,ALARMED=new Map(),ALARM_STN=new Set();let ACTX=null;
-function actx(){try{if(!ACTX){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ACTX=new C()}if(ACTX.state==="suspended")ACTX.resume();return ACTX}catch(e){return null}}
-document.addEventListener("pointerdown",actx);
-function sirenPlay(){const c=actx();if(!c)return;const t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type="sawtooth";
- o.frequency.setValueAtTime(700,t);for(let k=1;k<=4;k++)o.frequency.linearRampToValueAtTime(k%2?1100:700,t+k*.5);
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.25,t+.05);g.gain.setValueAtTime(.25,t+1.9);g.gain.linearRampToValueAtTime(0,t+2);
- o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+2.05)}
+const ALARM_MIN=8,ALARMED=new Map(),ALARM_STN=new Set();let ALARM_AUDIO=null;
+function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("F%26BALARM.mp3");ALARM_AUDIO.preload="auto"}return ALARM_AUDIO}
+document.addEventListener("pointerdown",()=>{try{alarmAudio()}catch(e){}});
+function sirenPlay(){try{const a=alarmAudio();a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
 function alarmCheck(){if(!V.auth||!V.stn||(V.role!=="kitchen"&&V.role!=="bar"))return;const now=Date.now(),first=!ALARM_STN.has(V.stn);ALARM_STN.add(V.stn);let fire=false;
  S.orders.forEach(o=>{const it=o.items.filter(i=>i.st===V.stn&&i.s&&!i.done&&!i.v);if(!it.length)return;const t=it[0].s,k=o.id+"_"+V.stn+"_"+t,mins=Math.floor((now-t)/6e4);
   if(!ALARMED.has(k))ALARMED.set(k,first?mins:ALARM_MIN-1);
@@ -453,7 +452,7 @@ function demo(){const now=new Date();for(let d=0;d<30;d++)for(let k=0;k<2+Math.f
 function station(){const s=V.stn,isB=V.role==="bar",tabs=`<button class="${V.fin?"":"on"}" onclick="go({fin:false})">Active</button><button class="${V.fin?"on":""}" onclick="go({fin:true})">Finished</button>`;
  const os=S.orders.map(o=>({o,it:o.items.map((i,x)=>({i,x})).filter(z=>z.i.st===s&&z.i.s&&(V.fin?(z.i.done&&!z.i.v):(!z.i.done&&!z.i.v)))})).filter(z=>z.it.length&&(V.fin||z.o.status==="open"||true));
  os.sort((a,b)=>V.fin?b.it[0].i.done-a.it[0].i.done:a.it[0].i.s-b.it[0].i.s);
- const cards=os.map(z=>`<div class="card tk"><div class="row"><b style="font-size:18px">${lab(z.o)}</b>${V.fin?`<span class="mut">${tm(z.it[0].i.s)}</span>`:tmr(z.it[0].i.s)}</div>
+ const cards=os.map((z,ix)=>`<div class="card tk ${!V.fin&&ix===0?"first":""}"><div class="row"><span class="qh">${V.fin?"":`<i class="qn">${ix+1}</i>`}<b style="font-size:18px">${lab(z.o)}</b>${!V.fin&&ix===0?`<em class="qf">START FIRST</em>`:""}</span>${V.fin?`<span class="mut">${tm(z.it[0].i.s)}</span>`:tmr(z.it[0].i.s)}</div>
  ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${q.i.n}</span>${isB||!V.fin?"":""}${V.fin?`<span class="mut">done ${tm(q.i.done)}</span>`:`<button class="p" onclick="ready(${z.o.id},${q.x})">Ready</button>`}</div></div>`).join("")}</div>`).join("");
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
  return `<div class="pg">`+head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div></div>`}
