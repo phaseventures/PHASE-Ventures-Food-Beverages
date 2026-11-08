@@ -66,10 +66,10 @@ button.big{width:100%;margin-top:26px;padding:15px;font-family:"Chakra Petch",sa
 .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.kp button{min-height:56px;font-size:22px}
 .kd{font-size:38px;font-weight:800;text-align:center;padding:10px;border:1px solid var(--bd);border-radius:12px;margin:10px 0;min-height:64px}
 
-:root{--hh:68px;padding:0}
+:root{--hh:88px;padding:0}
 body{height:100vh;min-height:0;overflow:hidden}*{scrollbar-width:thin;scrollbar-color:#4a2a33 transparent}
 .top{position:fixed;top:0;left:0;right:0;z-index:10;height:calc(var(--hh) + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 24px 0}
-.top .logo{width:46px;height:46px;object-fit:contain;flex:none}.top b{font-size:22px}.tag:empty{display:none}
+.top .logo{height:64px;width:auto;max-width:200px;object-fit:contain;flex:none;margin-top:10px}.top b{font-size:22px}.tag:empty{display:none}
 #app{position:fixed;top:calc(var(--hh) + env(safe-area-inset-top,0px));left:0;right:0;bottom:0;display:flex;flex-direction:column;overflow:auto}
 body.nohd .top{display:none}body.nohd #app{top:0}
 .c{min-height:0!important;flex:1}
