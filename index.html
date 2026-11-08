@@ -95,7 +95,7 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .tm.ok{color:#34d399;background:rgba(52,211,153,.14)}.tm.wn{color:#fbbf24;background:rgba(251,191,36,.14)}.tm.bd{color:#fb7185;background:rgba(251,113,133,.16)}
 .tp{display:flex;flex-direction:column;height:100%}.tp .floor{flex:1;min-height:0;height:auto!important;overflow:auto}
 .ft.sel{outline:4px solid var(--warn);outline-offset:2px}.ft.mrg .fn{color:#fde68a}
-.rb{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;flex:none}.rb button{white-space:nowrap;flex:none}
+.rb{display:flex;overflow-x:auto;padding:10px 0 2px;flex:none}.seg{display:inline-flex;margin:0 auto;border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:var(--card)}.seg button{white-space:nowrap;flex:none;border:0;border-radius:0;border-right:1px solid var(--bd);font-size:15px;min-height:42px;padding:8px 22px;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}.seg button:last-child{border-right:0}
 .ft{width:168px;height:120px;min-height:0;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .ft .fn{font-size:20px;font-weight:700}.ft .fs{font-size:15px;font-weight:400;opacity:.9;margin-top:4px}.ft .sw{font-size:18px;font-weight:800;margin-top:6px}
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px;margin-bottom:12px}.cs{padding-top:16px;border-top:1px solid var(--bd)}.cs:first-child{border-top:0;padding-top:0}.cs.full{grid-column:1/-1}
@@ -229,8 +229,14 @@ function doMerge(){const sel=V.mg||[];if(sel.length<2)return;const os=[...new Se
  const b=os[0];os.slice(1).forEach(q=>{b.items.push(...q.items);b.guests=(b.guests||0)+(q.guests||0);b.pays=[...(b.pays||[]),...(q.pays||[])];b.pr=0;S.orders=S.orders.filter(z=>z!==q)});
  b.tables=[...new Set([...b.tables,...sel])];b.takeout=false;save();go({mg:null})}
 function unmergeT(oid,n){const o=ord(oid);if(o.tables.length<2)return;o.tables=o.tables.filter(x=>x!==n);save();go({modal:null})}
-function roomTap(id){if(V.room===id&&V.edit)go({modal:{t:"room",id}});else go({room:id})}
-function addRoom(){mig();const id="r"+Date.now().toString(36);S.rooms.push({id,name:"Room "+(S.rooms.length+1)});save();go({room:id,edit:true,modal:{t:"room",id}})}
+let RT=null,RL=0,RTAP={id:null,n:0,t:0};
+function rpd(id){RL=0;clearTimeout(RT);RT=setTimeout(()=>{RL=1;go({modal:{t:"room",id}})},600)}
+function rpu(){clearTimeout(RT);setTimeout(()=>{RL=0},300)}
+function roomTap(id){if(RL){RL=0;return}
+ const last=S.rooms[S.rooms.length-1].id,now=Date.now();
+ if(id===last){RTAP.n=(RTAP.id===id&&now-RTAP.t<2500)?RTAP.n+1:1;RTAP.id=id;RTAP.t=now;if(RTAP.n>=6){RTAP.n=0;addRoom();return}}else RTAP.n=0;
+ go({room:id})}
+function addRoom(){mig();const id="r"+Date.now().toString(36);S.rooms.push({id,name:"Room "+(S.rooms.length+1)});save();go({room:id,modal:{t:"room",id}})}
 function saveRoom(id){const r=S.rooms.find(z=>z.id===id);r.name=$("rn").value.trim()||r.name;save();go({modal:null})}
 function delRoom(id){if(S.rooms.length<2||S.tables.some(z=>z.r===id))return;S.rooms=S.rooms.filter(z=>z.id!==id);V.room=S.rooms[0].id;save();go({modal:null})}
 function saveTbl(n){const t=S.tables.find(z=>z.n===n);t.name=$("tn").value;const r=$("tr")&&$("tr").value;if(r&&r!==t.r){const p=fs(r);t.r=r;t.gx=p.x;t.gy=p.y;V.room=r}save();go({modal:null})}
@@ -239,7 +245,7 @@ function tablesTab(){mig();
  return `<div class="tp"><div class="row" style="flex-wrap:wrap;margin-bottom:10px"><h2>Tables</h2><span class="mut"><span style="color:#22c55e">&#9632;</span> Open &nbsp;<span style="color:#ef4444">&#9632;</span> Not paid &nbsp;<span style="color:#fbbf24">&#9632;</span> Receipt printed</span>
  ${V.edit?`<span><button onclick="const p=fs();S.tables.push({n:''+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:'',r:V.room,seats:4,gx:p.x,gy:p.y});save();render()">+ Add table</button> <button class="p" onclick="go({edit:false})">Done</button></span>`:V.mg?`<span class="mut">Tap the tables to merge</span><span><button onclick="go({mg:null})">Cancel</button> <button class="p" ${V.mg.length<2?"disabled":""} onclick="doMerge()">Merge (${V.mg.length})</button></span>`:`<span><button onclick="go({mg:[]})">Merge tables</button> <span class="mut">Hold a table to move or rename it</span></span>`}</div>
  <div id="floor" class="floor sc ${V.edit?"edit":""}">${T}</div>
- <div class="rb">${S.rooms.map(r=>`<button class="${r.id===V.room?"on":""}" onclick="roomTap('${r.id}')">${esc(r.name)}${V.edit&&r.id===V.room?" &#9998;":""}</button>`).join("")}<button onclick="addRoom()">+ Room</button></div></div>`}
+ <div class="rb"><div class="seg">${S.rooms.map(r=>`<button class="${r.id===V.room?"on":""}" onpointerdown="rpd('${r.id}')" onpointerup="rpu()" onpointerleave="rpu()" onpointercancel="rpu()" oncontextmenu="return false" onclick="roomTap('${r.id}')">${esc(r.name)}</button>`).join("")}</div></div></div>`}
 let D=null;
 function pd(e,n){e.preventDefault();const t=S.tables.find(z=>z.n===n);D={n,t,sx:e.clientX,sy:e.clientY,ox:t.gx,oy:t.gy,mv:0,lp:0};
  if(!V.edit&&!V.mg)D.timer=setTimeout(()=>{if(D){D.lp=1;V.edit=true;render()}},600)}
