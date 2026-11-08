@@ -104,7 +104,8 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .lw .in{font-size:14px!important;padding:11px 13px;border-radius:10px}.lw .pwb .eye{top:0}.lw button.big{margin-top:20px;padding:12px;font-size:13px;min-height:0}.lw .er{margin-top:8px;min-height:20px}
 @media(min-width:761px){.fit .split{grid-template-columns:minmax(420px,560px) 1fr}}
 .lw .logo{transform:translateX(1.3px)}
-</style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span></header><div id="app"></div>
+#intro{position:fixed;inset:0;z-index:9999;background:#000;opacity:0;pointer-events:none;transition:opacity .7s ease;display:flex;align-items:center;justify-content:center}#intro.show{opacity:1;pointer-events:auto}#intro video{width:100%;height:100%;object-fit:contain;background:#000}
+</style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
 const SB_ON=!SB_URL.startsWith("PASTE");
@@ -194,10 +195,19 @@ async function resetAll(){const t=Date.now();
  USERS.forEach(u=>{try{localStorage.removeItem("dpos_"+u)}catch(e){}});
  if(SB_ON){for(const u of USERS){try{await fetch(SB_URL+"/rest/v1/pos_state?on_conflict=id",{method:"POST",headers:{...sbH,Prefer:"resolution=merge-duplicates"},body:JSON.stringify({id:"dpos_"+u,data:fresh(),rev:t})})}catch(e){}}}
  S=fresh();REV=0;V.oid=null;go({bad:2})}
+let INTRO_BUSY=false;
+function playIntro(done){if(INTRO_BUSY)return;INTRO_BUSY=true;
+ const o=$("intro"),v=$("introv");let fin=false,safety=null;
+ const end=()=>{if(fin)return;fin=true;clearTimeout(safety);o.classList.remove("show");setTimeout(()=>{try{v.pause();v.currentTime=0}catch(e){}INTRO_BUSY=false},800)};
+ o.classList.add("show");
+ setTimeout(()=>{done();if(v.error){end();return}
+  try{v.currentTime=0}catch(e){}v.muted=false;
+  const p=v.play();if(p&&p.catch)p.catch(()=>{v.muted=true;const q=v.play();if(q&&q.catch)q.catch(end)})},700);
+ v.onended=end;v.onerror=end;o.onclick=end;safety=setTimeout(end,90000)}
 function login(){const u=$("un").value.trim().toLowerCase();
  if($("pw").value==="MYRNH"){forceReloadAll();return}
  if(u==="japheth james"&&$("pw").value==="4RNHZND"){if(confirm("This will permanently erase ALL data (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
-if(USERS.includes(u)&&$("pw").value===PASS){V.user=u;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)}else go({bad:true})}
+if(USERS.includes(u)&&$("pw").value===PASS){playIntro(()=>{V.user=u;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)})}else go({bad:true})}
 function head(t,tabs){return `<div class="bar"><span class="tag">${t}</span>${tabs||""}<span class="sp"></span><button onclick="go({role:null,stn:null,oid:null})">Switch section</button></div>`}
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function counter(){
@@ -240,7 +250,7 @@ function roomTap(id){if(RL){RL=0;return}
 function addRoom(){mig();const id="r"+Date.now().toString(36);S.rooms.push({id,name:"Room "+(S.rooms.length+1)});save();go({room:id,modal:{t:"room",id}})}
 function saveRoom(id){const r=S.rooms.find(z=>z.id===id);r.name=$("rn").value.trim()||r.name;save();go({modal:null})}
 function delRoom(id){if(S.rooms.length<2||S.tables.some(z=>z.r===id))return;S.rooms=S.rooms.filter(z=>z.id!==id);V.room=S.rooms[0].id;save();go({modal:null})}
-function saveTbl(n){const t=S.tables.find(z=>z.n===n);t.name=$("tn").value;const r=$("tr")&&$("tr").value;if(r&&r!==t.r){const p=fs(r);t.r=r;t.gx=p.x;t.gy=p.y;V.room=r}save();go({modal:null})}
+function saveTbl(n){const t=S.tables.find(z=>z.n===n);t.name=$("tn").value;t.seats=Math.max(1,Math.min(50,parseInt($("ts").value)||4));const r=$("tr")&&$("tr").value;if(r&&r!==t.r){const p=fs(r);t.r=r;t.gx=p.x;t.gy=p.y;V.room=r}save();go({modal:null})}
 function tablesTab(){mig();
  const T=S.tables.filter(t=>t.r===V.room).map(t=>{const o=openFor(t.n),k=!o?"g":(o.pr?"y":"r");return `<div class="ft ${k} ${V.edit?"ed":""} ${V.mg&&V.mg.includes(t.n)?"sel":""} ${o&&o.tables.length>1?"mrg":""}" data-n="${t.n}" style="left:${t.gx*G}px;top:${t.gy*G}px" onpointerdown="pd(event,'${t.n}')"><div class="fn">${o&&o.tables.length>1?"&#128279; ":""}${esc(tname(t.n))}</div><div class="fs">${o?o.guests+" guests - "+m(calc(o).total):t.seats+" seats"}</div>${o?`<div class="sw" data-sw="${o.created}">${swf(o.created)}</div>`:""}</div>`}).join("");
  return `<div class="tp"><div class="row" style="flex-wrap:wrap;margin-bottom:10px"><h2>Tables</h2><span></span>
@@ -333,7 +343,7 @@ function extraModal(M,o,W){const t=M.t;
  if(t==="guest")return W(`<h3>${esc((M.mt||[M.n]).map(tname).join(" + "))} - Guest</h3><div class="mut">How many people are seated?</div><input class="plain in" placeholder="Customer name (optional)" value="${esc(V.cn||"")}" oninput="V.cn=this.value" style="margin:8px 0"><div class="kd">${V.kp||"0"}</div>${kpad()}<button class="p" style="width:100%;margin-top:8px" onclick="startGuests('${M.n}')">Enter</button>`);
  if(t==="topt"){const q=openFor(M.n);return W(`<h3>${esc(lab(q))}</h3><div class="mut">${q.guests} guests - ${m(calc(q).total)}${q.pr?" - receipt printed":""}</div><div style="display:grid;gap:8px;margin-top:10px"><button class="p" onclick="go({oid:${q.id},tab:'home',modal:null})">View order</button><button onclick="go({oid:${q.id}});printOrder()">Print order</button><button onclick="go({oid:${q.id},modal:{t:'assign'}})">Reassign table</button>${q.tables.length>1?`<button onclick="unmergeT(${q.id},'${M.n}')">Unmerge ${esc(tname(M.n))}</button>`:""}</div>`)}
  if(t==="room"){const r=S.rooms.find(z=>z.id===M.id),n=S.tables.filter(z=>z.r===r.id).length;return W(`<h3>Rename room</h3><input class="plain in" id="rn" value="${esc(r.name)}" placeholder="e.g. Indoor, Outdoor, Lounge, Main hall"><div class="mut" style="margin-top:8px">${S.rooms.length<2?"You need at least one room.":n?"To delete this room, first move or remove its "+n+" table(s).":""}</div><div class="row" style="margin-top:10px"><button class="d" ${n||S.rooms.length<2?"disabled":""} onclick="delRoom('${r.id}')">Delete room</button><button class="p" onclick="saveRoom('${r.id}')">Save name</button></div>`)}
- if(t==="tname"){const tb=S.tables.find(z=>z.n===M.n);return W(`<h3>Edit table</h3><input class="plain in" id="tn" value="${esc(tb.name||"Table "+tb.n)}">${S.rooms.length>1?`<div class="fl">ROOM</div><select class="plain in" id="tr">${S.rooms.map(r=>`<option value="${r.id}" ${r.id===tb.r?"selected":""}>${esc(r.name)}</option>`).join("")}</select>`:""}<div class="row" style="margin-top:10px"><button class="d" ${openFor(tb.n)?"disabled":""} onclick="S.tables=S.tables.filter(z=>z.n!=='${tb.n}');save();go({modal:null})">Remove table</button><button class="p" onclick="saveTbl('${tb.n}')">Save</button></div>`)}
+ if(t==="tname"){const tb=S.tables.find(z=>z.n===M.n);return W(`<h3>Edit table</h3><input class="plain in" id="tn" value="${esc(tb.name||"Table "+tb.n)}"><div class="fl">SEATS</div><input class="plain in" id="ts" type="number" min="1" max="50" inputmode="numeric" value="${tb.seats||4}">${S.rooms.length>1?`<div class="fl">ROOM</div><select class="plain in" id="tr">${S.rooms.map(r=>`<option value="${r.id}" ${r.id===tb.r?"selected":""}>${esc(r.name)}</option>`).join("")}</select>`:""}<div class="row" style="margin-top:10px"><button class="d" ${openFor(tb.n)?"disabled":""} onclick="S.tables=S.tables.filter(z=>z.n!=='${tb.n}');save();go({modal:null})">Remove table</button><button class="p" onclick="saveTbl('${tb.n}')">Save</button></div>`)}
  return null}
 function history(){const l=S.orders.filter(o=>o.status==="paid").sort((a,b)=>b.paidAt-a.paidAt);
  const rows=l.map(o=>`<tr><td><b>${esc(lab(o))}</b></td><td>${o.method}</td><td>${live(o).map(i=>i.q+"x "+i.n).join(", ")}${o.items.some(i=>i.v)?`<div style="color:var(--bad)">Voided: ${o.items.filter(i=>i.v).map(i=>i.q+"x "+i.n+" ("+i.vr+")").join(", ")}</div>`:""}</td><td>${new Date(o.paidAt).toLocaleDateString()} ${tm(o.paidAt)}</td><td class="num">${m(o.total)}</td></tr>`).join("")||`<tr><td colspan="5" class="mut">No finished orders yet.</td></tr>`;
