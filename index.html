@@ -105,6 +105,18 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 @media(min-width:761px){.fit .split{grid-template-columns:minmax(420px,560px) 1fr}}
 .lw .logo{transform:translateX(1.3px)}
 #intro{position:fixed;inset:0;z-index:9999;background:#000;opacity:0;pointer-events:none;transition:opacity .7s ease;display:flex;align-items:center;justify-content:center}#intro.show{opacity:1;pointer-events:auto}#intro video{width:100%;height:100%;object-fit:contain;background:#000}
+.sb{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.disp{flex:1;display:flex;flex-direction:column;min-height:0;padding:max(14px,env(safe-area-inset-top)) 4vw 3vh;user-select:none;-webkit-user-select:none}
+.dh{display:flex;flex-direction:column;align-items:center;gap:14px;flex:none}.dlogo{padding:6px 18px;-webkit-touch-callout:none}.dlogo .logo{width:auto;height:clamp(60px,13vh,130px);max-width:60vw;object-fit:contain}
+.dline{height:2px;width:100%;background:linear-gradient(90deg,transparent,#d81f2d,transparent)}
+.dc{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;margin-top:2vh}
+.dcol{padding:0 2vw;display:flex;flex-direction:column;min-height:0}.dcol+.dcol{border-left:1px solid var(--bd)}
+.dcol h2{font-family:"Chakra Petch",sans-serif;letter-spacing:.2em;text-align:center;font-size:clamp(18px,3vw,38px);margin:0 0 2vh}.dcol:first-child h2{color:#34d399}.dcol:last-child h2{color:#fbbf24}
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px;align-content:start;overflow:auto;flex:1;min-height:0}
+.dt{border-radius:16px;padding:14px 10px;text-align:center;border:2px solid;overflow-wrap:anywhere}
+.dt b{display:block;font-family:"Chakra Petch",sans-serif;font-size:clamp(26px,4.5vw,64px);line-height:1.1}.dt span{display:block;font-size:clamp(13px,1.6vw,22px);opacity:.85;margin-top:4px}
+.dt.sv{border-color:#34d399;color:#bbf7d0;background:rgba(52,211,153,.12)}.dt.pp{border-color:#fbbf24;color:#fde68a;background:rgba(251,191,36,.1)}
+@media(max-width:700px){.dc{grid-template-columns:1fr}.dcol+.dcol{border-left:0;border-top:1px solid var(--bd);padding-top:2vh}}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
@@ -163,8 +175,25 @@ const tfmt=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return k<60?k+
 const tmr=t=>`<span class="tm ${tcl(t)}" data-t="${t}">${tfmt(t)}</span>`;
 const swf=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return Math.floor(k/60)+"hrs "+k%60+"min"};
 function render(){const k={};document.querySelectorAll(".sc[id]").forEach(e=>k[e.id]=e.scrollTop);const a=$("app");k.app=a.scrollTop;render0();
- document.body.classList.toggle("nohd",V.splash||!V.auth);$("hn").textContent=S.name;$("hu").textContent=V.user||"";sbBadge();
+ document.body.classList.toggle("nohd",V.splash||!V.auth||V.role==="display");$("hn").textContent=S.name;$("hu").textContent=V.user||"";sbBadge();
  a.scrollTop=k.app;document.querySelectorAll(".sc[id]").forEach(e=>{if(k[e.id]!=null)e.scrollTop=k[e.id]});if(V.sb){const e=$("ls");if(e)e.scrollTop=e.scrollHeight;V.sb=0}}
+let CT=null,CL=0,XT=null,DSIG="";
+function cpd(){CL=0;clearTimeout(CT);CT=setTimeout(()=>{CL=1;go({role:"display",modal:null})},700)}
+function cpu(){clearTimeout(CT)}
+function cclick(){if(CL){CL=0;return}go({role:"counter",tab:"home",oid:null})}
+function xpd(){clearTimeout(XT);XT=setTimeout(()=>go({role:null}),1200)}
+function xpu(){clearTimeout(XT)}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&V.role==="display")go({role:null})});
+function dispData(){const now=Date.now(),prep=[],srv=[];
+ S.orders.forEach(o=>{if(o.status!=="open"&&o.status!=="paid")return;const it=live(o).filter(i=>i.s);if(!it.length)return;
+  const l=o.takeout?"#"+o.id:o.tables.map(tname).join(" + "),sub=o.cust||"";
+  if(it.some(i=>!i.done)){if(o.status==="open")prep.push({l,s:sub,t:Math.min(...it.map(i=>i.s))})}
+  else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000)srv.push({l,s:sub,t:d})}});
+ prep.sort((a,b)=>a.t-b.t);srv.sort((a,b)=>b.t-a.t);return{prep,srv}}
+function dispPage(){const d=dispData(),tile=(x,c)=>`<div class="dt ${c}"><b>${esc(x.l)}</b>${x.s?`<span>${esc(x.s)}</span>`:""}</div>`;DSIG=JSON.stringify(d);
+ return `<div class="disp"><div class="dh"><div class="dlogo" onpointerdown="xpd()" onpointerup="xpu()" onpointerleave="xpu()" onpointercancel="xpu()" oncontextmenu="return false">${LOGO()}</div><div class="dline"></div></div>
+ <div class="dc"><div class="dcol"><h2>NOW SERVING</h2><div class="dg">${d.srv.map(x=>tile(x,"sv")).join("")}</div></div><div class="dcol"><h2>NOW PREPARING</h2><div class="dg">${d.prep.map(x=>tile(x,"pp")).join("")}</div></div></div></div>`}
+setInterval(()=>{if(V.auth&&V.role==="display"){const g=JSON.stringify(dispData());if(g!==DSIG)render()}},3000);
 function render0(){
  const a=$("app");
  if(V.splash){a.innerHTML=`<div class="c">${LOGO()}<h1 class="ti">PHASE VENTURES</h1></div>`;setTimeout(()=>{V.splash=false;render()},1600);return}
@@ -172,8 +201,9 @@ function render0(){
  <label class="fl">NAME</label><input class="in" id="un" placeholder="Enter name" autocomplete="off" autocapitalize="off">
  <label class="fl">PASSWORD</label><div class="pwb"><input class="in" id="pw" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"><button class="eye" onclick="const p=$('pw');p.type=p.type==='password'?'text':'password'">${SV('eye',20)}</button></div>
  <button class="p big" onclick="login()">ENTER POS</button><div class="er">${V.bad===2?"All data has been reset.":V.bad?"Wrong name or password.":""}</div></div></div>`;setTimeout(()=>$("un")&&$("un").focus(),0);return}
+ if(V.role==="display"){a.innerHTML=dispPage();return}
  if(!V.role){a.innerHTML=`<div class="c"><h2>Choose your section</h2><div class="sec">
- <button class="sb" onclick="go({role:'counter',tab:'home',oid:null})">Counter</button><button class="sb" onclick="go({role:'kitchen'})">Kitchen</button><button class="sb" onclick="go({role:'bar',stn:'bar'})">Bar</button></div>
+ <button class="sb" onpointerdown="cpd()" onpointerup="cpu()" onpointerleave="cpu()" onpointercancel="cpu()" oncontextmenu="return false" onclick="cclick()">Counter</button><button class="sb" onclick="go({role:'kitchen'})">Kitchen</button><button class="sb" onclick="go({role:'bar',stn:'bar'})">Bar</button></div>
  <button onclick="go({auth:false,user:null})">Lock POS</button></div>`;return}
  if(V.role==="kitchen"&&!V.stn){a.innerHTML=`<div class="c"><h2>Which kitchen?</h2><div class="sec" style="grid-template-columns:repeat(2,200px)">
  <button class="sb" onclick="go({stn:'main'})">Main Kitchen</button><button class="sb" onclick="go({stn:'app'})">Appetizer Kitchen</button></div><button onclick="go({role:null})">Back</button></div>`;return}
@@ -404,7 +434,7 @@ function station(){const s=V.stn,isB=V.role==="bar",tabs=`<button class="${V.fin
  return `<div class="pg">`+head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div></div>`}
 function ready(oid,x){ord(oid).items[x].done=Date.now();save();render()}
 setInterval(()=>{if(SB_ON){sbPull(false);return}
- if(V.auth&&(V.role==="kitchen"||V.role==="bar")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},2000);
+ if(V.auth&&(V.role==="kitchen"||V.role==="bar"||V.role==="display")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},2000);
 setInterval(()=>{document.querySelectorAll("[data-t]").forEach(e=>{const t=+e.dataset.t;e.textContent=tfmt(t);e.classList.remove("ok","wn","bd");e.classList.add(tcl(t))});document.querySelectorAll("[data-sw]").forEach(e=>e.textContent=swf(+e.dataset.sw))},5000);
 $("hl").innerHTML=LOGO();render();
 </script></body></html>
