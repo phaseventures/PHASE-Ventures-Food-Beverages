@@ -121,7 +121,7 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),190px));gap:12px;align-content:start;overflow:auto;flex:1;min-height:0}
 .dt{border-radius:12px;padding:8px 14px;text-align:center;border:2px solid;overflow-wrap:anywhere}
 .dt b{display:block;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-weight:700;font-size:clamp(20px,2.3vw,36px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dt b i{font-style:normal;font-size:.6em;font-weight:700;opacity:.8;margin-left:8px;letter-spacing:1px}.dt span{display:block;font-size:clamp(12px,1.2vw,19px);opacity:.85;margin-top:4px}
-@keyframes dflick{0%,100%{opacity:1}50%{opacity:.12}}.dt.new{animation:dflick .5s ease-in-out 10}
+@keyframes dflick{0%,100%{opacity:1}50%{opacity:.12}}.dt.new{animation:dflick 1s ease-in-out 2}
 .dt.sv{border-color:#34d399;color:#bbf7d0;background:rgba(52,211,153,.12)}.dt.pp{border-color:#fbbf24;color:#fde68a;background:rgba(251,191,36,.1)}
 @media(max-width:700px){.dc{grid-template-columns:1fr}.dcol+.dcol{border-left:0;border-top:1px solid var(--bd);padding-top:2vh}}
 
@@ -131,7 +131,7 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .qh{flex-wrap:nowrap;flex:1;min-width:0}.qh b{overflow-wrap:anywhere}
 .tk{padding:12px}.tk .line{padding:8px 0}.tk .row{gap:10px}.tk .line .row span:first-child{min-width:0}
 .tk button{border-radius:5px;min-height:38px;padding:6px 14px}
-.sm{margin:0 0 6px}
+.sm{margin:0 0 6px;font-size:13px}.sr .tag{font-size:11px}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
@@ -207,7 +207,7 @@ function dispData(){const now=Date.now(),prep=[],srv=[];
  S.orders.forEach(o=>{if(!o.takeout)return;if(o.status!=="open"&&o.status!=="paid")return;const it=live(o).filter(i=>i.s);if(!it.length)return;
   const l=o.takeout?"#"+o.id:tgrp(o.tables),sub=o.cust||"",pg=o.takeout?[it.filter(i=>i.done).reduce((a,i)=>a+i.q,0),it.reduce((a,i)=>a+i.q,0)]:null;
   if(it.some(i=>!i.done)){if(o.status==="open")prep.push({id:o.id,l,s:sub,p:pg,t:Math.min(...it.map(i=>i.s))})}
-  else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000)srv.push({id:o.id,l,s:sub,t:d})}});
+  else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000&&!it.every(i=>i.sv))srv.push({id:o.id,l,s:sub,t:d})}});
  prep.sort((a,b)=>a.t-b.t);srv.sort((a,b)=>b.t-a.t);return{prep,srv}}
 function dispPage(){DPREV=null;
  return `<div class="disp"><div class="dh"><div class="dlogo" onpointerdown="xpd()" onpointerup="xpu()" onpointerleave="xpu()" onpointercancel="xpu()" oncontextmenu="return false">${LOGO()}</div><div class="dline"></div></div>
@@ -216,7 +216,7 @@ let DPREV=null,DNEW={};
 function dispTile(x,c,col){const nu=(DNEW[col+x.id]||0)>Date.now();return `<div class="dt ${c} ${nu?"new":""}"><b>${esc(x.l)}${x.p?`<i>${x.p[0]}/${x.p[1]}</i>`:""}</b>${x.s?`<span>${esc(x.s)}</span>`:""}</div>`}
 function dispFill(){const d=dispData(),now=Date.now();DSIG=JSON.stringify(d);
  const cur={srv:new Set(d.srv.map(x=>x.id)),prep:new Set(d.prep.map(x=>x.id))};
- if(DPREV)["srv","prep"].forEach(c=>cur[c].forEach(id=>{if(!DPREV[c].has(id))DNEW[c+id]=now+5000}));
+ if(DPREV)["srv","prep"].forEach(c=>cur[c].forEach(id=>{if(!DPREV[c].has(id))DNEW[c+id]=now+2000}));
  DPREV=cur;
  $("dsrv").innerHTML=d.srv.map(x=>dispTile(x,"sv","srv")).join("");$("dprep").innerHTML=d.prep.map(x=>dispTile(x,"pp","prep")).join("")}
 setInterval(()=>{if(V.auth&&V.role==="display"){const g=JSON.stringify(dispData());if(g!==DSIG)render()}},3000);
@@ -474,16 +474,18 @@ function station(){const s=V.stn,isB=V.role==="bar",tabs=`<button class="${V.fin
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
  return `<div class="pg">`+head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div></div>`}
 function serve(){const now=Date.now();
- const os=S.orders.filter(o=>o.status==="open").map(o=>{const it=live(o).map((i,x)=>({i,x})).filter(z=>z.i.s),miss=it.filter(z=>!z.i.done),dn=it.filter(z=>z.i.done);
+ const os=S.orders.filter(o=>o.status==="open"||o.status==="paid").map(o=>{const it=live(o).map((i,x)=>({i,x})).filter(z=>z.i.s&&!z.i.sv),miss=it.filter(z=>!z.i.done),dn=it.filter(z=>z.i.done);
   return{o,it,miss,dn,t:miss.length?Math.min(...miss.map(z=>z.i.s)):Math.max(0,...dn.map(z=>+z.i.done||0))}})
-  .filter(z=>z.it.length&&(z.miss.length||now-z.t<600000));
+  .filter(z=>z.it.length&&(z.miss.length||now-z.t<10800000));
  os.sort((a,b)=>(!!a.miss.length===!!b.miss.length)?(a.miss.length?a.t-b.t:b.t-a.t):(a.miss.length?-1:1));
  const cards=os.map(z=>{const p=z.miss.length,sum=z.miss.reduce((a,q)=>a+q.i.q,0),tot=z.it.reduce((a,q)=>a+q.i.q,0);
-  return `<div class="card tk ${p?"":"rdy"}"><div class="row"><b style="font-size:18px">${esc(lab(z.o))}</b>${p?tmr(z.t):`<span class="tag rd">ALL READY</span>`}</div>
- <div class="mut" style="margin:2px 0 6px">${tot-sum}/${tot} ready</div>
+  return `<div class="card tk ${p?"":"rdy"}"><div class="row"><b style="font-size:16px">${esc(lab(z.o))}</b>${p?tmr(z.t):`<span class="tag rd">ALL READY</span>`}</div>
+ <div class="mut" style="margin:2px 0 6px;font-size:12px">${tot-sum}/${tot} ready</div>
  ${p?`<div class="sm"><b>Still missing:</b> ${z.miss.map(q=>q.i.q+"x "+esc(q.i.n)).join(", ")}</div>`:""}
- ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:17px"><b>${q.i.q}x</b> ${esc(q.i.n)}</span><span class="tag ${q.i.done?"rd":"pr2"}">${q.i.done?"Ready":({app:"Appetizer",main:"Kitchen",bar:"Bar"}[q.i.st]||"Preparing")}</span></div></div>`).join("")}</div>`}).join("");
- return `<div class="pg">`+head("Serve","")+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${cards}</div>${cards?"":`<div class="mut" style="padding:30px;text-align:center">Nothing being prepared right now.</div>`}</div></div>`}
+ ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:14px"><b>${q.i.q}x</b> ${esc(q.i.n)}</span><span class="tag ${q.i.done?"rd":"pr2"}">${q.i.done?"Ready":({app:"Appetizer",main:"Kitchen",bar:"Bar"}[q.i.st]||"Preparing")}</span></div></div>`).join("")}
+ ${z.dn.length?`<button class="p" style="width:100%;margin-top:8px" onclick="served(${z.o.id})">Served</button>`:""}</div>`}).join("");
+ return `<div class="pg">`+head("Serve","")+`<div class="wrap"><div class="grid sr" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${cards}</div>${cards?"":`<div class="mut" style="padding:30px;text-align:center">Nothing being prepared right now.</div>`}</div></div>`}
+function served(oid){const o=ord(oid);if(!o)return;o.items.forEach(i=>{if(i.s&&i.done&&!i.v&&!i.sv)i.sv=Date.now()});save();render()}
 function ready(oid,x){ord(oid).items[x].done=Date.now();save();render()}
 setInterval(()=>{if(SB_ON){sbPull(false);return}
  if(V.auth&&(V.role==="kitchen"||V.role==="bar"||V.role==="serve"||V.role==="display")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},2000);
