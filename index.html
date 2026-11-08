@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dining POS</title>
+<title>PHASE POS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:transparent;--card:rgba(255,255,255,.07);--tx:#f6eef0;--mut:#b9a0a8;--ac:#7c3aed;--act:#fff;--bd:rgba(255,255,255,.16);--ok:#34d399;--bad:#fb7185;--warn:#fbbf24;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{color-scheme:dark;--bg:transparent;--card:rgba(255,255,255,.07);--tx:#f6eef0;--mut:#b9a0a8;--ac:#d81f2d;--act:#fff;--bd:rgba(255,255,255,.16);--ok:#34d399;--bad:#fb7185;--warn:#fbbf24;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-size:16px}
 button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:10px 14px;min-height:44px}
 button:hover{border-color:var(--ac)}button.p{background:var(--ac);color:var(--act);border-color:var(--ac);font-weight:700}
@@ -32,24 +33,41 @@ input{font:inherit;padding:12px;border-radius:10px;border:1px solid var(--bd);ba
 .mod>div{background:var(--card);border-radius:14px;padding:18px;max-width:520px;width:100%;max-height:85vh;overflow:auto}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}.stats .card b{font-size:22px;display:block}
 .tk{border-left:6px solid var(--ac)}
-html{background:#000}body{background:linear-gradient(180deg,#18090d 0%,#000 100%) no-repeat fixed;min-height:100vh}
+html{min-height:100%;background:#000 linear-gradient(180deg,#18090d 0%,#000 100%) no-repeat fixed}body{background:transparent;min-height:100vh}
 .top{display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--bd);background:rgba(24,9,13,.85);backdrop-filter:blur(8px)}
 .top b{font-size:20px;letter-spacing:.3px}.top .logo{width:44px;height:44px}.lg{cursor:pointer;display:block}
 .c{min-height:calc(100vh - 72px)!important}.mod>div{background:#26101a;border:1px solid var(--bd)}
 .bar{background:rgba(24,9,13,.9);backdrop-filter:blur(8px);top:0}
 .acts{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:10px}
-.ab{background:var(--ac);color:#fff;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;padding:8px 2px;min-height:62px;border-radius:12px}.ab span{font-size:22px;line-height:1.1}
+.ab{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;padding:8px 2px;min-height:62px;border-radius:12px}.ab span{font-size:22px;line-height:1.1}
 .ab.hot{box-shadow:0 0 0 2px var(--warn)}.ab.arm{background:var(--warn);color:#241500}
 .search input{width:100%;letter-spacing:0;text-align:left;font-size:16px;margin-bottom:10px}.plain{letter-spacing:0!important;text-align:left!important;font-size:16px!important}
 .tile{background:#fff;color:#18090d;font-weight:800;font-size:18px;min-height:110px;border:0}.tile:hover{outline:3px solid var(--ac)}
 .nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(12,4,7,.95);border-top:1px solid var(--bd);z-index:6}
-.nav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;font-size:13px;padding:4px}.nav button span{font-size:20px}.nav button.on{color:#c4b5fd}
-.meter{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.meter i{display:block;height:100%;background:#a78bfa}
+.nav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;font-size:13px;padding:4px}.nav button span{font-size:20px}.nav button.on{color:#fca5a5}
+.meter{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.meter i{display:block;height:100%;background:#ef4444}
 .stats .card b{font-size:20px}textarea{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
 @media(max-width:760px){.acts{grid-template-columns:repeat(4,1fr)}.top b{font-size:15px}}
+button.p,button.on{background:linear-gradient(135deg,#e11d2e,#5a0b14)!important;border-color:transparent!important;color:#fff!important}.nav button.on{background:none!important;color:#fca5a5!important}
+.c .logo{width:110px;height:110px;object-fit:contain}.top .logo{width:44px;height:44px;object-fit:contain}
+.ti{font-family:"Chakra Petch","Trebuchet MS",sans-serif;font-size:34px;letter-spacing:4px;margin:6px 0 0;text-align:center}
+.su{text-align:center;font-size:12px;letter-spacing:4px;color:#6b7280;margin:8px 0 14px}.dv{border:0;border-top:1px solid #1f1f23;margin:0 0 18px}
+.lw{width:min(420px,92vw);display:flex;flex-direction:column;align-items:stretch}.lw .logo{align-self:center}
+.fl{font-family:"Chakra Petch",sans-serif;font-size:12px;letter-spacing:2px;color:#9ca3af;margin:12px 0 8px}
+.in{width:100%;letter-spacing:0!important;text-align:left!important;font-size:16px!important;font-family:Inter,system-ui,sans-serif;background:#0b0b0b;border:1px solid #2a2a2e;border-radius:12px;padding:15px 16px}
+.pwb{position:relative}.pwb .eye{position:absolute;right:6px;top:4px;border:0;background:none;color:#9ca3af;font-size:18px}
+button.big{width:100%;margin-top:26px;padding:15px;font-family:"Chakra Petch",sans-serif;letter-spacing:3px;font-size:15px}.er{color:var(--bad);min-height:24px;text-align:center;margin-top:12px;font-size:14px}
+.sec{display:grid;grid-template-columns:repeat(3,200px);gap:14px;justify-content:center}.sb{width:200px;height:110px;font-size:20px;font-weight:700;text-align:center;justify-content:center}
+@media(max-width:700px){.sec,.sec[style]{grid-template-columns:200px!important}}
+.floor{position:relative;height:calc(100vh - 290px);min-height:420px;border:1px dashed var(--bd);border-radius:14px;background:rgba(255,255,255,.03)}
+.floor.edit{border-color:var(--warn);background-image:radial-gradient(var(--bd) 1px,transparent 1px);background-size:24px 24px}
+.ft{position:absolute;width:128px;min-height:84px;border-radius:12px;padding:10px;border:2px solid;cursor:pointer;touch-action:none;user-select:none;font-weight:700}
+.ft small{display:block;font-weight:400;opacity:.85;margin-top:4px}.ft.g{background:#0f3d24;border-color:#22c55e}.ft.r{background:#4a1015;border-color:#ef4444}.ft.y{background:#4a3a08;border-color:#fbbf24}.ft.ed{border-style:dashed;cursor:move}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.kp button{min-height:56px;font-size:22px}
+.kd{font-size:38px;font-weight:800;text-align:center;padding:10px;border:1px solid var(--bd);border-radius:12px;margin:10px 0;min-height:64px}
 </style></head><body><div id="app"></div>
 <script>
-const PASS="PH1S3",CUR="$",TAX=0.10;
+const PASS="PH1S3",CUR="SR ",TAX=0.10;
 const MENU=[
 {id:1,n:"Spring Rolls",p:6,c:2,st:"app",cat:"Appetizers"},{id:2,n:"Garlic Bread",p:5,c:1.2,st:"app",cat:"Appetizers"},
 {id:3,n:"Caesar Salad",p:8,c:2.5,st:"app",cat:"Appetizers"},{id:4,n:"Tomato Soup",p:6,c:1.5,st:"app",cat:"Appetizers"},
@@ -59,85 +77,104 @@ const MENU=[
 {id:11,n:"Fresh Orange Juice",p:5,c:1.4,st:"bar",cat:"Drinks"},{id:12,n:"Iced Tea",p:4,c:0.5,st:"bar",cat:"Drinks"},
 {id:13,n:"Coffee",p:3.5,c:0.4,st:"bar",cat:"Drinks"},{id:14,n:"Mocktail",p:7,c:1.8,st:"bar",cat:"Drinks"}];
 const STN={app:"Appetizer Kitchen",main:"Main Kitchen",bar:"Bar"};
-let S={tables:[1,2,3,4,5,6,7,8].map(n=>({n:""+n,seats:4})),orders:[],seq:1,name:"PHASE Ventures | Food & Beverages",exp:[],house:[]};
-try{const x=localStorage.getItem("dpos");if(x)S=JSON.parse(x)}catch(e){}
-if(S.name==="Your Restaurant")S.name="PHASE Ventures | Food & Beverages";
-const save=()=>{try{localStorage.setItem("dpos",JSON.stringify(S))}catch(e){}};
-let V={auth:false,splash:true,role:null,stn:null,tab:"order",oid:null,cat:null,q:"",rt:"summary",armed:0,fin:false,modal:null,cal:new Date(),sel:null,bad:false};
+const fresh=()=>({tables:[1,2,3,4,5,6,7,8].map((n,i)=>({n:""+n,name:"",seats:4,x:6+(i%4)*24,y:8+Math.floor(i/4)*34})),orders:[],seq:1,name:"PHASE Ventures | Food & Beverages",exp:[],house:[]});
+let S=fresh();
+const KEY=()=>"dpos_"+(V.user||"x");
+function loadS(){S=fresh();try{const x=localStorage.getItem(KEY());if(x)S=JSON.parse(x)}catch(e){}S.tables.forEach((t,i)=>{if(t.x==null){t.x=6+(i%4)*24;t.y=8+Math.floor(i/4)*34}});S.exp=S.exp||[];S.house=S.house||[]}
+const save=()=>{try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}};
+const USERS=["resto1","resto2"];
+const tname=n=>{const t=S.tables.find(z=>z.n===n);return t&&t.name?t.name:"Table "+n};
+let V={auth:false,splash:true,role:null,stn:null,tab:"home",user:null,edit:false,kp:"",pm:"Cash",oid:null,cat:null,q:"",rt:"summary",armed:0,fin:false,modal:null,cal:new Date(),sel:null,bad:false};
 const $=s=>document.getElementById(s),m=v=>CUR+(+v).toFixed(2);
 const dk=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const tm=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
 const ord=id=>S.orders.find(o=>o.id===id);
-const lab=o=>o.takeout?"Takeout #"+o.id:"Table "+o.tables.join(" + ");
+const lab=o=>o.takeout?"Takeout #"+o.id:o.tables.map(tname).join(" + ");
 const live=o=>o.items.filter(i=>!i.v);
 const calc=o=>{const l=live(o),g=l.reduce((a,i)=>a+i.p*i.q,0),sub=g*(1-(o.disc||0)/100),cost=l.reduce((a,i)=>a+i.c*i.q,0),tax=sub*TAX,
  vd=o.items.filter(i=>i.v).reduce((a,i)=>a+i.p*i.q,0);return{g,sub,cost,tax,total:sub+tax,vd}};
 const openFor=t=>S.orders.find(o=>o.status==="open"&&o.tables.includes(t));
 function go(p){Object.assign(V,p);render()}
-function LOGO(){if(S.logo)return `<img class="logo" src="${S.logo}" alt="logo" style="object-fit:contain;border-radius:8px">`;return `<svg class="logo" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="var(--ac)"/><circle cx="60" cy="60" r="44" fill="none" stroke="var(--act)" stroke-width="2"/><path d="M44 28v22a6 6 0 0 0 6 6v36M38 28v18M50 28v18M56 28v22a6 6 0 0 1-6 6" stroke="var(--act)" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M78 28c-8 6-10 20-6 32h6v28" stroke="var(--act)" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`}
+function LOGO(){return `<img class="logo" src="PHASE-LOGO.PNG" alt="PHASE" onerror="this.style.display='none'">`}
 function render(){render0();if(!V.splash){const a=$("app");a.innerHTML=hdr()+a.innerHTML}}
 function render0(){
  const a=$("app");
- if(V.splash){a.innerHTML=`<div class="c">${LOGO()}<h1 style="margin:0">${S.name}</h1><div class="mut">Dining POS</div></div>`;setTimeout(()=>{V.splash=false;render()},1800);return}
- if(!V.auth){a.innerHTML=`<div class="c">${LOGO()}<h2>${S.name}</h2><div class="mut">Enter password to open the POS</div>
- <input id="pw" type="password" autocomplete="off" onkeydown="if(event.key==='Enter')login()"><button class="p" onclick="login()" style="min-width:200px">Open POS</button>
- <div style="color:var(--bad);min-height:22px">${V.bad?"Wrong password. Try again.":""}</div></div>`;setTimeout(()=>$("pw")&&$("pw").focus(),0);return}
- if(!V.role){a.innerHTML=`<div class="c">${LOGO()}<h2>Choose your section</h2><div class="grid" style="width:min(640px,100%)">
- <button class="item p" onclick="go({role:'counter',tab:'home',oid:null})"><b style="font-size:20px">Counter</b>Take orders and payments</button>
- <button class="item" onclick="go({role:'kitchen'})"><b style="font-size:20px">Kitchen</b>Main or appetizer tickets</button>
- <button class="item" onclick="go({role:'bar',stn:'bar'})"><b style="font-size:20px">Bar</b>Drink orders</button></div>
- <button onclick="go({auth:false})">Lock POS</button></div>`;return}
- if(V.role==="kitchen"&&!V.stn){a.innerHTML=`<div class="c"><h2>Which kitchen?</h2><div class="grid" style="width:min(460px,100%)">
- <button class="item p" onclick="go({stn:'main'})"><b style="font-size:20px">Main Kitchen</b>Mains</button>
- <button class="item p" onclick="go({stn:'app'})"><b style="font-size:20px">Appetizer Kitchen</b>Starters</button></div>
- <button onclick="go({role:null})">Back</button></div>`;return}
+ if(V.splash){a.innerHTML=`<div class="c">${LOGO()}<h1 class="ti">PHASE VENTURES</h1></div>`;setTimeout(()=>{V.splash=false;render()},1600);return}
+ if(!V.auth){a.innerHTML=`<div class="c"><div class="lw">${LOGO()}<h1 class="ti">PHASE VENTURES</h1><div class="su">ENTER PASSWORD TO CONTINUE</div><hr class="dv">
+ <label class="fl">NAME</label><input class="in" id="un" placeholder="Enter name" autocomplete="off" autocapitalize="off">
+ <label class="fl">PASSWORD</label><div class="pwb"><input class="in" id="pw" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"><button class="eye" onclick="const p=$('pw');p.type=p.type==='password'?'text':'password'">&#128065;</button></div>
+ <button class="p big" onclick="login()">ENTER POS</button><div class="er">${V.bad?"Wrong name or password.":""}</div></div></div>`;setTimeout(()=>$("un")&&$("un").focus(),0);return}
+ if(!V.role){a.innerHTML=`<div class="c">${LOGO()}<h2>Choose your section</h2><div class="sec">
+ <button class="sb" onclick="go({role:'counter',tab:'home',oid:null})">Counter</button><button class="sb" onclick="go({role:'kitchen'})">Kitchen</button><button class="sb" onclick="go({role:'bar',stn:'bar'})">Bar</button></div>
+ <button onclick="go({auth:false,user:null})">Lock POS</button></div>`;return}
+ if(V.role==="kitchen"&&!V.stn){a.innerHTML=`<div class="c"><h2>Which kitchen?</h2><div class="sec" style="grid-template-columns:repeat(2,200px)">
+ <button class="sb" onclick="go({stn:'main'})">Main Kitchen</button><button class="sb" onclick="go({stn:'app'})">Appetizer Kitchen</button></div><button onclick="go({role:null})">Back</button></div>`;return}
  a.innerHTML=(V.role==="counter"?counter():station())+(V.modal?modal():"");
 }
-function login(){if($("pw").value===PASS)go({auth:true,bad:false});else go({bad:true})}
+function login(){const u=$("un").value.trim().toLowerCase();if(USERS.includes(u)&&$("pw").value===PASS){V.user=u;loadS();go({auth:true,bad:false})}else go({bad:true})}
 function head(t,tabs){return `<div class="bar"><span class="tag">${t}</span>${tabs||""}<span class="sp"></span><button onclick="go({role:null,stn:null,oid:null})">Switch section</button></div>`}
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function hdr(){return `<header class="top"><label class="lg" title="Click to upload your logo (PHASE LOGO.PNG)">${LOGO()}<input type="file" accept="image/*" hidden onchange="upLogo(this)"></label><b>${esc(S.name)}</b></header>`}
-function upLogo(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.logo=r.result;save();render()};r.readAsDataURL(f)}
+function hdr(){return `<header class="top">${LOGO()}<b>${esc(S.name)}</b><span style="flex:1"></span>${V.user?`<span class="tag">${esc(V.user)}</span>`:""}</header>`}
 function counter(){
  const T=V.tab,o=V.oid?ord(V.oid):null;
  const nav=[["home","Home","⌂"],["orders","Orders","◷"],["tables","Tables","▦"]].map(t=>`<button class="${T===t[0]?"on":""}" onclick="go({tab:'${t[0]}'})"><span>${t[2]}</span>${t[1]}</button>`).join("")+`<button onclick="newOrder([],true)"><span>+</span>New</button>`;
- const body=T==="home"?(o?home(o):hub()):T==="orders"?ordersTab():T==="tables"?tablesTab():reports();
+ const body=T==="home"?home(o):T==="orders"?ordersTab():T==="tables"?tablesTab():reports();
  return head("Counter",`<button onclick="go({modal:{t:'more'}})">More</button>`)+`<div class="wrap" style="padding-bottom:100px">${body}</div><nav class="nav">${nav}</nav>`}
-function ab(ic,l,fn,c){return `<button class="ab ${c||""}" onclick="${fn}"><span>${ic}</span>${l}</button>`}
 function mgrid(){const q=(V.q||"").toLowerCase();
  if(!q&&!V.cat)return [["Mains","MAIN"],["Appetizers","APPETIZER"],["Drinks","DRINKS"]].map(c=>`<button class="tile" onclick="go({cat:'${c[0]}'})">${c[1]}</button>`).join("");
  const l=MENU.filter(i=>q?i.n.toLowerCase().includes(q):i.cat===V.cat);
  return `<button class="tile" onclick="go({cat:null,q:''})">&larr; Categories</button>`+l.map(i=>`<button class="item" onclick="add(${i.id})"><b>${i.n}</b><span class="mut">${m(i.p)}</span></button>`).join("")}
+function ab(ic,l,fn,c,dis){return `<button class="ab ${c||""}" ${dis?"disabled":""} onclick="${fn}"><span>${ic}</span>${l}</button>`}
 function home(o){
- const c=calc(o),unsent=live(o).some(i=>!i.s),armed=Date.now()<V.armed;
- const lines=o.items.map((i,x)=>`<div class="line ${i.v?"v":""}"><div class="row"><span><b>${i.q}x</b> ${i.n}${i.s?` <span class="tag">${i.done?"served":"sent"}</span>`:""}</span><span>${m(i.p*i.q)}</span></div>
- ${i.v?`<div class="mut">Voided: ${i.vr}</div>`:`<div class="row" style="margin-top:6px;justify-content:flex-start">${i.s?"":`<button onclick="qty(${x},-1)">-</button><button onclick="qty(${x},1)">+</button>`}<button class="d" onclick="go({modal:{t:'void',x:${x}}})">${i.s?"Void":"Remove"}</button></div>`}</div>`).join("")||`<div class="mut" style="padding:24px 0">No items yet. Pick a category and tap a dish.</div>`;
- const left=`<div class="card"><div class="row"><h3>${lab(o)}</h3><span>${(o.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</span></div>
- <div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-bottom:6px"><button onclick="go({modal:{t:'assign'}})">${o.tables.length?"Move table":"Assign table"}</button>${o.takeout?"":`<button onclick="go({modal:{t:'merge'}})">Merge tables</button>`}</div>
+ const unsent=o&&live(o).some(i=>!i.s),armed=Date.now()<V.armed,c=o?calc(o):null;
+ const lines=o?o.items.map((i,x)=>`<div class="line ${i.v?"v":""}"><div class="row"><span><b>${i.q}x</b> ${i.n}${i.s?` <span class="tag">${i.done?"served":"sent"}</span>`:""}</span><span>${m(i.p*i.q)}</span></div>
+ ${i.v?`<div class="mut">Voided: ${i.vr}</div>`:`<div class="row" style="margin-top:6px;justify-content:flex-start">${i.s?"":`<button onclick="qty(${x},-1)">-</button><button onclick="qty(${x},1)">+</button>`}<button class="d" onclick="go({modal:{t:'void',x:${x}}})">${i.s?"Void":"Remove"}</button></div>`}</div>`).join("")||`<div class="mut" style="padding:24px 0">No items yet. Pick a category and tap a dish.</div>`:"";
+ const left=o?`<div class="card"><div class="row"><h3>${esc(lab(o))}</h3><span class="mut">${o.guests?o.guests+" guests":""}</span></div>
+ <div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-bottom:6px">${(o.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}${o.takeout?"":`<button onclick="go({modal:{t:'merge'}})">Merge tables</button>`}</div>
  ${o.note?`<div class="mut">Note: ${esc(o.note)}</div>`:""}${lines}
  <div class="tot"><div class="row"><span>Subtotal</span><span>${m(c.g)}</span></div>${o.disc?`<div class="row"><span>Discount (${o.disc}%)</span><span>-${m(c.g-c.sub)}</span></div>`:""}<div class="row"><span>Tax (${TAX*100}%)</span><span>${m(c.tax)}</span></div>
  <div class="row" style="margin-top:6px"><b>Total</b><span class="g">${m(c.total)}</span></div></div>
- <button class="p" style="width:100%;margin-top:12px" ${live(o).length&&!unsent?"":"disabled"} onclick="go({modal:{t:'pay'}})">Take payment</button>
- ${unsent?`<div class="mut" style="margin-top:6px">Tap Kitchen twice to send new items. Then you can take payment.</div>`:""}</div>`;
- const right=`<div><div class="acts">${ab("🖨","Print","go({modal:{t:'receipt'}})")}${ab("👨‍🍳",armed?"Tap again":"Kitchen","send()",(unsent?"hot ":"")+(armed?"arm":""))}${ab("⊘","Void","go({modal:{t:'voidpick'}})")}${ab("%","Discount","go({modal:{t:'disc'}})")}${ab("✎","Notes","go({modal:{t:'note'}})")}${ab("🏷","Tags","go({modal:{t:'tags'}})")}${ab("•••","More","go({modal:{t:'more'}})")}</div>
+ <button class="p" style="width:100%;margin-top:12px" ${live(o).length&&!unsent?"":"disabled"} onclick="go({modal:{t:'pay'},kp:'',pm:'Cash'})">Pay</button>
+ ${unsent?`<div class="mut" style="margin-top:6px">Press Order twice to send the new items. Then you can pay.</div>`:""}</div>`
+ :`<div class="card"><h3>No table selected</h3><div class="mut">Tap Tables, pick a table and enter the number of guests.</div><button class="p" style="margin-top:12px" onclick="go({tab:'tables'})">Tables</button></div>`;
+ const n=!o;
+ const right=`<div><div class="acts">${ab("🖨","Print","printOrder()","",n||!live(o).length)}${ab("📋",armed?"Tap again":"Order","send()",(unsent?"hot ":"")+(armed?"arm":""),n||!unsent)}${ab("⊘","Void","go({modal:{t:'voidpick'}})","",n)}${ab("%","Discount","go({modal:{t:'disc'}})","",n)}${ab("✎","Notes","go({modal:{t:'note'}})","",n)}${ab("🏷","Tags","go({modal:{t:'tags'}})","",n)}${ab("•••","More","go({modal:{t:'more'}})")}</div>
  <div class="search"><input id="sq" placeholder="Search products" value="${esc(V.q)}" oninput="V.q=this.value;$('mg').innerHTML=mgrid()"></div><div id="mg" class="grid">${mgrid()}</div></div>`;
  return `<div class="split">${left}${right}</div>`}
+function printOrder(){const o=ord(V.oid);o.pr=Date.now();save();go({modal:{t:"receipt"}})}
+function tablesTab(){
+ const T=S.tables.map(t=>{const o=openFor(t.n),k=!o?"g":(o.pr?"y":"r");return `<div class="ft ${k} ${V.edit?"ed":""}" data-n="${t.n}" style="left:${t.x}%;top:${t.y}%" onpointerdown="pd(event,'${t.n}')">${esc(tname(t.n))}<small>${o?o.guests+" guests - "+m(calc(o).total):t.seats+" seats"}</small></div>`}).join("");
+ return `<div class="row" style="flex-wrap:wrap;margin-bottom:10px"><h2>Tables</h2><span class="mut"><span style="color:#22c55e">&#9632;</span> Open &nbsp;<span style="color:#ef4444">&#9632;</span> Not paid &nbsp;<span style="color:#fbbf24">&#9632;</span> Receipt printed</span>
+ ${V.edit?`<span><button onclick="S.tables.push({n:''+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:'',seats:4,x:40,y:40});save();render()">+ Add table</button> <button class="p" onclick="go({edit:false})">Done</button></span>`:`<span class="mut">Hold a table to move or rename it</span>`}</div>
+ <div id="floor" class="floor ${V.edit?"edit":""}">${T}</div>`}
+let D=null;
+function pd(e,n){e.preventDefault();const t=S.tables.find(z=>z.n===n);D={n,t,sx:e.clientX,sy:e.clientY,ox:t.x,oy:t.y,fl:$("floor").getBoundingClientRect(),mv:0,lp:0};
+ if(!V.edit)D.timer=setTimeout(()=>{if(D){D.lp=1;V.edit=true;render()}},600)}
+document.addEventListener("pointermove",e=>{if(!D)return;const dx=e.clientX-D.sx,dy=e.clientY-D.sy;if(Math.abs(dx)+Math.abs(dy)>6){D.mv=1;clearTimeout(D.timer)}
+ if(V.edit&&D.mv){D.t.x=Math.min(86,Math.max(0,D.ox+dx/D.fl.width*100));D.t.y=Math.min(80,Math.max(0,D.oy+dy/D.fl.height*100));const el=document.querySelector(`[data-n="${D.n}"]`);if(el){el.style.left=D.t.x+"%";el.style.top=D.t.y+"%"}}});
+document.addEventListener("pointerup",()=>{if(!D)return;clearTimeout(D.timer);const d=D;D=null;if(d.lp)return;if(d.mv){if(V.edit)save();return}
+ if(V.edit){go({modal:{t:"tname",n:d.n}});return}
+ const o=openFor(d.n);o?go({modal:{t:"topt",n:d.n}}):go({modal:{t:"guest",n:d.n},kp:""})});
+function kpad(){return `<div class="kp">${[1,2,3,4,5,6,7,8,9,".",0,"⌫"].map(k=>`<button onclick="kp('${k}')">${k}</button>`).join("")}</div>`}
+function kp(k){let s=V.kp||"";const g=V.modal&&V.modal.t==="guest";if(k==="⌫")s=s.slice(0,-1);else if(k==="."){if(g)return;if(!s.includes("."))s=(s||"0")+"."}else s=(s+k).slice(0,g?2:9);V.kp=s;render()}
+function startGuests(n){const g=parseInt(V.kp);if(!g)return;newOrder([n],false,g)}
+function newOrder(t,to,g){const o={id:S.seq++,tables:t,takeout:!!to,guests:g||0,items:[],status:"open",created:Date.now(),pays:[]};S.orders.push(o);save();go({oid:o.id,tab:"home",modal:null})}
 function ordersTab(){const op=S.orders.filter(o=>o.status==="open");
  return `<h2>Open orders</h2><div class="grid" style="margin-bottom:16px">${op.map(o=>`<button class="tb occ" onclick="go({oid:${o.id},tab:'home'})"><b>${lab(o)}</b><div>${m(calc(o).total)}</div></button>`).join("")||`<div class="mut">None open.</div>`}</div>`+history()}
-function tablesTab(){return `<div class="row" style="margin-bottom:10px"><span></span><button class="${V.arr?"on":""}" onclick="go({arr:!V.arr})">${V.arr?"Done arranging":"Arrange tables"}</button></div>`+(V.arr?setup():hub())}
 function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  const W=h=>`<div class="mod" onclick="if(event.target===this)go({modal:null})"><div>${h}<div class="row" style="margin-top:12px"><span></span><button onclick="go({modal:null})">Close</button></div></div></div>`;
  const td=dk(new Date()),inp=(id,ph,ty)=>`<input class="plain" id="${id}" placeholder="${ph}" ${ty?`type="${ty}" step="0.01"`:""} style="width:100%;margin:6px 0">`;
+ const XM=extraModal(M,o,W);if(XM)return XM;
  if(t==="more"){const L=[["🧾","Open Till","till"],["📅","End of Day ("+new Date().toLocaleDateString()+")","eod"],["🗄","Drawer Operations","drawer"],["💳","House Account Payment","house"],["📊","Reports","reports"],["🔄","Sync Data","sync"],["🩺","Diagnostics","diag"],["🖨","Devices","dev"],["⎋","Exit","exit"]];
   return W(`<h3>More</h3><div style="display:grid;gap:6px">${L.map(l=>`<button class="${l[2]==="exit"?"d":""}" style="text-align:left" onclick="more('${l[2]}')">${l[0]}&nbsp; ${l[1]}</button>`).join("")}</div>`)}
  if(t==="till")return W(`<h3>Open till</h3><div class="mut">${S.till?"Current float: "+m(S.till.f)+" since "+tm(S.till.t):"Enter the starting cash in the drawer."}</div>${inp("a","Starting cash","number")}<button class="p" onclick="S.till={t:Date.now(),f:+$('a').value||0};save();go({modal:null})">Open till</button>`);
  if(t==="drawer")return W(`<h3>Drawer operations</h3>${inp("a","Amount","number")}${inp("n","Reason (for example: ice, supplies)")}<div class="row"><button class="p" onclick="cash(1)">Cash in</button><button class="d" onclick="cash(-1)">Paid out (expense)</button></div>`);
  if(t==="house")return W(`<h3>House account payment</h3>${inp("n","Account name")}${inp("a","Amount received","number")}<button class="p" onclick="S.house=S.house||[];S.house.push({d:'${td}',n:$('n').value,a:+$('a').value||0});save();go({modal:null})">Record payment</button>`);
- if(t==="eod"){const P=S.orders.filter(q=>q.status==="paid"&&dk(new Date(q.paidAt))===td),s=k=>P.reduce((a,q)=>a+(q[k]||0),0),cs=P.filter(q=>q.method==="Cash").reduce((a,q)=>a+q.total,0);
+ if(t==="eod"){const P=S.orders.filter(q=>q.status==="paid"&&dk(new Date(q.paidAt))===td),s=k=>P.reduce((a,q)=>a+(q[k]||0),0),cs=P.reduce((a,q)=>a+(q.pays||[{m:q.method,a:q.total}]).filter(p=>p.m==="Cash").reduce((x,p)=>x+p.a,0),0);
   return W(`<h3>End of day ${td}</h3><div class="line row"><span>Orders</span><b>${P.length}</b></div><div class="line row"><span>Net sales</span><b>${m(s("sub"))}</b></div><div class="line row"><span>Tax</span><b>${m(s("tax"))}</b></div><div class="line row"><span>Voids</span><b>${m(s("vd"))}</b></div><div class="line row"><span>Cash sales</span><b>${m(cs)}</b></div><div class="line row"><span>Expected in drawer</span><b>${m(cs+(S.till?S.till.f:0))}</b></div>
   <button class="p" style="width:100%;margin-top:10px" onclick="S.till=null;S.closed=S.closed||[];S.closed.push('${td}');save();go({modal:null})">Close the day</button>`)}
  if(t==="sync"){save();return W(`<h3>Sync data</h3><div>Saved on this device at ${tm(Date.now())}. Counter, kitchen and bar share it when open in the same browser.</div>`)}
- if(t==="diag"){let sz=0;try{sz=(localStorage.getItem("dpos")||"").length}catch(e){}return W(`<h3>Diagnostics</h3><div class="line row"><span>Orders stored</span><b>${S.orders.length}</b></div><div class="line row"><span>Tables</span><b>${S.tables.length}</b></div><div class="line row"><span>Storage used</span><b>${(sz/1024).toFixed(1)} KB</b></div><div class="line row"><span>Menu items</span><b>${MENU.length}</b></div>`)}
+ if(t==="diag"){let sz=0;try{sz=(localStorage.getItem(KEY())||"").length}catch(e){}return W(`<h3>Diagnostics</h3><div class="line row"><span>Orders stored</span><b>${S.orders.length}</b></div><div class="line row"><span>Tables</span><b>${S.tables.length}</b></div><div class="line row"><span>Storage used</span><b>${(sz/1024).toFixed(1)} KB</b></div><div class="line row"><span>Menu items</span><b>${MENU.length}</b></div>`)}
  if(t==="dev")return W(`<h3>Devices</h3>${[["Receipt printer","Use Print on the order screen"],["Appetizer Kitchen display","Section screen"],["Main Kitchen display","Section screen"],["Bar display","Section screen"]].map(d=>`<div class="line row"><span>${d[0]}</span><span class="mut">${d[1]}</span></div>`).join("")}`);
  if(t==="disc")return W(`<h3>Discount</h3><div class="grid">${[0,5,10,15,20,50].map(p=>`<button class="${(o.disc||0)===p?"on":""}" onclick="ord(V.oid).disc=${p};save();go({modal:null})">${p?p+"% off":"No discount"}</button>`).join("")}</div>`);
  if(t==="note")return W(`<h3>Order note</h3><textarea id="nt" rows="4" style="width:100%;font:inherit;padding:10px;border-radius:10px">${esc(o.note)}</textarea><button class="p" style="margin-top:8px" onclick="ord(V.oid).note=$('nt').value;save();go({modal:null})">Save note</button>`);
@@ -148,13 +185,7 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
 function more(k){if(k==="reports")go({modal:null,tab:"reports"});else if(k==="exit")go({modal:null,role:null,oid:null,stn:null});else go({modal:{t:k}})}
 function tag(g){const o=ord(V.oid);o.tags=o.tags||[];const i=o.tags.indexOf(g);i<0?o.tags.push(g):o.tags.splice(i,1);save();render()}
 function cash(s){const a=+$("a").value||0,n=$("n").value||"Drawer";if(s<0){S.exp=S.exp||[];S.exp.push({d:dk(new Date()),c:n,a})}else if(S.till)S.till.f+=a;save();go({modal:null})}
-function hub(){
- const t=S.tables.map(x=>{const o=openFor(x.n);return `<button class="tb ${o?"occ":"free"}" onclick="${o?`go({oid:${o.id},tab:'home'})`:`openT('${x.n}')`}"><b style="font-size:20px">Table ${x.n}</b><div class="mut">${x.seats} seats</div>${o?`<div>${o.tables.length>1?"Merged: "+o.tables.join("+"):"In use"} - ${m(calc(o).total)}</div>`:`<div class="mut">Free - tap to start</div>`}</button>`}).join("");
- const tk=S.orders.filter(o=>o.status==="open"&&o.takeout).map(o=>`<button class="tb occ" onclick="go({oid:${o.id},tab:'home'})"><b>Takeout #${o.id}</b><div>${m(calc(o).total)}</div></button>`).join("");
- return `<div class="row"><h2>Pick a table to start an order</h2><button class="p" onclick="newOrder([],true)">+ New takeout</button></div><div class="grid">${t}${tk}</div>`}
-function newOrder(t,to){const o={id:S.seq++,tables:t,takeout:!!to,items:[],status:"open",created:Date.now()};S.orders.push(o);save();go({oid:o.id,tab:"home"})}
-function openT(n){newOrder([n],false)}
-function add(id){const o=ord(V.oid),d=MENU.find(i=>i.id===id),e=o.items.find(i=>i.id===id&&!i.s&&!i.v);
+function add(id){if(!V.oid){go({tab:"tables"});return}const o=ord(V.oid);o.pr=0;const d=MENU.find(i=>i.id===id),e=o.items.find(i=>i.id===id&&!i.s&&!i.v);
  if(e)e.q++;else o.items.push({k:Math.random(),id,n:d.n,p:d.p,c:d.c,st:d.st,q:1,s:0,done:0,v:0});save();render()}
 function qty(x,d){const i=ord(V.oid).items[x];i.q+=d;if(i.q<1)ord(V.oid).items.splice(x,1);save();render()}
 function send(){const o=ord(V.oid);if(Date.now()<V.armed){o.items.forEach(i=>{if(!i.v&&!i.s){i.s=Date.now()}});V.armed=0;save();render();return}
@@ -163,11 +194,11 @@ function modal0(){const M=V.modal,o=V.oid?ord(V.oid):null;let h="";
  const x=`<div class="row" style="margin-top:12px"><span></span><button onclick="go({modal:null})">Close</button></div>`;
  if(M.t==="void"){const i=o.items[M.x];h=`<h3>${i.s?"Void":"Remove"} ${i.n}?</h3><div class="mut">${i.s?"This item was already sent. Choose a reason:":"Choose a reason:"}</div><div style="display:grid;gap:8px;margin-top:10px">
  ${["Customer changed mind","Order mistake","Out of stock","Food quality"].map(r=>`<button class="d" onclick="doVoid(${M.x},'${r}')">${r}</button>`).join("")}</div>${x}`}
- if(M.t==="assign"){h=`<h3>${o.tables.length?"Move to which table?":"Assign a table"}</h3><div class="grid">${S.tables.filter(t=>!openFor(t.n)).map(t=>`<button class="item" onclick="setT('${t.n}')"><b>Table ${t.n}</b><span class="mut">${t.seats} seats</span></button>`).join("")||"<div class='mut'>No free tables.</div>"}</div>${x}`}
+ if(M.t==="assign"){h=`<h3>${o.tables.length?"Move to which table?":"Assign a table"}</h3><div class="grid">${S.tables.filter(t=>!openFor(t.n)).map(t=>`<button class="item" onclick="setT('${t.n}')"><b>${esc(tname(t.n))}</b><span class="mut">${t.seats} seats</span></button>`).join("")||"<div class='mut'>No free tables.</div>"}</div>${x}`}
  if(M.t==="merge"){const ot=S.orders.filter(q=>q.status==="open"&&!q.takeout&&q.id!==o.id);
  const fr=S.tables.filter(t=>!openFor(t.n));
  h=`<h3>Merge tables</h3><div class="mut">Join another occupied table's bill into this one.</div><div class="grid" style="margin:10px 0">${ot.map(q=>`<button class="item" onclick="merge(${q.id})"><b>${lab(q)}</b><span class="mut">${m(calc(q).total)}</span></button>`).join("")||"<div class='mut'>No other occupied tables.</div>"}</div>
- <div class="mut">Or add a free table to this group (seating a larger party):</div><div class="grid" style="margin-top:8px">${fr.map(t=>`<button onclick="addT('${t.n}')">+ Table ${t.n}</button>`).join("")}</div>${x}`}
+ <div class="mut">Or add a free table to this group (seating a larger party):</div><div class="grid" style="margin-top:8px">${fr.map(t=>`<button onclick="addT('${t.n}')">+ ${esc(tname(t.n))}</button>`).join("")}</div>${x}`}
  if(M.t==="pay"){const c=calc(o);h=`<h3>Payment - ${lab(o)}</h3><div style="font-size:30px;font-weight:800;color:var(--ac)">${m(c.total)}</div><div style="display:grid;gap:8px;margin-top:12px">
  <button class="p" onclick="pay('Cash')">Paid by cash</button><button class="p" onclick="pay('Card')">Paid by card</button></div>${x}`}
  return `<div class="mod" onclick="if(event.target===this)go({modal:null})"><div>${h}</div></div>`}
@@ -175,12 +206,24 @@ function doVoid(x,r){const o=ord(V.oid),i=o.items[x];if(i.s){i.v=1;i.vr=r;i.vt=D
 function setT(n){ord(V.oid).tables=[n];ord(V.oid).takeout=false;V.modal=null;save();render()}
 function addT(n){ord(V.oid).tables.push(n);V.modal=null;save();render()}
 function merge(id){const o=ord(V.oid),q=ord(id);o.tables=[...new Set([...o.tables,...q.tables])];o.items.push(...q.items);o.takeout=false;S.orders=S.orders.filter(z=>z.id!==id);V.modal=null;save();render()}
-function pay(mt){const o=ord(V.oid),c=calc(o);Object.assign(o,{status:"paid",paidAt:Date.now(),method:mt,sub:c.sub,tax:c.tax,total:c.total,cost:c.cost,vd:c.vd});V.oid=null;V.modal=null;save();render()}
-function setup(){return `<div class="row"><h2>Table arrangement</h2><button class="p" onclick="S.tables.push({n:''+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),seats:4});save();render()">+ Add table</button></div>
- <div class="mut" style="margin-bottom:10px">Change seats or remove tables that are not in use.</div><div class="grid">${S.tables.map((t,x)=>`<div class="card"><b>Table ${t.n}</b><div class="row" style="margin:8px 0"><button onclick="seat(${x},-1)">-</button>${t.seats} seats<button onclick="seat(${x},1)">+</button></div>
- <button class="d" ${openFor(t.n)?"disabled":""} onclick="S.tables.splice(${x},1);save();render()">Remove</button></div>`).join("")}</div>
- <div class="card" style="margin-top:14px"><h3>Restaurant name</h3><input style="letter-spacing:0;text-align:left;width:min(380px,100%)" value="${S.name}" onchange="S.name=this.value;save();render()"></div>`}
-function seat(x,d){S.tables[x].seats=Math.max(1,S.tables[x].seats+d);save();render()}
+function addPay(){const o=ord(V.oid),a=+V.kp||0,pd=(o.pays||[]).reduce((s,p)=>s+p.a,0),rem=+(calc(o).total-pd).toFixed(2),ap=Math.min(a,rem);if(a<=0||ap<=0)return;o.pays=o.pays||[];o.pays.push({m:V.pm||"Cash",a:+ap.toFixed(2),given:a,t:Date.now()});V.kp="";save();render()}
+function finishPay(){const o=ord(V.oid),c=calc(o);Object.assign(o,{status:"paid",paidAt:Date.now(),method:[...new Set(o.pays.map(p=>p.m))].join(" + "),sub:c.sub,tax:c.tax,total:c.total,cost:c.cost,vd:c.vd});V.oid=null;V.modal=null;V.tab="tables";save();render()}
+function payModal(o,W){const c=calc(o),ps=o.pays||[],pd=ps.reduce((a,p)=>a+p.a,0),rem=Math.max(0,+(c.total-pd).toFixed(2)),mt=V.pm||"Cash";
+ return W(`<h3>Pay - ${esc(lab(o))}</h3><div class="row line"><span>Bill total</span><b>${m(c.total)}</b></div>
+ <div class="grid" style="grid-template-columns:repeat(4,1fr);margin:10px 0">${["Cash","Mada","Visa","STC Pay"].map(k=>`<button class="${mt===k?"on":""}" onclick="V.pm='${k}';render()">${k}</button>`).join("")}</div>
+ <div class="kd">${V.kp||"0"}</div>
+ <div class="row" style="margin-bottom:8px"><button onclick="V.kp='${rem}';render()">Full balance</button>${o.guests>1?`<button onclick="V.kp='${(c.total/o.guests).toFixed(2)}';render()">Split by ${o.guests}</button>`:""}</div>
+ ${kpad()}<button class="p" style="width:100%;margin-top:8px" onclick="addPay()">Enter</button>
+ <div style="margin-top:12px">${ps.map((p,i)=>`<div class="row line"><span>Payment ${i+1} - ${p.m}</span><span>${m(p.a)}${p.given>p.a?` (change ${m(p.given-p.a)})`:""}</span></div>`).join("")}
+ ${ps.length?`<button style="margin:6px 0" onclick="ord(V.oid).pays.pop();save();render()">Undo last payment</button>`:""}
+ <div class="row line"><span>Remaining balance</span><b style="font-size:22px;color:${rem?"var(--warn)":"var(--ok)"}">${m(rem)}</b></div></div>
+ <button class="p" style="width:100%;margin-top:8px" ${rem>0.004||!ps.length?"disabled":""} onclick="finishPay()">Pay</button>`)}
+function extraModal(M,o,W){const t=M.t;
+ if(t==="pay")return payModal(o,W);
+ if(t==="guest")return W(`<h3>${esc(tname(M.n))} - Guest</h3><div class="mut">How many people are seated?</div><div class="kd">${V.kp||"0"}</div>${kpad()}<button class="p" style="width:100%;margin-top:8px" onclick="startGuests('${M.n}')">Enter</button>`);
+ if(t==="topt"){const q=openFor(M.n);return W(`<h3>${esc(tname(M.n))}</h3><div class="mut">${q.guests} guests - ${m(calc(q).total)}${q.pr?" - receipt printed":""}</div><div style="display:grid;gap:8px;margin-top:10px"><button class="p" onclick="go({oid:${q.id},tab:'home',modal:null})">View order</button><button onclick="go({oid:${q.id}});printOrder()">Print order</button><button onclick="go({oid:${q.id},modal:{t:'assign'}})">Reassign table</button></div>`)}
+ if(t==="tname"){const tb=S.tables.find(z=>z.n===M.n);return W(`<h3>Edit table</h3><input class="plain in" id="tn" value="${esc(tb.name||"Table "+tb.n)}"><div class="row" style="margin-top:10px"><button class="d" ${openFor(tb.n)?"disabled":""} onclick="S.tables=S.tables.filter(z=>z.n!=='${tb.n}');save();go({modal:null})">Remove table</button><button class="p" onclick="S.tables.find(z=>z.n==='${tb.n}').name=$('tn').value;save();go({modal:null})">Save name</button></div>`)}
+ return null}
 function history(){const l=S.orders.filter(o=>o.status==="paid").sort((a,b)=>b.paidAt-a.paidAt);
  return `<h2>Finished orders</h2>${l.map(o=>`<div class="card" style="margin-bottom:8px"><div class="row"><b>${lab(o)} <span class="tag">${o.method}</span></b><b>${m(o.total)}</b></div><div class="mut">${new Date(o.paidAt).toLocaleDateString()} ${tm(o.paidAt)}</div>
  <div>${live(o).map(i=>i.q+"x "+i.n).join(", ")}</div>${o.items.some(i=>i.v)?`<div style="color:var(--bad)">Voided: ${o.items.filter(i=>i.v).map(i=>i.q+"x "+i.n+" ("+i.vr+")").join(", ")}</div>`:""}</div>`).join("")||`<div class="mut">No finished orders yet.</div>`}`}
@@ -194,12 +237,12 @@ function reports(){
  const st=(l,v,c)=>`<div class="card">${l}<b ${c?`style="color:${c}"`:""}>${v}</b></div>`;
  const tabs=[["summary","Summary"],["sellers","Best and least sellers"],["calendar","Calendar"],["ai","AI analysis"]].map(t=>`<button class="${rt===t[0]?"on":""}" onclick="go({rt:'${t[0]}'})">${t[1]}</button>`).join("");
  let body="";
- if(rt==="summary"){const I=Array(n).fill(0),E=Array(n).fill(0),Hh=Array(16).fill(0),pay={Cash:0,Card:0};
-  P.forEach(o=>{const t=new Date(o.paidAt),i=t.getDate()-1;I[i]+=o.sub;E[i]+=o.cost;Hh[Math.min(15,Math.max(0,t.getHours()-8))]++;pay[o.method]=(pay[o.method]||0)+o.total});
+ if(rt==="summary"){const I=Array(n).fill(0),E=Array(n).fill(0),Hh=Array(16).fill(0),pay={};
+  P.forEach(o=>{const t=new Date(o.paidAt),i=t.getDate()-1;I[i]+=o.sub;E[i]+=o.cost;Hh[Math.min(15,Math.max(0,t.getHours()-8))]++;(o.pays||[{m:o.method,a:o.total}]).forEach(p=>pay[p.m]=(pay[p.m]||0)+p.a)});
   ex.forEach(e=>E[+e.d.slice(8)-1]+=e.a);hs.forEach(h=>I[+h.d.slice(8)-1]+=h.a);
-  bars.lb=null;const c1=bars(I,E,"#a78bfa","#f43f5e");bars.lb=Array.from({length:16},(_,i)=>(i+8)+"h");const c2=bars(Hh,null,"#a78bfa");bars.lb=null;
-  body=`<div class="stats">${st("Income (net sales + house payments)",m(inc),"#a78bfa")}${st("Expenses (cost of goods + other)",m(expn),"#fb7185")}${st("Net profit",m(inc-expn),inc>=expn?"#34d399":"#fb7185")}${st("Gross income",m(M.sub-M.cogs))}${st("Orders",M.n)}${st("Avg. order",m(M.n?M.rev/M.n:0))}${st("Voided value",m(M.vd))}${st("Cash / Card",m(pay.Cash||0)+" / "+m(pay.Card||0))}</div>
-  <div class="card" style="margin-bottom:12px"><h3>Income vs expenses by day</h3>${c1}<div class="mut"><span style="color:#a78bfa">&#9632;</span> Income &nbsp; <span style="color:#f43f5e">&#9632;</span> Expenses</div></div>
+  bars.lb=null;const c1=bars(I,E,"#34d399","#f43f5e");bars.lb=Array.from({length:16},(_,i)=>(i+8)+"h");const c2=bars(Hh,null,"#34d399");bars.lb=null;
+  body=`<div class="stats">${st("Income (net sales + house payments)",m(inc),"#34d399")}${st("Expenses (cost of goods + other)",m(expn),"#fb7185")}${st("Net profit",m(inc-expn),inc>=expn?"#34d399":"#fb7185")}${st("Gross income",m(M.sub-M.cogs))}${st("Orders",M.n)}${st("Avg. order",m(M.n?M.rev/M.n:0))}${st("Voided value",m(M.vd))}${st("Payments",Object.entries(pay).map(([k,v])=>k+" "+m(v)).join(" / ")||"-")}</div>
+  <div class="card" style="margin-bottom:12px"><h3>Income vs expenses by day</h3>${c1}<div class="mut"><span style="color:#34d399">&#9632;</span> Income &nbsp; <span style="color:#f43f5e">&#9632;</span> Expenses</div></div>
   <div class="card" style="margin-bottom:12px"><h3>Orders by hour</h3>${c2}</div>
   <div class="card"><h3>Add an expense</h3><div class="row" style="flex-wrap:wrap;justify-content:flex-start"><input class="plain" id="ed" placeholder="Description (rent, staff...)"><input class="plain" id="ea" type="number" placeholder="Amount"><button class="p" onclick="S.exp=S.exp||[];S.exp.push({d:'${dk(new Date())}',c:$('ed').value||'Expense',a:+$('ea').value||0});save();render()">Add expense</button></div>
   ${ex.slice(-6).map(e=>`<div class="line row"><span>${e.d} ${esc(e.c)}</span><span>${m(e.a)}</span></div>`).join("")}</div>`}
@@ -243,6 +286,6 @@ function station(){const s=V.stn,isB=V.role==="bar",tabs=`<button class="${V.fin
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
  return head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div>`}
 function ready(oid,x){ord(oid).items[x].done=Date.now();save();render()}
-setInterval(()=>{if(V.auth&&(V.role==="kitchen"||V.role==="bar")&&!V.modal){try{const x=localStorage.getItem("dpos");if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},4000);
+setInterval(()=>{if(V.auth&&(V.role==="kitchen"||V.role==="bar")&&!V.modal){try{const x=localStorage.getItem(KEY());if(x&&x!==JSON.stringify(S)){S=JSON.parse(x);render()}}catch(e){}}},4000);
 render();
 </script></body></html>
