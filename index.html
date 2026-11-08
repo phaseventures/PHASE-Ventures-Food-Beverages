@@ -194,7 +194,7 @@ function xpd(){clearTimeout(XT);XT=setTimeout(()=>go({role:null}),1200)}
 function xpu(){clearTimeout(XT)}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&V.role==="display")go({role:null})});
 function dispData(){const now=Date.now(),prep=[],srv=[];
- S.orders.forEach(o=>{if(o.status!=="open"&&o.status!=="paid")return;const it=live(o).filter(i=>i.s);if(!it.length)return;
+ S.orders.forEach(o=>{if(!o.takeout)return;if(o.status!=="open"&&o.status!=="paid")return;const it=live(o).filter(i=>i.s);if(!it.length)return;
   const l=o.takeout?"#"+o.id:tgrp(o.tables),sub=o.cust||"",pg=o.takeout?[it.filter(i=>i.done).reduce((a,i)=>a+i.q,0),it.reduce((a,i)=>a+i.q,0)]:null;
   if(it.some(i=>!i.done)){if(o.status==="open")prep.push({l,s:sub,p:pg,t:Math.min(...it.map(i=>i.s))})}
   else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000)srv.push({l,s:sub,t:d})}});
@@ -219,7 +219,7 @@ function render0(){
  a.innerHTML=(V.role==="counter"?counter():station())+(V.modal?modal():"");
 }
 const ALARM_MIN=8,ALARMED=new Map(),ALARM_STN=new Set();let ALARM_AUDIO=null;
-function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("F%26BALARM.mp3");ALARM_AUDIO.preload="auto"}return ALARM_AUDIO}
+function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("PHASEALARM.MP3");ALARM_AUDIO.preload="auto"}return ALARM_AUDIO}
 document.addEventListener("pointerdown",()=>{try{alarmAudio()}catch(e){}});
 function sirenPlay(){try{const a=alarmAudio();a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
 function alarmCheck(){if(!V.auth||!V.stn||(V.role!=="kitchen"&&V.role!=="bar"))return;const now=Date.now(),first=!ALARM_STN.has(V.stn);ALARM_STN.add(V.stn);let fire=false;
