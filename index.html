@@ -98,6 +98,8 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .ft .fn{font-size:20px;font-weight:700}.ft .fs{font-size:15px;font-weight:400;opacity:.9;margin-top:4px}.ft .sw{font-size:18px;font-weight:800;margin-top:6px}
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px;margin-bottom:12px}.cs{padding-top:16px;border-top:1px solid var(--bd)}.cs:first-child{border-top:0;padding-top:0}.cs.full{grid-column:1/-1}
 @media(max-width:760px){.fit .split{height:auto}.wrap.fit{overflow:auto}.tk2{height:70vh}.cg{grid-template-columns:1fr}}
+.lw{width:min(320px,88vw)}.lw .logo{width:96px;height:auto;margin-bottom:18px}.lw .fl{font-size:11px;margin:10px 0 6px}
+.lw .in{font-size:14px!important;padding:11px 13px;border-radius:10px}.lw .pwb .eye{top:0}.lw button.big{margin-top:20px;padding:12px;font-size:13px;min-height:0}.lw .er{margin-top:8px;min-height:20px}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span></header><div id="app"></div>
 <script>
 const PASS="PH1S3",CUR="SR ",TAX=0.10;
@@ -143,7 +145,7 @@ function render(){const k={};document.querySelectorAll(".sc[id]").forEach(e=>k[e
 function render0(){
  const a=$("app");
  if(V.splash){a.innerHTML=`<div class="c">${LOGO()}<h1 class="ti">PHASE VENTURES</h1></div>`;setTimeout(()=>{V.splash=false;render()},1600);return}
- if(!V.auth){a.innerHTML=`<div class="c"><div class="lw">${LOGO()}<h1 class="ti">PHASE VENTURES</h1><hr class="dv">
+ if(!V.auth){a.innerHTML=`<div class="c"><div class="lw">${LOGO()}
  <label class="fl">NAME</label><input class="in" id="un" placeholder="Enter name" autocomplete="off" autocapitalize="off">
  <label class="fl">PASSWORD</label><div class="pwb"><input class="in" id="pw" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"><button class="eye" onclick="const p=$('pw');p.type=p.type==='password'?'text':'password'">${SV('eye',20)}</button></div>
  <button class="p big" onclick="login()">ENTER POS</button><div class="er">${V.bad?"Wrong name or password.":""}</div></div></div>`;setTimeout(()=>$("un")&&$("un").focus(),0);return}
