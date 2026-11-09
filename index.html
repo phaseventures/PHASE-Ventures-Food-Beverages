@@ -208,6 +208,12 @@ table.rt3{width:100%;border-collapse:collapse;margin-top:4px}
 .rm .rh h2{font-size:24px}
 .rm .rtm{margin-top:12px;gap:10px}
 .rm .rt3 td{padding:13px 8px}
+
+.rpa{display:flex;gap:8px;flex-wrap:wrap}.rpa button{height:42px;min-height:0;display:inline-flex;align-items:center;gap:8px;box-sizing:border-box}
+.rsh{margin:24px 0 10px;font-size:13px;color:var(--mut);font-weight:500;letter-spacing:.4px}
+.stats.rs4 .card b{font-size:21px}
+.cs h3{font-size:15px;margin-bottom:4px}
+.pm{margin:10px 0}.pm .row{margin-bottom:5px;font-size:14px}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
@@ -379,7 +385,7 @@ function home(o){const unsent=o&&live(o).some(i=>!i.s),armed=Date.now()<V.armed,
  <div class="search"><input id="sq" placeholder="Search products" value="${esc(V.q)}" oninput="V.q=this.value;$('mg').innerHTML=mgrid()"></div><div id="mg" class="grid sc">${mgrid()}</div></div>`;
  return `<div class="split">${o?tkt(o):`<div class="card tk2"></div>`}${right}</div>`}
 function printOrder(){const o=ord(V.oid);o.pr=Date.now();save();printHTML(receiptHTML(o));render()}
-function printHTML(h){const f=document.createElement("iframe");f.setAttribute("aria-hidden","true");f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";document.body.appendChild(f);const d=f.contentWindow.document;d.open();d.write(h);d.close();setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){}setTimeout(()=>{try{f.remove()}catch(e){}},60000)},350)}
+function printHTML(h){const f=document.createElement("iframe");f.setAttribute("aria-hidden","true");f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";document.body.appendChild(f);const d=f.contentWindow.document;d.open();d.write(h);d.close();setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){}setTimeout(()=>{try{f.remove()}catch(e){}},60000)},700)}
 function receiptHTML(o){const c=calc(o);return `<!doctype html><html><head><meta charset="utf-8"><title>Receipt</title><style>@page{margin:6mm}body{font-family:Arial,sans-serif;font-size:13px;color:#000;width:72mm;margin:0 auto}h3{text-align:center;margin:0 0 4px}.c{text-align:center;color:#444;font-size:12px;margin-bottom:8px}.r{display:flex;justify-content:space-between;padding:3px 0}.n{font-size:11px;color:#444;padding:0 0 3px 14px}hr{border:0;border-top:1px dashed #000}</style></head><body><h3>${esc(S.name)}</h3><div class="c">${esc(lab(o))} - ${new Date().toLocaleString()}</div>${live(o).map(i=>`<div class="r"><span>${i.q}x ${esc(i.n)}</span><span>${m(i.p*i.q)}</span></div>${i.nt?`<div class="n">${esc(i.nt)}</div>`:""}`).join("")}<hr><div class="r"><span>Subtotal</span><span>${m(c.g)}</span></div>${o.disc?`<div class="r"><span>Discount (${o.disc}%)</span><span>-${m(c.g-c.sub)}</span></div>`:""}<div class="r"><span>Tax</span><span>${m(c.tax)}</span></div><div class="r"><b>Total</b><b>${m(c.total)}</b></div></body></html>`}
 function selX(){const s=V.li;return s&&s.o===V.oid?s.x:-1}
 function selItem(){const x=selX(),o=V.oid&&ord(V.oid),i=o&&o.items[x];return i&&!i.v?i:null}
@@ -599,12 +605,13 @@ function reports(){
   const dl=Array.from({length:n},(_,i)=>i+1),hl=Array.from({length:16},(_,i)=>(i+8)+"h"),ok=Object.keys(oc),hm=ms=>Math.floor(ms/36e5)+"h "+Math.round(ms%36e5/6e4)+"m",top=ok.slice().sort((a,b)=>oc[b].ms-oc[a].ms)[0],
   s1=[{n:"Revenue",c:"#60a5fa",d:R},{n:"Net sales",c:"#34d399",d:N},{n:"Gross income",c:"#fbbf24",d:Gi}],s2=[{n:"Orders",c:"#34d399",d:Hh}],s3=[{n:"Hours occupied",c:"#fb7185",d:ok.map(k=>oc[k].ms/36e5)}];
   bars.lb=null;const c2=bars(I,E,"#34d399","#f43f5e");
-  body=`<div class="stats rs3">${st("Income (net sales + house payments)",m(inc),"#34d399")}${st("Expenses (cost of goods + other)",m(expn),"#fb7185")}${st("Net profit",m(inc-expn),inc>=expn?"#34d399":"#fb7185")}</div><div class="stats rs4">${st("Revenue",m(M.rev))}${st("Net sales",m(M.sub))}${st("Gross income",m(M.sub-M.cogs))}${st("Orders",M.n)}${st("Avg. order",m(M.n?M.rev/M.n:0))}${st("Voided value",m(M.vd))}${st("Payments",Object.entries(pay).map(([k,v])=>k+" "+m(v)).join(" / ")||"-")}</div>
-  <div class="card cg"><div class="cs full"><h3>Revenue, net sales and gross income</h3><div class="mut" style="margin-bottom:6px">${leg(s1)}</div>${area(s1,dl,m)}</div>
+  body=`<div class="rsh">Month at a glance</div><div class="stats rs3">${st("Income (net sales + house payments)",m(inc),"#34d399")}${st("Expenses (cost of goods + other)",m(expn),"#fb7185")}${st("Net profit",m(inc-expn),inc>=expn?"#34d399":"#fb7185")}</div><div class="stats rs4">${st("Revenue (incl. tax)",m(M.rev))}${st("Net sales",m(M.sub))}${st("Tax collected",m(M.tax))}${st("Gross income",m(M.sub-M.cogs))}${st("Orders",M.n)}${st("Avg. order",m(M.n?M.rev/M.n:0))}${st("Voided value",m(M.vd))}${st("Gross margin",M.sub?Math.round((M.sub-M.cogs)/M.sub*100)+"%":"-")}</div>
+  <div class="rsh">Trends</div><div class="card cg"><div class="cs full"><h3>Revenue, net sales and gross income</h3><div class="mut" style="margin-bottom:6px">${leg(s1)}</div>${area(s1,dl,m)}</div>
   <div class="cs"><h3>Income vs expenses by day</h3>${c2}<div class="mut"><span style="color:#34d399">&#9632;</span> Income &nbsp; <span style="color:#f43f5e">&#9632;</span> Expenses</div></div>
   <div class="cs"><h3>Orders by hour</h3>${area(s2,hl,v=>Math.round(v))}</div>
   <div class="cs full"><h3>Table occupancy</h3><div class="mut" style="margin-bottom:6px">${top&&oc[top].ms?"Most occupied: "+esc(tname(top))+" ("+hm(oc[top].ms)+")":"No finished orders this month."}</div>${area(s3,ok.map(k=>esc(tname(k)).replace(/^Table /,"T")),v=>hm(v*36e5))}</div></div>
-  <div class="card"><h3>Add an expense</h3><div class="row" style="flex-wrap:wrap;justify-content:flex-start"><input class="plain" id="ed" placeholder="Description (rent, staff...)"><input class="plain" id="ea" type="number" placeholder="Amount"><button class="p" onclick="S.exp=S.exp||[];S.exp.push({d:'${dk(new Date())}',c:$('ed').value||'Expense',a:+$('ea').value||0});save();render()">Add expense</button></div>
+  <div class="rsh">Payments</div><div class="card">${Object.keys(pay).length?(()=>{const pt=Math.max(1,Object.values(pay).reduce((a,b)=>a+b,0));return Object.entries(pay).map(([k,v])=>`<div class="pm"><div class="row"><span>${esc(k)}</span><span class="mut">${m(v)} (${Math.round(v/pt*100)}%)</span></div><div class="meter"><i style="width:${v/pt*100}%"></i></div></div>`).join("")})():`<div class="mut">No payments this month.</div>`}</div>
+  <div class="rsh">Expenses</div><div class="card"><h3>Add an expense</h3><div class="row" style="flex-wrap:wrap;justify-content:flex-start"><input class="plain" id="ed" placeholder="Description (rent, staff...)"><input class="plain" id="ea" type="number" placeholder="Amount"><button class="p" onclick="S.exp=S.exp||[];S.exp.push({d:'${dk(new Date())}',c:$('ed').value||'Expense',a:+$('ea').value||0});save();render()">Add expense</button></div>
   ${ex.slice(-6).map(e=>`<div class="line row"><span>${e.d} ${esc(e.c)}</span><span>${m(e.a)}</span></div>`).join("")}</div>`}
  if(rt==="sellers"){const sm={};MENU.forEach(i=>sm[i.n]={n:i.n,q:0,r:0,cat:i.cat});P.forEach(o=>live(o).forEach(i=>{const e=sm[i.n]||(sm[i.n]={n:i.n,q:0,r:0,cat:"Other"});e.q+=i.q;e.r+=i.p*i.q}));
   const L=Object.values(sm).sort((a,b)=>b.q-a.q),mx=Math.max(1,L[0]?L[0].q:1),row=e=>`<div style="margin:10px 0"><div class="row"><span>${e.n}</span><span class="mut">${e.q} sold - ${m(e.r)}</span></div><div class="meter"><i style="width:${e.q/mx*100}%"></i></div></div>`;
@@ -616,14 +623,75 @@ function reports(){
   for(let i=1;i<=n;i++){const k=dk(new Date(y,mo,i)),a=by[k]||[];cells+=`<button class="${k===sel?"on":""}" onclick="go({sel:'${k}'})"><b>${i}</b><br>${a.length?m(A(a).rev):""}</button>`}
   const D=A(by[sel]||[]);body=`<div class="split" style="grid-template-columns:1fr 1fr"><div class="card"><div class="cal">${cells}</div></div><div><h3>${sel}</h3><div class="stats">${st("Revenue",m(D.rev))}${st("Net sales",m(D.sub))}${st("Gross income",m(D.sub-D.cogs))}${st("Tax",m(D.tax))}${st("Voided",m(D.vd))}${st("Orders",D.n)}</div></div></div>`}
  
- return `<div class="rphd"><h2>Reports</h2><button onclick="demo()">Load sample data</button></div><div class="rptabs">${tabs}</div>
+ return `<div class="rphd"><h2>Reports</h2><div class="rpa"><button onclick="demo()">Load sample data</button><button class="p" onclick="printMonthly()">${SV("printer",18)} Print report</button></div></div><div class="rptabs">${tabs}</div>
  ${`<div class="cnav" style="margin:6px 0 18px"><button onclick="V.cal=new Date(${y},${mo-1},1);render()">Previous</button><b>${d.toLocaleString([],{month:"long",year:"numeric"})}</b><button onclick="V.cal=new Date(${y},${mo+1},1);render()">Next</button></div>`}${body}`}
-function area(sr,lb,fm){const n=lb.length;if(!n)return"";const W=700,H=170,P=14,mx=Math.max(1e-9,...sr.flatMap(s=>s.d)),x=i=>n>1?P+i*(W-2*P)/(n-1):W/2,y=v=>H-v/mx*H,k=Math.ceil(n/12);
-const g=[0,.5,1].map(f=>`<line x1="0" x2="${W}" y1="${H-f*H}" y2="${H-f*H}" stroke="#fff" stroke-opacity=".1" stroke-dasharray="3 4"/>`).join("");
-const p=sr.map(s=>{const l=s.d.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join("");return `<path d="${l}L${x(n-1)} ${H}L${x(0)} ${H}Z" fill="${s.c}" fill-opacity=".16"/><path d="${l}" fill="none" stroke="${s.c}" stroke-width="2.2" stroke-linejoin="round"/>`}).join("");
-const t=lb.map((l,i)=>i%k===0?`<text x="${x(i)}" y="${H+16}" font-size="11" text-anchor="middle" fill="#b49aa2">${l}</text>`:"").join("");
-const h=lb.map((l,i)=>`<rect x="${x(i)-W/n/2}" y="0" width="${W/n}" height="${H}" fill="transparent"><title>${l}: ${sr.map(q=>q.n+" "+fm(q.d[i])).join(", ")}</title></rect>`).join("");
-return `<svg viewBox="0 0 ${W} ${H+22}" style="width:100%">${g}<text x="${P}" y="10" font-size="11" fill="#b49aa2">${fm(mx)}</text>${p}${t}${h}</svg>`}
+
+/* ===== PHASE print template ===== */
+const PHCSS=`@page{size:A4 portrait;margin:0 0 16mm 0;@bottom-right{content:"Page " counter(page) " of " counter(pages);font:9px Arial;color:#777;margin-right:14mm}@bottom-left{content:"PHASE Ventures \\00A0\\2022\\00A0 Confidential";font:9px Arial;color:#777;margin-left:14mm}}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:#1a1114;font-size:11.5px;line-height:1.45;background:#fff}
+.lh{background:#14070b;color:#fff;padding:12mm 14mm 9mm;display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #d81f2d}
+.lh .br{display:flex;align-items:center;gap:14px}.lh img{height:46px;width:auto;max-width:130px;object-fit:contain}
+.lh .co b{display:block;font-size:17px;letter-spacing:.4px}.lh .co span{font-size:11px;color:#c9a9b1}
+.lh .ti{text-align:right}.lh .ti b{display:block;font-size:21px;letter-spacing:.3px}.lh .ti span{font-size:12px;color:#e8c9d0}
+.pg{padding:8mm 14mm 4mm}
+.meta{display:flex;gap:0;border:1px solid #e3d6da;border-radius:6px;margin-bottom:6mm}
+.meta div{flex:1;padding:7px 12px;border-right:1px solid #e3d6da}.meta div:last-child{border:0}
+.meta small{display:block;font-size:9.5px;color:#7a6168;margin-bottom:1px}.meta b{font-size:12px}
+.hero{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;gap:10px;margin-bottom:6mm}
+.hero div{border:1px solid #e3d6da;border-radius:6px;padding:10px 12px}
+.hero small{display:block;font-size:10px;color:#7a6168;margin-bottom:3px}.hero b{font-size:17px}
+.hero .np{background:#14070b;border-color:#14070b;color:#fff}.hero .np small{color:#c9a9b1}.hero .np b{font-size:23px;color:#5eead4}.hero .np.neg b{color:#fda4af}
+.hero em{display:block;font-style:normal;font-size:10px;color:#7a6168;margin-top:2px}.hero .np em{color:#c9a9b1}
+h3.s{font-size:12.5px;margin:6mm 0 2mm;padding-bottom:3px;border-bottom:2px solid #d81f2d;display:flex;justify-content:space-between;align-items:baseline}
+h3.s span{font-weight:400;font-size:10px;color:#7a6168}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:10px;color:#7a6168;font-weight:600;padding:5px 6px;border-bottom:1px solid #1a1114;background:#faf5f6}
+td{padding:5px 6px;border-bottom:1px solid #eee3e6}.n{text-align:right;font-variant-numeric:tabular-nums}
+tr{page-break-inside:avoid}tbody tr:nth-child(even) td{background:#fcf9fa}
+tfoot td{border-top:2px solid #1a1114;border-bottom:0;font-weight:700;background:#fff!important}
+tr.sub td{color:#5c464d}tr.tot td{font-weight:700;border-top:1.5px solid #1a1114}tr.res td{font-weight:800;font-size:13px;border-top:2px solid #1a1114;background:#faf5f6!important}
+.pos{color:#0f766e}.neg{color:#be123c}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8mm}.avoid{page-break-inside:avoid}
+.bar{height:6px;background:#efe4e7;border-radius:3px;overflow:hidden;min-width:60px}.bar i{display:block;height:100%;background:#d81f2d}
+.note{color:#7a6168;font-size:10px;margin-top:6px}
+.sig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12mm;margin-top:14mm;page-break-inside:avoid}.sig div{border-top:1px solid #1a1114;padding-top:4px;font-size:10px;color:#7a6168}
+.empty{padding:14px;text-align:center;color:#7a6168;border:1px dashed #d9c8cd;border-radius:6px}`;
+function phLogo(){const im=document.querySelector("img.logo");if(!im||!im.naturalWidth)return LG[0];try{const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);return c.toDataURL("image/png")}catch(e){return im.currentSrc||im.src}}
+function phaseDoc(title,sub,body){const now=new Date();
+ return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)} - ${esc(sub)}</title><style>${PHCSS}</style></head><body>
+ <div class="lh"><div class="br"><img src="${phLogo()}" alt="PHASE" onerror="this.style.display='none'"><div class="co"><b>PHASE Ventures</b><span>Food &amp; Beverages</span></div></div><div class="ti"><b>${esc(title)}</b><span>${esc(sub)}</span></div></div>
+ <div class="pg"><div class="meta"><div><small>Outlet</small><b>${esc(RNAME)}</b></div><div><small>Currency</small><b>Saudi Riyal (SAR)</b></div><div><small>Generated</small><b>${now.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})} ${tm(now.getTime())}</b></div><div><small>Prepared by</small><b>${esc(V.user||"-")}</b></div></div>${body}
+ <div class="sig"><div>Prepared by</div><div>Reviewed by</div><div>Approved by</div></div></div></body></html>`}
+function printMonthly(){const d=V.cal,y=d.getFullYear(),mo=d.getMonth(),pre=y+"-"+String(mo+1).padStart(2,"0"),n=new Date(y,mo+1,0).getDate(),
+ P=S.orders.filter(o=>o.status==="paid"&&dk(new Date(o.paidAt)).startsWith(pre)),ex=(S.exp||[]).filter(e=>e.d.startsWith(pre)),hs=(S.house||[]).filter(h=>h.d.startsWith(pre)),
+ sum=(a,k)=>a.reduce((s,o)=>s+(o[k]||0),0),rev=sum(P,"total"),sub=sum(P,"sub"),tax=sum(P,"tax"),cogs=sum(P,"cost"),vd=sum(P,"vd"),
+ hsum=hs.reduce((s,h)=>s+h.a,0),exsum=ex.reduce((s,e)=>s+e.a,0),inc=sub+hsum,expn=cogs+exsum,np=inc-expn,gi=sub-cogs,pc=(a,b)=>b?Math.round(a/b*100)+"%":"-",
+ mn=d.toLocaleString([],{month:"long",year:"numeric"}),
+ day=Array.from({length:n},()=>({o:0,sub:0,tax:0,rev:0})),pay={},pm={},cat={},MC={};MENU.forEach(i=>MC[i.n]=i.cat);
+ P.forEach(o=>{const t=new Date(o.paidAt).getDate()-1,D=day[t];D.o++;D.sub+=o.sub;D.tax+=o.tax;D.rev+=o.total;(o.pays||[{m:o.method,a:o.total}]).forEach(p=>pay[p.m]=(pay[p.m]||0)+p.a);
+  live(o).forEach(i=>{const e=pm[i.n]=pm[i.n]||{q:0,r:0};e.q+=i.q;e.r+=i.p*i.q;const c=MC[i.n]||"Other";cat[c]=(cat[c]||0)+i.p*i.q})});
+ const mx=Math.max(1,...day.map(z=>z.rev)),W=700,H=130,bw=(W-40)/n,
+ chart=`<svg viewBox="0 -8 ${W} ${H+32}" style="width:100%">${[0,.5,1].map(f=>`<line x1="40" x2="${W}" y1="${H-f*H}" y2="${H-f*H}" stroke="#d9c8cd" stroke-width="${f?.6:1}" ${f?'stroke-dasharray="3 3"':""}/><text x="34" y="${H-f*H+3}" font-size="9" text-anchor="end" fill="#7a6168">${Math.round(mx*f)}</text>`).join("")}${day.map((z,i)=>`<rect x="${40+i*bw+bw*.15}" y="${H-z.rev/mx*H}" width="${bw*.7}" height="${z.rev/mx*H}" fill="#d81f2d" rx="1.5"/>`).join("")}${day.map((z,i)=>(i+1)%2===0?"":`<text x="${40+i*bw+bw/2}" y="${H+14}" font-size="9" text-anchor="middle" fill="#7a6168">${i+1}</text>`).join("")}</svg>`,
+ rows=day.map((z,i)=>z.o?`<tr><td>${new Date(y,mo,i+1).toLocaleDateString([],{weekday:"short",day:"numeric",month:"short"})}</td><td class="n">${z.o}</td><td class="n">${m(z.sub)}</td><td class="n">${m(z.tax)}</td><td class="n">${m(z.rev)}</td><td class="n">${m(z.rev/z.o)}</td></tr>`:"").join(""),
+ pl=Object.entries(pm).sort((a,b)=>b[1].q-a[1].q),pt=pl.reduce((a,e)=>a+e[1].r,0),pq=pl.reduce((a,e)=>a+e[1].q,0),
+ payt=Object.values(pay).reduce((a,b)=>a+b,0),ct=Math.max(1,Object.values(cat).reduce((a,b)=>a+b,0)),
+ IS=(a,b,c)=>`<tr class="${c||""}"><td>${a}</td><td class="n">${b}</td></tr>`,
+ body=`<div class="hero"><div class="np ${np<0?"neg":""}"><small>Net profit</small><b>${m(np)}</b><em>${pc(np,inc)} of income</em></div><div><small>Net sales</small><b>${m(sub)}</b></div><div><small>Orders</small><b>${P.length}</b><em>Avg. ${m(P.length?rev/P.length:0)}</em></div><div><small>Gross margin</small><b>${pc(gi,sub)}</b><em>${m(gi)} gross income</em></div></div>
+ <h3 class="s">Daily revenue <span>${mn}, incl. tax</span></h3>${P.length?chart:`<div class="empty">No paid orders in ${mn}.</div>`}
+ <div class="two avoid"><div><h3 class="s">Income statement</h3><table><tbody>
+ ${IS("Revenue (incl. tax)",m(rev))}${IS("Less: tax collected","-"+m(tax),"sub")}${IS("Net sales",m(sub),"tot")}${IS("Less: cost of goods","-"+m(cogs),"sub")}${IS("Gross income",m(gi),"tot")}${IS("House payments received","+"+m(hsum),"sub")}${IS("Less: other expenses","-"+m(exsum),"sub")}${IS("Net profit",`<span class="${np<0?"neg":"pos"}">${m(np)}</span>`,"res")}</tbody></table><div class="note">Voided items this month: ${m(vd)} (not included above).</div></div>
+ <div><h3 class="s">Payments by method</h3>${Object.keys(pay).length?`<table><thead><tr><th>Method</th><th class="n">Amount</th><th class="n">Share</th></tr></thead><tbody>${Object.entries(pay).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${m(v)}</td><td class="n">${pc(v,payt)}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${m(payt)}</td><td></td></tr></tfoot></table>`:`<div class="empty">No payments.</div>`}</div></div>
+ <h3 class="s">Daily sales <span>${rows?"Days with trading only":""}</span></h3>${rows?`<table><thead><tr><th>Date</th><th class="n">Orders</th><th class="n">Net sales</th><th class="n">Tax</th><th class="n">Revenue</th><th class="n">Avg. order</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Total</td><td class="n">${P.length}</td><td class="n">${m(sub)}</td><td class="n">${m(tax)}</td><td class="n">${m(rev)}</td><td class="n">${m(P.length?rev/P.length:0)}</td></tr></tfoot></table>`:`<div class="empty">No trading days.</div>`}
+ <div class="two"><div class="avoid"><h3 class="s">Top products <span>by quantity</span></h3>${pl.length?`<table><thead><tr><th>Item</th><th class="n">Qty</th><th class="n">Sales</th></tr></thead><tbody>${pl.slice(0,10).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v.q}</td><td class="n">${m(v.r)}</td></tr>`).join("")}</tbody><tfoot><tr><td>All products</td><td class="n">${pq}</td><td class="n">${m(pt)}</td></tr></tfoot></table>`:`<div class="empty">Nothing sold.</div>`}</div>
+ <div class="avoid"><h3 class="s">Sales by category</h3>${Object.keys(cat).length?`<table><tbody>${Object.entries(cat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}<div class="bar"><i style="width:${v/ct*100}%"></i></div></td><td class="n">${m(v)}<br><span class="note">${pc(v,ct)}</span></td></tr>`).join("")}</tbody></table>`:`<div class="empty">No category data.</div>`}</div></div>
+ <h3 class="s avoid">Expenses <span>Cost of goods ${m(cogs)} + other ${m(exsum)}</span></h3>${ex.length?`<table><thead><tr><th>Date</th><th>Description</th><th class="n">Amount</th></tr></thead><tbody>${ex.slice().sort((a,b)=>a.d<b.d?-1:1).map(e=>`<tr><td>${e.d}</td><td>${esc(e.c)}</td><td class="n">${m(e.a)}</td></tr>`).join("")}</tbody><tfoot><tr><td colspan="2">Total other expenses</td><td class="n">${m(exsum)}</td></tr></tfoot></table>`:`<div class="empty">No other expenses recorded for ${mn}.</div>`}`;
+ printHTML(phaseDoc("Sales Summary Report",mn,body))}
+function area(sr,lb,fm){const n=lb.length;if(!n)return"";const W=700,H=170,P=14,PL=62,mx=Math.max(1e-9,...sr.flatMap(s=>s.d)),x=i=>n>1?PL+i*(W-PL-P)/(n-1):(PL+W-P)/2,y=v=>H-v/mx*H,k=Math.ceil(n/12);
+const g=[0,.5,1].map(f=>`<line x1="${PL}" x2="${W-P}" y1="${H-f*H}" y2="${H-f*H}" stroke="#fff" stroke-opacity="${f?".1":".28"}" ${f?'stroke-dasharray="3 4"':""}/><text x="${PL-8}" y="${H-f*H+4}" font-size="9" text-anchor="end" fill="#b49aa2">${fm(mx*f)}</text>`).join("");
+const p=sr.map(s=>{const l=s.d.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join("");return `<path d="${l}L${x(n-1)} ${H}L${x(0)} ${H}Z" fill="${s.c}" fill-opacity=".14"/><path d="${l}" fill="none" stroke="${s.c}" stroke-width="2" stroke-linejoin="round"/>`+s.d.map((v,i)=>v>0?`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="${s.c}"/>`:"").join("")}).join("");
+const t=lb.map((l,i)=>i%k===0?`<text x="${x(i)}" y="${H+18}" font-size="9" text-anchor="middle" fill="#b49aa2">${l}</text>`:"").join("");
+const h=lb.map((l,i)=>`<rect x="${x(i)-(W-PL-P)/n/2}" y="0" width="${(W-PL-P)/n}" height="${H}" fill="transparent"><title>${l}: ${sr.map(q=>q.n+" "+fm(q.d[i])).join(", ")}</title></rect>`).join("");
+return `<svg viewBox="0 -12 ${W} ${H+38}" style="width:100%">${g}${p}${t}${h}</svg>`}
 const leg=sr=>sr.map(q=>`<span style="color:${q.c}">&#9632;</span> ${q.n}`).join(" &nbsp; ");
 function demo(){const now=new Date();for(let d=0;d<30;d++)for(let k=0;k<2+Math.floor(Math.random()*6);k++){const it=[],n=2+Math.floor(Math.random()*4);
  for(let j=0;j<n;j++){const x=MENU[Math.floor(Math.random()*MENU.length)];it.push({id:x.id,n:x.n,p:x.p,c:x.c,st:x.st,q:1+Math.floor(Math.random()*2),s:1,done:1,v:0})}
