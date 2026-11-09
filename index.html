@@ -179,6 +179,10 @@ table.rt3{width:100%;border-collapse:collapse;margin-top:4px}
 .rm .rhd>:first-child{justify-self:start}.rm .rhd>:last-child{justify-self:end}
 .rm .rhd b{font-size:17px;text-align:center}
 .rm .rbd{overflow-y:auto;overscroll-behavior:contain;padding:6px 20px 22px;flex:1 1 auto;min-height:0;-webkit-overflow-scrolling:touch}
+.rft{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:26px}
+.rft button{height:44px;min-height:0;min-width:96px;padding:0 18px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:8px;line-height:1}
+.rft button svg{flex:none;display:block}
+.mod .rh .tt{display:none}
 .lrs{display:grid;gap:6px}.lr{display:flex;align-items:center;gap:10px;width:100%;text-align:left}
 .lr.on{border-color:var(--warn);color:var(--warn)}.lr .mut{margin-left:auto}
 .rm .rac{margin-top:18px}
@@ -517,7 +521,7 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  if(t==="voidpick"){const l=o.items.map((i,x)=>({i,x})).filter(z=>!z.i.v);return W(`<h3>Void which item?</h3>${l.map(z=>`<button style="width:100%;margin:4px 0;text-align:left" onclick="go({modal:{t:'void',x:${z.x}}})">${z.i.q}x ${z.i.n} ${z.i.s?"(sent)":""}</button>`).join("")||"<div class='mut'>No items to void.</div>"}`)}
  if(t==="receipt"){const c=calc(o);return W(`<h3 style="text-align:center">${esc(S.name)}</h3><div class="mut" style="text-align:center">${lab(o)} - ${new Date().toLocaleString()}</div>${live(o).map(i=>`<div class="row line"><span>${i.q}x ${i.n}</span><span>${m(i.p*i.q)}</span></div>`).join("")}<div class="row"><span>Tax</span><span>${m(c.tax)}</span></div><div class="row"><b>Total</b><b>${m(c.total)}</b></div><button class="p" style="width:100%;margin-top:10px" onclick="try{window.print()}catch(e){}">Print receipt</button>`)}
  return modal0()}
-function RWD(h,ti,l,r){return `<div class="mod" onclick="if(event.target===this)go({modal:null})"><div><h3>${ti}</h3>${h}<div class="row" style="margin-top:14px">${l||"<span></span>"}${r||"<span></span>"}</div></div></div>`}
+function RWD(h,ti,l,r){return `<div class="mod" onclick="if(event.target===this)go({modal:null})"><div><h3>${ti}</h3>${h}<div class="rft">${l||"<span></span>"}${r||"<span></span>"}</div></div></div>`}
 function more(k){if(k==="reports")go({modal:{t:"reports"},rd:null});else if(k==="exit")go({modal:null,role:null,oid:null,stn:null});else go({modal:{t:k}})}
 function tag(g){const o=ord(V.oid);o.tags=o.tags||[];const i=o.tags.indexOf(g);i<0?o.tags.push(g):o.tags.splice(i,1);save();render()}
 function cash(s){const a=+$("a").value||0,n=$("n").value||"Drawer";if(s<0){S.exp=S.exp||[];S.exp.push({d:dk(new Date()),c:n,a})}else if(S.till)S.till.f+=a;save();go({modal:null})}
