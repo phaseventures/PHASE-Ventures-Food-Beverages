@@ -421,7 +421,7 @@ async function savePDF(html,name,pad){
  try{await pdfLib();
   const css=(html.match(/<style>([\s\S]*?)<\/style>/)||[0,""])[1],bd=(html.match(/<body[^>]*>([\s\S]*)<\/body>/)||[0,html])[1],
    tt=((html.match(/<title>([\s\S]*?)<\/title>/)||[0,""])[1]).replace(/&amp;/g,"&").split(" - "),ttl=tt[0]||"Report",sbt=tt.slice(1).join(" - ");
-  r=document.createElement("div");r.id="pdfroot";r.style.cssText="position:fixed;left:0;top:0;width:794px;background:#fff;color:#1a1114;z-index:-1;box-sizing:border-box"+(pad?";padding:12mm":"");
+  r=document.createElement("div");r.id="pdfroot";r.style.cssText="position:fixed;left:0;top:0;width:794px;background:#fff;color:#1a1114;z-index:-1;visibility:hidden;pointer-events:none;box-sizing:border-box"+(pad?";padding:12mm":"");
   r.innerHTML="<style>#pdfroot :where(*:not(svg):not(svg *)){all:revert}"+pdfCSS(css)+"</style>"+bd;document.body.appendChild(r);
   await Promise.all([...r.querySelectorAll("img")].map(im=>im.complete?0:new Promise(z=>{im.addEventListener("load",z);im.addEventListener("error",z)})));
   r.querySelectorAll("img").forEach(im=>{if(!im.naturalWidth)im.style.display="none"});
@@ -430,7 +430,7 @@ async function savePDF(html,name,pad){
   const SC=2,top0=r.getBoundingClientRect().top,
    br=[...r.querySelectorAll("tr,h3.s,.two,.sig,.hero,.meta,.empty,.sum")].filter(e=>!(e.matches("tr")&&(e.closest("thead")||e.closest(".two")||e.parentElement.tagName==="TBODY"&&e.parentElement.firstElementChild===e))&&!(e.matches("h3.s")&&e.closest(".two"))).map(e=>Math.round((e.getBoundingClientRect().top-top0)*SC)).sort((a,b)=>a-b),
    fb=[...r.querySelectorAll(".pbk")].map(e=>Math.round((e.getBoundingClientRect().top-top0)*SC)).sort((a,b)=>a-b),
-   cv=await html2canvas(r,{scale:SC,useCORS:true,backgroundColor:"#ffffff",width:794,windowWidth:794,scrollX:0,scrollY:0}),
+   cv=await html2canvas(r,{scale:SC,useCORS:true,onclone:d=>{const e=d.getElementById("pdfroot");if(e)e.style.visibility="visible"},backgroundColor:"#ffffff",width:794,windowWidth:794,scrollX:0,scrollY:0}),
    W=cv.width,H=cv.height,pxm=W/210,bottom=Math.floor(281*pxm),off2=Math.floor(19*pxm),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
   let y=0,pg=0;
   while(y<H-2){const off=pg?off2:0,cap=bottom-off;let end=Math.min(H,y+cap);
@@ -693,7 +693,7 @@ body{margin:0;font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:#1a1114;fo
 .lh .br{display:flex;align-items:center;gap:20px}.lh img{height:44px;width:auto;max-width:130px;object-fit:contain}
 .lh .co b{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:700;font-size:17px;line-height:1.25;letter-spacing:0}
 .lh .co span{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:500;font-size:10px;line-height:1.3;color:#c9a9b1;margin-top:3px}
-.lh .ti{display:flex;flex-direction:column;align-items:flex-end;gap:26px}
+.lh .ti{display:flex;flex-direction:column;align-items:flex-end;gap:22px}
 .lh .ti b{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:700;font-size:21px;line-height:1.15;letter-spacing:.2px}
 .lh .ti span{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:500;font-size:11px;line-height:1.2;color:#e8c9d0;letter-spacing:4px}
 .pg{padding:8mm 14mm 4mm}
