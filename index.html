@@ -217,7 +217,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&V.role==="display")
 function dispData(){const now=Date.now(),prep=[],srv=[];
  S.orders.forEach(o=>{if(!o.takeout)return;if(o.status!=="open"&&o.status!=="paid")return;const it=live(o).filter(i=>i.s);if(!it.length)return;
   const l=o.takeout?"#"+o.id:tgrp(o.tables),sub=o.cust||"",pg=o.takeout?[it.filter(i=>i.done).reduce((a,i)=>a+i.q,0),it.reduce((a,i)=>a+i.q,0)]:null;
-  if(it.some(i=>!i.done)){if(o.status==="open")prep.push({id:o.id,l,s:sub,p:pg,t:Math.min(...it.map(i=>i.s))})}
+  if(it.some(i=>!i.done)){prep.push({id:o.id,l,s:sub,p:pg,t:Math.min(...it.map(i=>i.s))})}
   else{const d=Math.max(...it.map(i=>+i.done||0));if(now-d<600000&&!it.every(i=>i.sv))srv.push({id:o.id,l,s:sub,t:d})}});
  prep.sort((a,b)=>a.t-b.t);srv.sort((a,b)=>b.t-a.t);return{prep,srv}}
 function dispPage(){DPREV=null;
