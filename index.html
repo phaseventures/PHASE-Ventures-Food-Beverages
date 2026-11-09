@@ -216,7 +216,7 @@ table.rt3{width:100%;border-collapse:collapse;margin-top:4px}
 .pm{margin:10px 0}.pm .row{margin-bottom:5px;font-size:14px}
 
 .line .tm{font-size:14px;padding:1px 8px}.line.dn .row>span:first-child{opacity:.6}.tk{transition:border-color .3s}.dvl{font-size:11px;letter-spacing:1px;margin:12px 0 2px}
-.gbtn{display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:#fff;font-weight:700;border-radius:5px;padding:6px 14px;min-height:38px}
+.line .row .mut{white-space:nowrap}.gbtn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;background:#16a34a;color:#fff;font-weight:700;border-radius:5px;padding:6px 14px;min-height:38px}
 .lrs{gap:0}.lr{background:none!important;border:0!important;border-bottom:1px solid var(--bd)!important;border-radius:0!important;padding:16px 4px;min-height:0}
 .lr:hover{background:rgba(255,255,255,.05)!important}.lr svg{flex:none;opacity:.9}
 .lr.d,.lr.ex{color:var(--bad)}.lrs .lr:last-child{border-bottom:0!important}
@@ -329,11 +329,12 @@ function render0(){
  a.innerHTML=(V.role==="counter"?counter():V.role==="serve"?serve():station())+(V.modal?modal():"");
 }
 const ALARM_MIN=8,ALARMED=new Map(),ALARM_STN=new Set();let ALARM_AUDIO=null;
-function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("kitchenalarm.mp3");ALARM_AUDIO.preload="auto";ALARM_AUDIO.onerror=()=>{ALARM_BAD=1}}return ALARM_AUDIO}
-let ALARM_BAD=0,SIREN_WAIT=0;
+function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("kitchenalarm.MP3");ALARM_AUDIO.preload="auto";ALARM_AUDIO.onerror=()=>{if(!ALARM_ALT){ALARM_ALT=1;ALARM_AUDIO.src="kitchenalarm.mp3";ALARM_AUDIO.load()}else ALARM_BAD=1}}return ALARM_AUDIO}
+let ALARM_BAD=0,ALARM_ALT=0,SIREN_WAIT=0;
 document.addEventListener("pointerdown",()=>{try{alarmAudio()}catch(e){}if(SIREN_WAIT){SIREN_WAIT=0;sirenPlay()}});
+try{alarmAudio()}catch(e){}
 function beepFallback(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=window.__ac||(window.__ac=new C());if(c.state==="suspended")c.resume();const t=c.currentTime;for(let i=0;i<4;i++){const o=c.createOscillator(),g=c.createGain();o.type="square";o.frequency.value=i%2?660:880;g.gain.setValueAtTime(.0001,t+i*.25);g.gain.exponentialRampToValueAtTime(.25,t+i*.25+.02);g.gain.exponentialRampToValueAtTime(.0001,t+i*.25+.23);o.connect(g);g.connect(c.destination);o.start(t+i*.25);o.stop(t+i*.25+.24)}}catch(e){}}
-function sirenPlay(){if(ALARM_BAD){beepFallback();return}try{const a=alarmAudio();a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(err=>{if(err&&err.name==="NotAllowedError")SIREN_WAIT=1;else{ALARM_BAD=1;beepFallback()}})}catch(e){beepFallback()}}
+function sirenPlay(){if(ALARM_BAD){beepFallback();return}try{const a=alarmAudio();a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(err=>{if(err&&err.name==="NotAllowedError")SIREN_WAIT=1;else if(!ALARM_ALT){ALARM_ALT=1;a.src="kitchenalarm.mp3";a.play().catch(()=>{ALARM_BAD=1;beepFallback()})}else{ALARM_BAD=1;beepFallback()}})}catch(e){beepFallback()}}
 function alarmCheck(){if(!V.auth||!V.stn||(V.role!=="kitchen"&&V.role!=="bar"))return;const now=Date.now(),first=!ALARM_STN.has(V.stn);ALARM_STN.add(V.stn);let fire=false;
  S.orders.forEach(o=>{const it=o.items.filter(i=>i.st===V.stn&&i.s&&!i.done&&!i.v);if(!it.length)return;const t=it[0].s,k=o.id+"_"+V.stn+"_"+t,mins=Math.floor((now-t)/6e4);
   if(!ALARMED.has(k))ALARMED.set(k,first?mins:ALARM_MIN-1);
@@ -827,7 +828,7 @@ function station(){const s=V.stn,isB=V.role==="bar",now=Date.now(),tabs=`<button
  const nt=i=>i.nt?`<span class="inote" style="display:block;font-size:16px">&#9998; ${esc(i.nt)}</span>`:"";
  const cards=os.map((z,ix)=>{const act=!V.fin,allr=act&&!z.pen.length,first=act&&!allr&&ix===0;
   const pend=act?z.pen.map(q=>`<div class="line"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${esc(q.i.n)}${nt(q.i)}</span><span class="pr">${tmr(q.i.s)}<button class="p" onclick="ready(${z.o.id},${q.x})">Ready</button></span></div></div>`).join(""):"";
-  const dn=z.dn.map(q=>`<div class="line dn"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${esc(q.i.n)}${nt(q.i)}</span>${V.fin?`<span class="mut">took ${dur(q.i.done-q.i.s)} - done ${tm(q.i.done)}</span>`:`<span class="pr"><span class="mut">${dur(q.i.done-q.i.s)}</span><span class="gbtn">&#10003; Served</span></span>`}</div></div>`).join("");
+  const dn=z.dn.map(q=>`<div class="line dn"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${esc(q.i.n)}${nt(q.i)}</span>${V.fin?`<span class="mut">took ${dur(q.i.done-q.i.s)} - done ${tm(q.i.done)}</span>`:`<span class="pr"><span class="mut">${dur(q.i.done-q.i.s)}</span><span class="gbtn">Ready</span></span>`}</div></div>`).join("");
   return `<div class="card tk ${first?"first":""} ${allr?"rdy":""}">${first?`<em class="qf">START FIRST</em>`:""}<div class="row"><span class="qh">${V.fin?"":`<i class="qn">${ix+1}</i>`}<b style="font-size:18px">${lab(z.o)}</b></span>${V.fin?`<span class="mut">${tm(z.t0)}</span>`:allr?`<span class="tm ok">ALL READY</span>`:tmr(z.tp)}</div>
   ${pend}${act&&z.pen.length&&z.dn.length?`<div class="mut dvl">PREPARED - WITH THE SERVERS</div>`:""}${dn}</div>`}).join("");
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
