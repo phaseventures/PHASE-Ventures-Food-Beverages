@@ -215,7 +215,7 @@ table.rt3{width:100%;border-collapse:collapse;margin-top:4px}
 .cs h3{font-size:15px;margin-bottom:4px}
 .pm{margin:10px 0}.pm .row{margin-bottom:5px;font-size:14px}
 
-.line .tm{font-size:14px;padding:1px 8px}.line.dn .row>span:first-child{opacity:.6}.tk{transition:border-color .3s}.dvl{font-size:11px;letter-spacing:1px;margin:12px 0 2px}
+.line .tm{font-size:14px;padding:1px 8px}.tk{transition:border-color .3s}.dvl{font-size:11px;letter-spacing:1px;margin:12px 0 2px}
 .line .row .mut{white-space:nowrap}.gbtn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;background:#16a34a;color:#fff;font-weight:700;border-radius:5px;padding:6px 14px;min-height:38px}
 .lrs{gap:0}.lr{background:none!important;border:0!important;border-bottom:1px solid var(--bd)!important;border-radius:0!important;padding:16px 4px;min-height:0}
 .lr:hover{background:rgba(255,255,255,.05)!important}.lr svg{flex:none;opacity:.9}
@@ -401,7 +401,9 @@ function selItem(){const x=selX(),o=V.oid&&ord(V.oid),i=o&&o.items[x];return i&&
 function selLine(x){V.li=selX()===x?null:{o:V.oid,x};render()}
 function chipNote(t){const e=$("inn");e.value=(e.value?e.value.replace(/[,\s]+$/,"")+", ":"")+t}
 function saveItemNote(x,clr){const i=ord(V.oid).items[x];if(!i)return;i.nt=clr?"":String($("inn").value||"").replace(/[<>]/g,"").trim().slice(0,120);save();go({modal:null})}
-function setHrs(k){const d=dk(new Date());S.hours=S.hours||{};const h=S.hours[d]=S.hours[d]||{};if(k==="o"){if(!h.o)h.o=Date.now()}else h.c=Date.now()}
+const storeOpen=()=>{const h=(S.hours||{})[dk(new Date())]||{};return !!h.o&&!h.c};
+function openStore(){const a=$("a"),v=a&&a.value!==""?+a.value:null,d=dk(new Date());S.hours=S.hours||{};const h=S.hours[d]=S.hours[d]||{};if(!h.o)h.o=Date.now();h.c=0;if(!S.till||v!=null)S.till={t:Date.now(),f:v||0};S.closed=(S.closed||[]).filter(x=>x!==d);save();go({modal:null})}
+function setHrs(k){const d=dk(new Date());S.hours=S.hours||{};const h=S.hours[d]=S.hours[d]||{};if(k==="o"){if(!h.o)h.o=Date.now();h.c=0}else h.c=Date.now()}
 let CP=null,CF=0;
 function catpd(i){CF=0;clearTimeout(CP);CP=setTimeout(()=>{CF=1;setTimeout(()=>{CF=0},1500);go({modal:{t:"cat",i}})},600)}
 function catpu(){clearTimeout(CP)}
@@ -483,6 +485,7 @@ function prepHTML(P,R){const LATE=ALARM_MIN*6e4,its=[],tks=[],hd=`<h3 class="rse
   ok.forEach(i=>its.push({n:i.n,st:i.st,t:i.done-i.s,q:i.q}));
   if(ok.length===sent.length)tks.push({t:Math.max(...ok.map(i=>i.done))-Math.min(...sent.map(i=>i.s)),ns:new Set(sent.map(i=>i.n))})});
  if(!its.length)return hd+`<div class="mut">No preparation times were recorded for this day.</div>`;
+ const sold={},timed={};P.forEach(q=>live(q).forEach(i=>{sold[i.st]=(sold[i.st]||0)+i.q}));its.forEach(i=>{timed[i.st]=(timed[i.st]||0)+i.q});
  const av=a=>a.reduce((x,y)=>x+y,0)/a.length,by={},bs={},pc=(a,b)=>b?Math.round(a/b*100):0;
  its.forEach(i=>{const e=by[i.n]=by[i.n]||{n:i.n,s:0,c:0,q:0};e.s+=i.t;e.c++;e.q+=i.q;const g=bs[i.st]=bs[i.st]||{s:0,c:0};g.s+=i.t;g.c++});
  const L=Object.values(by).map(e=>({...e,a:e.s/e.c})).sort((a,b)=>b.a-a.a),top=L[0],
@@ -493,7 +496,11 @@ function prepHTML(P,R){const LATE=ALARM_MIN*6e4,its=[],tks=[],hd=`<h3 class="rse
   :`<b>${esc(top.n)}</b> is the most time-consuming item (average ${f1(top.a)}), but it is in only <b>${sh}%</b> of orders, so it is not the main cause of waiting.`);
  if(tks.length)sg.push(pc(late,tks.length)>=30?`<b>${late} of ${tks.length}</b> tickets took longer than ${ALARM_MIN} minutes. The ${esc(STN[stl.k]||stl.k)} is the slowest station (average ${f1(stl.a)} per item), so it needs extra hands or earlier prep at busy times.`
   :`<b>${tks.length-late} of ${tks.length}</b> tickets were ready within ${ALARM_MIN} minutes, so preparation time is on target.`);
+ const miss=Object.keys(STN).filter(k=>sold[k]&&!timed[k]).map(k=>STN[k]),
+  stRows=Object.keys(STN).filter(k=>sold[k]).map(k=>`<tr><td>${STN[k]}</td><td class="num">${sold[k]}</td><td class="num">${timed[k]||0}</td><td class="num">${bs[k]?f1(bs[k].s/bs[k].c):"Not recorded"}</td></tr>`).join("");
+ if(miss.length)sg.push(`No preparation time was recorded for the <b>${miss.join(" and ")}</b> because those items were not marked Ready on that screen, so they are not part of the averages above.`);
  return hd+R("Average item preparation",f1(av(its.map(i=>i.t))))+(tks.length?R("Average ticket time (sent to all ready)",f1(av(tks.map(k=>k.t))))+R("Longest ticket",f1(Math.max(...tks.map(k=>k.t))))+R("Tickets over "+ALARM_MIN+" min",late+" of "+tks.length):"")+R("Slowest station",esc(STN[stl.k]||stl.k)+" ("+f1(stl.a)+")")
+  +`<table class="rt3" style="margin-top:10px"><thead><tr><th>Station</th><th class="num">Items sold</th><th class="num">With time</th><th class="num">Avg prep</th></tr></thead><tbody>${stRows}</tbody></table>`
   +`<table class="rt3" style="margin-top:10px"><thead><tr><th>Slowest items</th><th class="num">Avg prep</th><th class="num">Prepared</th><th class="num">In orders</th></tr></thead><tbody>${L.slice(0,5).map(e=>`<tr><td>${esc(e.n)}</td><td class="num">${f1(e.a)}</td><td class="num">${e.q}</td><td class="num">${share(e.n)}%</td></tr>`).join("")}</tbody></table>`
   +`<div style="border-left:3px solid #d81f2d;padding:8px 12px;margin-top:12px;line-height:1.55"><b>Suggestion:</b> ${sg.join(" ")}</div>`}
 function rptHTML(t,rd){const td=dk(new Date()),R=(a,b,c)=>`<div class="line row"><span>${a}</span><b ${c?`style="color:${c}"`:""}>${b}</b></div>`,
@@ -506,7 +513,7 @@ function rptHTML(t,rd){const td=dk(new Date()),R=(a,b,c)=>`<div class="line row"
  if(t==="rp_orders"){const s=k=>P.reduce((a,q)=>a+(q[k]||0),0),tk=P.filter(q=>q.takeout).length;
   const list=[...P].sort((a,b)=>b.paidAt-a.paidAt).map(q=>`<div class="line row"><span>${esc(lab(q))}<div class="mut" style="font-size:12px">${tm(q.paidAt)} - ${esc(q.method||"")}</div></span><b>${m(q.total)}</b></div>`).join("");
   return rptHead("Orders Summary",rd,1)+R("Paid orders",P.length)+R("Dine-in / Takeaway",(P.length-tk)+" / "+tk)+(rd===td?R("Still open",S.orders.filter(q=>q.status==="open").length):"")+R("Net sales",m(s("sub")))+R("Tax",m(s("tax")))+R("Voids",m(s("vd")))+R("Total",m(s("total")))+R("Average order",m(P.length?s("total")/P.length:0))
-   +`<h3 class="rsec">Orders</h3>`+(list||`<div class="mut">No paid orders.</div>`)+prepHTML(P,R)}
+   +prepHTML(P,R)}
  if(t==="rp_mix"){const mx={};P.forEach(q=>q.items.forEach(i=>{if(i.v)return;const e=mx[i.n]=mx[i.n]||{q:0,r:0};e.q+=i.q;e.r+=i.p*i.q}));
   const L=Object.entries(mx).sort((a,b)=>b[1].q-a[1].q),tq=L.reduce((a,e)=>a+e[1].q,0),tr=L.reduce((a,e)=>a+e[1].r,0);
   return rptHead("Products Mix",rd,1)+`<table class="rt3"><thead><tr><th>Item</th><th class="num">Quantity</th><th class="num">Sale</th></tr></thead><tbody>${L.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="num">${v.q}</td><td class="num">${m(v.r)}</td></tr>`).join("")||`<tr><td colspan="3" class="mut">Nothing sold on this day.</td></tr>`}</tbody>${L.length?`<tfoot><tr><td>Total</td><td class="num">${tq}</td><td class="num">${m(tr)}</td></tr></tfoot>`:""}</table>`}
@@ -576,7 +583,7 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  const W=(h,w)=>`<div class="mod" onclick="if(event.target===this)go({modal:null})"><div${w?' class="wide"':""}>${h}<div class="row" style="margin-top:12px"><span></span><button onclick="go({modal:null})">Close</button></div></div></div>`;
  const td=dk(new Date()),inp=(id,ph,ty)=>`<input class="plain" id="${id}" placeholder="${ph}" ${ty?`type="${ty}" step="0.01"`:""} style="width:100%;margin:6px 0">`;
  const XM=extraModal(M,o,W);if(XM)return XM;
- if(t==="more"){const L=[["receipt","Open Till","till"],["calendar","Close Store / End of Day ("+new Date().toLocaleDateString()+")","eod"],["drawer","Drawer Operations","drawer"],["card","House Account Payment","house"],["bars","Reports","reports"],["sync","Sync Data","sync"],["pulse","Diagnostics","diag"],["monitor","Devices","dev"],["exit","Exit","exit"]];
+ if(t==="more"){const L=[["receipt","Open Till","till"],storeOpen()?["calendar","Close Store / End of Day ("+new Date().toLocaleDateString()+")","eod"]:["calendar","Open Store / Start of Day","open"],["drawer","Drawer Operations","drawer"],["card","House Account Payment","house"],["bars","Reports","reports"],["sync","Sync Data","sync"],["pulse","Diagnostics","diag"],["monitor","Devices","dev"],["exit","Exit","exit"]];
   return W(`<h3>More</h3><div class="lrs">${L.map(l=>`<button class="lr ${l[2]==="exit"?"d":""}" onclick="more('${l[2]}')">${SV(l[0],18)}${l[1]}</button>`).join("")}</div>`)}
 
  if(t==="reports"){const rows=[["rp_tills","Tills Summary",1,"drawer"],["rp_orders","Orders Summary",1,"receipt"],["rp_mix","Products Mix",1,"bars"],["rp_active","Active Orders Summary",0,"pulse"],["an","Sales Analytics",0,"bars"]];
@@ -595,6 +602,7 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
   return RWD(rptHTML(t,V.rd||td),nm,`<button onclick="${back}">Back</button>`,`<button class="p" onclick="printReport('${t}')">${SV("download",18)} Save PDF</button>`)}
  if(t==="odet"){const q=ord(M.id);if(!q)return W(`<h3>Order not found</h3>`);const R=(a,b,c)=>`<div class="line row"><span>${a}</span><b ${c?`style="color:${c}"`:""}>${b}</b></div>`;
   return W(`<h3>Order ${q.id} - ${esc(lab(q))}</h3><div class="mut" style="margin-bottom:6px">${new Date(q.paidAt).toLocaleDateString()} ${tm(q.paidAt)}</div>${live(q).map(i=>R("<b>"+i.q+"x</b> "+esc(i.n),m(i.p*i.q))).join("")}${q.items.filter(i=>i.v).map(i=>R("<b>"+i.q+"x</b> "+esc(i.n)+" (voided: "+esc(i.vr||"")+")",m(i.p*i.q),"var(--bad)")).join("")}${R("Net sales",m(q.sub))}${R("Tax",m(q.tax))}${R("Total",m(q.total))}${R("Payment",esc(q.method||""))}`)}
+ if(t==="open")return W(`<h3>Open store - ${td}</h3><div class="mut">Starts the day and records the opening time.</div>${inp("a","Starting cash in drawer (optional)","number")}<button class="p" style="width:100%;margin-top:10px" onclick="openStore()">Open store now</button>`);
  if(t==="till")return W(`<h3>Open till</h3><div class="mut">${S.till?"Current float: "+m(S.till.f)+" since "+tm(S.till.t):"Enter the starting cash in the drawer."}</div>${inp("a","Starting cash","number")}<button class="p" onclick="S.till={t:Date.now(),f:+$('a').value||0};setHrs('o');save();go({modal:null})">Open till</button>`);
  if(t==="drawer")return W(`<h3>Drawer operations</h3>${inp("a","Amount","number")}${inp("n","Reason (for example: ice, supplies)")}<div class="row"><button class="p" onclick="cash(1)">Cash in</button><button class="d" onclick="cash(-1)">Paid out (expense)</button></div>`);
  if(t==="house")return W(`<h3>House account payment</h3>${inp("n","Account name")}${inp("a","Amount received","number")}<button class="p" onclick="S.house=S.house||[];S.house.push({d:'${td}',n:$('n').value,a:+$('a').value||0});save();go({modal:null})">Record payment</button>`);
@@ -827,10 +835,11 @@ function station(){const s=V.stn,isB=V.role==="bar",now=Date.now(),tabs=`<button
  os.sort((a,b)=>V.fin?b.last-a.last:((!!a.pen.length===!!b.pen.length)?(a.pen.length?a.tp-b.tp:b.last-a.last):(a.pen.length?-1:1)));
  const nt=i=>i.nt?`<span class="inote" style="display:block;font-size:16px">&#9998; ${esc(i.nt)}</span>`:"";
  const cards=os.map((z,ix)=>{const act=!V.fin,allr=act&&!z.pen.length,first=act&&!allr&&ix===0;
-  const pend=act?z.pen.map(q=>`<div class="line"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${esc(q.i.n)}${nt(q.i)}</span><span class="pr">${tmr(q.i.s)}<button class="p" onclick="ready(${z.o.id},${q.x})">Ready</button></span></div></div>`).join(""):"";
-  const dn=z.dn.map(q=>`<div class="line dn"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${esc(q.i.n)}${nt(q.i)}</span>${V.fin?`<span class="mut">took ${dur(q.i.done-q.i.s)} - done ${tm(q.i.done)}</span>`:`<span class="pr"><span class="mut">${dur(q.i.done-q.i.s)}</span><span class="gbtn">Ready</span></span>`}</div></div>`).join("");
+  const nmh=q=>`<span style="font-size:18px"><b>${q.i.q}x</b> ${esc(q.i.n)}${nt(q.i)}</span>`;
+  const pend=act?z.all.map(q=>q.i.done?`<div class="line dn"><div class="row">${nmh(q)}<span class="pr"><span class="mut">${dur(q.i.done-q.i.s)}</span><span class="gbtn">Ready</span></span></div></div>`:`<div class="line"><div class="row">${nmh(q)}<span class="pr">${tmr(q.i.s)}<button class="p" onclick="ready(${z.o.id},${q.x})">Ready</button></span></div></div>`).join(""):"";
+  const dn=V.fin?z.dn.map(q=>`<div class="line dn"><div class="row">${nmh(q)}<span class="mut">took ${dur(q.i.done-q.i.s)} - done ${tm(q.i.done)}</span></div></div>`).join(""):"";
   return `<div class="card tk ${first?"first":""} ${allr?"rdy":""}">${first?`<em class="qf">START FIRST</em>`:""}<div class="row"><span class="qh">${V.fin?"":`<i class="qn">${ix+1}</i>`}<b style="font-size:18px">${lab(z.o)}</b></span>${V.fin?`<span class="mut">${tm(z.t0)}</span>`:allr?`<span class="tm ok">ALL READY</span>`:tmr(z.tp)}</div>
-  ${pend}${act&&z.pen.length&&z.dn.length?`<div class="mut dvl">PREPARED - WITH THE SERVERS</div>`:""}${dn}</div>`}).join("");
+  ${pend}${dn}</div>`}).join("");
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
  return `<div class="pg">`+head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div></div>`}
 function serve(){const now=Date.now();
