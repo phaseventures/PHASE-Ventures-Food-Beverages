@@ -216,7 +216,7 @@ table.rt3{width:100%;border-collapse:collapse;margin-top:4px}
 .pm{margin:10px 0}.pm .row{margin-bottom:5px;font-size:14px}
 
 .lrs{gap:0}.lr{background:none!important;border:0!important;border-bottom:1px solid var(--bd)!important;border-radius:0!important;padding:16px 4px;min-height:0}
-.lr:hover{background:rgba(255,255,255,.05)!important}.lr svg{display:none}
+.lr:hover{background:rgba(255,255,255,.05)!important}.lr svg{flex:none;opacity:.9}
 .lr.d,.lr.ex{color:var(--bad)}.lrs .lr:last-child{border-bottom:0!important}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
@@ -410,20 +410,32 @@ function setGrid(v){v=Math.round(+v);if(!(v>=6))v=6;if(v>160)v=160;const r=S.roo
 const RNAME="Black Paradise";
 const PCSS="@page{size:A4 portrait;margin:14mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Arial,Helvetica,sans-serif;color:#000;background:#fff;margin:0;padding:0;font-size:13px}.rh{text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:16px}.rh h2{margin:0 0 6px;font-size:26px;letter-spacing:3px}.rh .sub{color:#444;margin-top:4px}.rh .tt{font-size:17px;font-weight:700;color:#000}.rtm{display:flex;gap:12px;margin-top:12px}.rtm div{flex:1;border:1px solid #999;padding:8px 12px;text-align:left}.rtm small{display:block;font-size:10px;color:#555;letter-spacing:1px}.rtm b{font-size:16px}.line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #999}.row{display:flex;justify-content:space-between;gap:12px}.mut{color:#555;font-size:12px}h3{margin:20px 0 6px}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;color:#555;padding:8px 6px;border-bottom:1px solid #000}td{padding:9px 6px;border-bottom:1px dashed #999}.num{text-align:right}tfoot td{border-top:2px solid #000;border-bottom:0;font-weight:700}";
 
-function pdfLib(){return new Promise((ok,no)=>{if(window.html2pdf)return ok();const e=document.createElement("script");e.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";e.onload=()=>window.html2pdf?ok():no();e.onerror=no;document.head.appendChild(e)})}
+function ldJS(u,g){return new Promise((ok,no)=>{if(g())return ok();const e=document.createElement("script");e.src=u;e.onload=()=>g()?ok():no();e.onerror=no;document.head.appendChild(e)})}
+function pdfLib(){return ldJS("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",()=>window.html2canvas).then(()=>ldJS("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",()=>window.jspdf&&window.jspdf.jsPDF))}
 function pdfNote(t,ms){let d=$("pdfn");if(!d){d=document.createElement("div");d.id="pdfn";d.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#26101a;border:1px solid var(--bd);color:#fff;padding:12px 18px;border-radius:12px;z-index:99;font-size:14px;max-width:90vw;text-align:center";document.body.appendChild(d)}d.textContent=t;d.style.display="block";clearTimeout(pdfNote.t);if(ms)pdfNote.t=setTimeout(()=>d.style.display="none",ms)}
+function pdfCSS(css){let a=css.indexOf("@page");if(a>-1){let d=0,x=css.indexOf("{",a);for(;x<css.length;x++){if(css[x]==="{")d++;else if(css[x]==="}"){d--;if(!d){x++;break}}}css=css.slice(0,a)+css.slice(x)}
+ return css.replace(/([^{}]+)\{([^{}]*)\}/g,(m,sel,body)=>sel.split(",").map(z=>{z=z.trim();return z==="body"?"#pdfroot":z==="*"?"#pdfroot *":"#pdfroot "+z}).join(",")+"{"+body+"}")}
 async function savePDF(html,name,pad){
  pdfNote("Preparing PDF...");
- let f;
+ let r;
  try{await pdfLib();
-  if(pad)html=html.replace("</head>","<style>body{padding:12mm}</style></head>");
-  f=document.createElement("iframe");f.setAttribute("aria-hidden","true");f.style.cssText="position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0";document.body.appendChild(f);
-  const d=f.contentWindow.document;d.open();d.write(html);d.close();
-  await new Promise(r=>setTimeout(r,800));
-  await html2pdf().set({margin:[0,0,8,0],filename:name,image:{type:"jpeg",quality:.98},html2canvas:{scale:2,useCORS:true,windowWidth:794,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["tr",".avoid","h3"]}}).from(d.body).save();
-  pdfNote("Saved "+name,3500)
- }catch(e){pdfNote("Could not create the PDF file here, opening print. Choose 'Save as PDF' as the destination.",6000);printHTML(html)}
- finally{if(f)setTimeout(()=>f.remove(),1000)}}
+  const css=(html.match(/<style>([\s\S]*?)<\/style>/)||[0,""])[1],bd=(html.match(/<body[^>]*>([\s\S]*)<\/body>/)||[0,html])[1];
+  r=document.createElement("div");r.id="pdfroot";r.style.cssText="position:fixed;left:0;top:0;width:794px;background:#fff;color:#000;z-index:-1;box-sizing:border-box"+(pad?";padding:12mm":"");
+  r.innerHTML="<style>"+pdfCSS(css)+"</style>"+bd;document.body.appendChild(r);
+  await Promise.all([...r.querySelectorAll("img")].map(im=>im.complete?0:new Promise(z=>{im.onload=im.onerror=z})));
+  await new Promise(z=>setTimeout(z,250));
+  const SC=2,top0=r.getBoundingClientRect().top,
+   br=[...r.querySelectorAll("tr,h3.s,.two,.sig,.hero,.meta,.empty")].filter(e=>!(e.matches("tr")&&(e.closest("thead")||e.closest(".two")||e.parentElement.tagName==="TBODY"&&e.parentElement.firstElementChild===e))&&!(e.matches("h3.s")&&e.closest(".two"))).map(e=>Math.round((e.getBoundingClientRect().top-top0)*SC)).sort((a,b)=>a-b),
+   cv=await html2canvas(r,{scale:SC,useCORS:true,backgroundColor:"#ffffff",width:794,windowWidth:794,scrollX:0,scrollY:0}),
+   W=cv.width,H=cv.height,pxm=W/210,usable=Math.floor(287*pxm),off2=Math.floor(8*pxm),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
+  let y=0,pg=0;
+  while(y<H-2){const off=pg?off2:0,cap=usable-off;let end=Math.min(H,y+cap);
+   if(end<H){const c=br.filter(b=>b>y+cap*.35&&b<=y+cap);if(c.length)end=c[c.length-1]}
+   const hh=end-y,pc=document.createElement("canvas");pc.width=W;pc.height=hh;const cx=pc.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,W,hh);cx.drawImage(cv,0,y,W,hh,0,0,W,hh);
+   if(pg)doc.addPage();doc.addImage(pc.toDataURL("image/jpeg",.95),"JPEG",0,off/pxm,210,hh/pxm);y=end;pg++}
+  doc.save(name);pdfNote("Saved "+name,3500)
+ }catch(e){console.error(e);pdfNote("Could not create the PDF file here, opening print. Choose 'Save as PDF' as the destination.",6000);printHTML(html)}
+ finally{if(r)r.remove()}}
 function printReport(t){savePDF(`<!doctype html><html><head><meta charset="utf-8"><title>${RNAME}</title><style>${PCSS}</style></head><body>${rptHTML(t,V.rd||dk(new Date()))}</body></html>`,"PHASE-"+t.replace("rp_","")+"-"+(V.rd||dk(new Date()))+".pdf",1)}
 function dayHours(d){const td=dk(new Date()),h=(S.hours||{})[d]||{},os=S.orders.filter(q=>dk(new Date(q.created||q.paidAt))===d);
  let o=h.o||(os.length?Math.min(...os.map(q=>q.created||q.paidAt)):0),c=h.c||0;
@@ -511,7 +523,7 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  const td=dk(new Date()),inp=(id,ph,ty)=>`<input class="plain" id="${id}" placeholder="${ph}" ${ty?`type="${ty}" step="0.01"`:""} style="width:100%;margin:6px 0">`;
  const XM=extraModal(M,o,W);if(XM)return XM;
  if(t==="more"){const L=[["receipt","Open Till","till"],["calendar","Close Store / End of Day ("+new Date().toLocaleDateString()+")","eod"],["drawer","Drawer Operations","drawer"],["card","House Account Payment","house"],["bars","Reports","reports"],["sync","Sync Data","sync"],["pulse","Diagnostics","diag"],["monitor","Devices","dev"],["exit","Exit","exit"]];
-  return W(`<h3>More</h3><div class="lrs">${L.map(l=>`<button class="lr ${l[2]==="exit"?"d":""}" onclick="more('${l[2]}')">${l[1]}</button>`).join("")}</div>`)}
+  return W(`<h3>More</h3><div class="lrs">${L.map(l=>`<button class="lr ${l[2]==="exit"?"d":""}" onclick="more('${l[2]}')">${SV(l[0],18)}${l[1]}</button>`).join("")}</div>`)}
 
  if(t==="reports"){const rows=[["rp_tills","Tills Summary",1,"drawer"],["rp_orders","Orders Summary",1,"receipt"],["rp_mix","Products Mix",1,"bars"],["rp_active","Active Orders Summary",0,"pulse"],["an","Sales Analytics",0,"bars"]];
   return RWD('<div class="lrs">'+rows.map(r=>`<button class="lr" onclick="${r[0]==="an"?"go({modal:null,tab:'reports'})":r[2]?`go({modal:{t:'rpcal',to:'${r[0]}'},rd:null,rcm:new Date()})`:`go({modal:{t:'${r[0]}'}})`}">${SV(r[3],18)}${r[1]}</button>`).join("")+'</div>',"Reports",null,`<button onclick="go({modal:null})">Close</button>`)}
@@ -675,7 +687,8 @@ tr.sub td{color:#5c464d}tr.tot td{font-weight:700;border-top:1.5px solid #1a1114
 .note{color:#7a6168;font-size:10px;margin-top:6px}
 .sig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12mm;margin-top:14mm;page-break-inside:avoid}.sig div{border-top:1px solid #1a1114;padding-top:4px;font-size:10px;color:#7a6168}
 .empty{padding:14px;text-align:center;color:#7a6168;border:1px dashed #d9c8cd;border-radius:6px}`;
-function phLogo(){const im=document.querySelector("img.logo");if(!im||!im.naturalWidth)return LG[0];try{const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);return c.toDataURL("image/png")}catch(e){return im.currentSrc||im.src}}
+const PH_LOGO_DATA="";
+function phLogo(){if(PH_LOGO_DATA)return PH_LOGO_DATA;const im=document.querySelector("img.logo");if(!im||!im.naturalWidth)return LG[0];try{const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);return c.toDataURL("image/png")}catch(e){return im.currentSrc||im.src}}
 function phaseDoc(title,sub,body){const now=new Date();
  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)} - ${esc(sub)}</title><style>${PHCSS}</style></head><body>
  <div class="lh"><div class="br"><img src="${phLogo()}" alt="PHASE" onerror="this.style.display='none'"><div class="co"><b>PHASE Ventures</b><span>Food &amp; Beverages</span></div></div><div class="ti"><b>${esc(title)}</b><span>${esc(sub)}</span></div></div>
