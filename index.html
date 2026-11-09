@@ -247,7 +247,7 @@ function render0(){
  a.innerHTML=(V.role==="counter"?counter():V.role==="serve"?serve():station())+(V.modal?modal():"");
 }
 const ALARM_MIN=8,ALARMED=new Map(),ALARM_STN=new Set();let ALARM_AUDIO=null;
-function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("PHASEALARM.MP3");ALARM_AUDIO.preload="auto"}return ALARM_AUDIO}
+function alarmAudio(){if(!ALARM_AUDIO){ALARM_AUDIO=new Audio("kitchenalarm.mp3");ALARM_AUDIO.preload="auto"}return ALARM_AUDIO}
 document.addEventListener("pointerdown",()=>{try{alarmAudio()}catch(e){}});
 function sirenPlay(){try{const a=alarmAudio();a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
 function alarmCheck(){if(!V.auth||!V.stn||(V.role!=="kitchen"&&V.role!=="bar"))return;const now=Date.now(),first=!ALARM_STN.has(V.stn);ALARM_STN.add(V.stn);let fire=false;
