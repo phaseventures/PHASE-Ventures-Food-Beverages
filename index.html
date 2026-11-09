@@ -143,6 +143,36 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .orm,.ore{display:flex;flex-direction:column;gap:4px;font-size:16px}.ore{align-items:flex-end}
 .orm span,.ore span{color:var(--mut);font-size:16px}.ore b{letter-spacing:1px;font-size:16px}
 .st-active{color:#fbbf24}.st-pending{color:#b49aa2}.st-done{color:#34d399}
+.mod>div.wide{max-width:780px;padding:28px 32px}
+.wide .line{padding:13px 0}
+.rh{text-align:center;padding:2px 0 20px;margin-bottom:20px;border-bottom:1px solid var(--bd)}
+.rh h2{font-family:"Chakra Petch",sans-serif;letter-spacing:4px;font-size:28px;margin:0 0 8px}
+.rh .sub{color:var(--mut);font-size:14px;margin-top:4px}
+.rh .tt{font-size:18px;font-weight:700;color:var(--tx)}
+.rtm{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.rtm div{border:1px solid var(--bd);border-radius:10px;padding:12px 14px;text-align:left}
+.rtm small{display:block;color:var(--mut);font-size:12px;letter-spacing:1px;margin-bottom:4px}
+.rtm b{font-size:19px}
+.rbl{display:flex;flex-direction:column;gap:12px}
+.rl{width:100%;text-align:left;padding:18px 18px;font-size:17px;border-radius:12px}
+table.rt3{width:100%;border-collapse:collapse;margin-top:4px}
+.rt3 th{text-align:left;font-size:13px;color:var(--mut);font-weight:500;padding:14px 12px;border-bottom:1px solid var(--bd)}
+.rt3 td{padding:16px 12px;border-bottom:1px dashed var(--bd);font-size:16px}
+.rt3 .num{text-align:right}
+.rt3 tfoot td{border-top:2px solid var(--bd);border-bottom:0;font-weight:800;padding-top:18px}
+.rsec{margin:26px 0 8px;font-size:17px}
+.rcal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.rcal .h{text-align:center;font-size:12px;color:var(--mut);padding:4px 0}
+.rcal button{min-height:54px;padding:4px;position:relative}
+.rcal button.dot:after{content:"";position:absolute;bottom:7px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--ok)}
+.rcal button.td{border-color:var(--warn)}
+.rac{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.rac button{min-height:54px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.ln{cursor:pointer}
+.line.sel{background:rgba(251,191,36,.12);box-shadow:inset 3px 0 0 var(--warn);padding-left:10px;padding-right:10px;border-radius:6px}
+.inote{color:#fde68a;font-size:14px;margin-top:3px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.chips button{min-height:36px;padding:4px 12px;font-size:14px}
+.floor.edit{background-image:radial-gradient(rgba(255,255,255,.45) 1.5px,transparent 1.6px)}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
@@ -158,7 +188,7 @@ async function sbPull(first){if(!SB_ON||!V.auth||PUSHING||DIRTY)return;
   const a=await r.json();SYNC="live";
   if(!a.length){if(first)sbQueue();sbBadge();return}
   const row=a[0];if(+row.rev>REV){const busy=V.modal||D||(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName));if(busy&&!first){return}
-   S=row.data;REV=+row.rev;S.exp=S.exp||[];S.house=S.house||[];try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}render()}
+   S=row.data;REV=+row.rev;norm();try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}render()}
   sbBadge()}catch(e){SYNC="offline";sbBadge()}}
 function sbBadge(){const e=document.getElementById("hu");if(e&&V.user)e.textContent=V.user+(SB_ON?" \u2022 "+SYNC:" \u2022 local only")}
 const PASS="PH1S3",CUR="SR ",TAX=0.10;
@@ -171,10 +201,15 @@ const MENU=[
 {id:11,n:"Fresh Orange Juice",p:5,c:1.4,st:"bar",cat:"Drinks"},{id:12,n:"Iced Tea",p:4,c:0.5,st:"bar",cat:"Drinks"},
 {id:13,n:"Coffee",p:3.5,c:0.4,st:"bar",cat:"Drinks"},{id:14,n:"Mocktail",p:7,c:1.8,st:"bar",cat:"Drinks"}];
 const STN={app:"Appetizer Kitchen",main:"Main Kitchen",bar:"Bar"};
-const fresh=()=>({rooms:[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}],tables:[1,2,3,4,5,6,7,8].map((n,i)=>({n:""+n,name:"",r:"r1",seats:4,gx:2+(i%4)*9,gy:2+Math.floor(i/4)*7})),orders:[],seq:1,name:"PHASE Ventures | Food & Beverages",exp:[],house:[]});
+const DEFCATS=[{k:"Mains",l:"MAIN"},{k:"Appetizers",l:"APPETIZER"},{k:"Drinks",l:"DRINKS"}];
+const BASEN=MENU.length;
+function syncMenu(){MENU.length=BASEN;(S.items||[]).forEach(i=>MENU.push(i))}
+function norm(){S.exp=S.exp||[];S.house=S.house||[];S.hours=S.hours||{};S.items=S.items||[];if(!S.cats||!S.cats.length)S.cats=DEFCATS.map(x=>({...x}));syncMenu()}
+const cats=()=>S.cats&&S.cats.length?S.cats:DEFCATS;
+const fresh=()=>({rooms:[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}],tables:[1,2,3,4,5,6,7,8].map((n,i)=>({n:""+n,name:"",r:"r1",seats:4,gx:48+(i%4)*216,gy:48+Math.floor(i/4)*168})),gpx:1,hours:{},cats:DEFCATS.map(x=>({...x})),items:[],orders:[],seq:1,name:"PHASE Ventures | Food & Beverages",exp:[],house:[]});
 let S=fresh();
 const KEY=()=>"dpos_"+(V.user||"x");
-function loadS(){S=fresh();try{const x=localStorage.getItem(KEY());if(x)S=JSON.parse(x)}catch(e){}S.tables.forEach((t,i)=>{if(t.gx==null){t.gx=2+(i%4)*9;t.gy=2+Math.floor(i/4)*7}});S.exp=S.exp||[];S.house=S.house||[]}
+function loadS(){S=fresh();try{const x=localStorage.getItem(KEY());if(x)S=JSON.parse(x)}catch(e){}S.tables.forEach((t,i)=>{if(t.gx==null){t.gx=2+(i%4)*9;t.gy=2+Math.floor(i/4)*7}});norm()}
 const save=()=>{try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}sbQueue()};
 const USERS=["resto1","resto2"];
 const tname=n=>{const t=S.tables.find(z=>z.n===n);return t&&t.name?t.name:"Table "+n};
@@ -294,24 +329,68 @@ function counter(){
  const body=T==="pay"&&o?payPage(o):T==="orders"?ordersTab():T==="tables"?tablesTab():T==="reports"?reports():home(o);
  return `<div class="pg"><div class="wrap ${fit?"fit":""}">${body}</div><nav class="nav">${nav}</nav></div>`}
 function mgrid(){const q=(V.q||"").toLowerCase();
- if(!q&&!V.cat)return [["Mains","MAIN"],["Appetizers","APPETIZER"],["Drinks","DRINKS"]].map(c=>`<button class="tile" onclick="go({cat:'${c[0]}'})">${c[1]}</button>`).join("");
+ if(!q&&!V.cat)return cats().map((c,i)=>`<button class="tile" onpointerdown="catpd(${i})" onpointerup="catpu()" onpointerleave="catpu()" onpointercancel="catpu()" oncontextmenu="return false" onclick="catTap(${i})">${esc(c.l)}</button>`).join("");
  const l=MENU.filter(i=>q?i.n.toLowerCase().includes(q):i.cat===V.cat);
- return `<button class="tile" onclick="go({cat:null,q:''})">&larr; Categories</button>`+l.map(i=>`<button class="item" onclick="add(${i.id})"><b>${i.n}</b><span class="mut">${m(i.p)}</span></button>`).join("")}
+ return `<button class="tile" onclick="go({cat:null,q:''})">&larr; Back</button>`+l.map(i=>`<button class="item" onclick="add(${i.id})"><b>${esc(i.n)}</b><span class="mut">${m(i.p)}</span></button>`).join("")+(!q&&V.cat?`<button class="item" style="border-style:dashed" onclick="go({modal:{t:'newitem'}})"><b>+ Add item</b><span class="mut">New</span></button>`:"")}
 function ab(ic,l,fn,c,dis){return `<button class="ab ${c||""}" ${dis?"disabled":""} onclick="${fn}"><span>${SV(ic)}</span>${l}</button>`}
 function tkt(o,ro){const unsent=live(o).some(i=>!i.s),c=calc(o);
- const lines=o.items.map((i,x)=>`<div class="line ${i.v?"v":""}"><div class="row"><span><b>${i.q}x</b> ${i.n}${i.s?` <span class="tag">${i.done?"served":"sent"}</span>`:""}</span><span>${m(i.p*i.q)}</span></div>${ro?"":i.v?`<div class="mut">Voided: ${i.vr}</div>`:`<div class="row" style="margin-top:6px;justify-content:flex-start">${i.s?"":`<button onclick="qty(${x},-1)">-</button><button onclick="qty(${x},1)">+</button>`}<button class="d" onclick="go({modal:{t:'void',x:${x}}})">${i.s?"Void":"Remove"}</button></div>`}</div>`).join("")||"";
+ const lines=o.items.map((i,x)=>`<div class="line ${i.v?"v":""} ${!ro&&selX()===x?"sel":""}"><div class="row ${ro||i.v?"":"ln"}" ${ro||i.v?"":`onclick="selLine(${x})"`}><span><b>${i.q}x</b> ${esc(i.n)}${i.s?` <span class="tag">${i.done?"served":"sent"}</span>`:""}</span><span>${m(i.p*i.q)}</span></div>${i.nt?`<div class="inote">&#9998; ${esc(i.nt)}</div>`:""}${ro?"":i.v?`<div class="mut">Voided: ${i.vr}</div>`:`<div class="row" style="margin-top:6px;justify-content:flex-start">${i.s?"":`<button onclick="qty(${x},-1)">-</button><button onclick="qty(${x},1)">+</button>`}<button onclick="go({modal:{t:'inote',x:${x}}})">${i.nt?"Edit note":"Note"}</button><button class="d" onclick="go({modal:{t:'void',x:${x}}})">${i.s?"Void":"Remove"}</button></div>`}</div>`).join("")||"";
  return `<div class="card tk2"><div class="th"><div class="row"><h3>${esc(lab(o))}</h3><span class="mut">${o.guests?o.guests+" guests":""}</span></div><div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-bottom:6px">${(o.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}${ro?"":`<button onclick="go({modal:{t:'cust'}})">${o.cust?"&#128100; "+esc(o.cust):"+ Customer name"}</button>`}${o.takeout||ro?"":`<button onclick="go({modal:{t:'merge'}})">Merge tables</button>`}</div>${o.note?`<div class="mut">Note: ${esc(o.note)}</div>`:""}</div>
  <div class="ls sc" id="ls${ro?"p":""}">${lines}</div>
  <div class="tf tot"><div class="row"><span>Subtotal</span><span>${m(c.g)}</span></div>${o.disc?`<div class="row"><span>Discount (${o.disc}%)</span><span>-${m(c.g-c.sub)}</span></div>`:""}<div class="row"><span>Tax (${TAX*100}%)</span><span>${m(c.tax)}</span></div>
  <div class="row" style="margin-top:6px"><b>Total</b><span class="g">${m(c.total)}</span></div>${ro?"":`<button class="p" style="width:100%;margin-top:12px" ${live(o).length&&!unsent?"":"disabled"} onclick="go({tab:'pay',kp:'',pm:'Cash',ep:null})">Pay</button>`}</div></div>`}
 function home(o){const unsent=o&&live(o).some(i=>!i.s),armed=Date.now()<V.armed,n=!o;
- const right=`<div class="rt"><div class="acts">${ab("printer","Print","printOrder()","",n||!live(o).length)}${ab("order","Order","send()",(unsent?"hot ":"")+(armed?"arm":""),n||!unsent)}${ab("void","Void","go({modal:{t:'voidpick'}})","",n)}${ab("percent","Discount","go({modal:{t:'disc'}})","",n)}${ab("pencil","Notes","go({modal:{t:'note'}})","",n)}${ab("tag","Tags","go({modal:{t:'tags'}})","",n)}${ab("more","More","go({modal:{t:'more'}})")}</div>
+ const right=`<div class="rt"><div class="acts">${ab("printer","Print","printOrder()","",n||!live(o).length)}${ab("order","Order","send()",(unsent?"hot ":"")+(armed?"arm":""),n||!unsent)}${ab("void","Void","go({modal:{t:'voidpick'}})","",n)}${ab("percent","Discount","go({modal:{t:'disc'}})","",n)}${ab("pencil",selItem()?"Item note":"Notes",selItem()?"go({modal:{t:'inote',x:"+V.li.x+"}})":"go({modal:{t:'note'}})","",n)}${ab("tag","Tags","go({modal:{t:'tags'}})","",n)}${ab("more","More","go({modal:{t:'more'}})")}</div>
  <div class="search"><input id="sq" placeholder="Search products" value="${esc(V.q)}" oninput="V.q=this.value;$('mg').innerHTML=mgrid()"></div><div id="mg" class="grid sc">${mgrid()}</div></div>`;
  return `<div class="split">${o?tkt(o):`<div class="card tk2"></div>`}${right}</div>`}
-function printOrder(){const o=ord(V.oid);o.pr=Date.now();save();go({modal:{t:"receipt"}})}
-const G=24,TW=7,TH=5;
-function mig(){if(!S.rooms||!S.rooms.length)S.rooms=[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}];const seen=new Set();S.tables.forEach(t=>{t.n=String(t.n);if(seen.has(t.n)){t.n=""+(Math.max(0,...S.tables.map(z=>+z.n||0))+1);t.gx=NaN}seen.add(t.n);t.gx=Math.round(+t.gx);t.gy=Math.round(+t.gy);if(!isFinite(t.gx))t.gx=2;if(!isFinite(t.gy))t.gy=2;if(!t.r||!S.rooms.some(r=>r.id===t.r))t.r=S.rooms[0].id});if(!V.room||!S.rooms.some(r=>r.id===V.room))V.room=S.rooms[0].id}
-function fs(r){r=r||V.room;for(let y=1;;y++)for(let x=1;x<=34;x++)if(!S.tables.some(z=>z.r===r&&Math.abs(z.gx-x)<TW&&Math.abs(z.gy-y)<TH))return{x,y}}
+function printOrder(){const o=ord(V.oid);o.pr=Date.now();save();printHTML(receiptHTML(o));render()}
+function printHTML(h){const f=document.createElement("iframe");f.setAttribute("aria-hidden","true");f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";document.body.appendChild(f);const d=f.contentWindow.document;d.open();d.write(h);d.close();setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){}setTimeout(()=>{try{f.remove()}catch(e){}},60000)},350)}
+function receiptHTML(o){const c=calc(o);return `<!doctype html><html><head><meta charset="utf-8"><title>Receipt</title><style>@page{margin:6mm}body{font-family:Arial,sans-serif;font-size:13px;color:#000;width:72mm;margin:0 auto}h3{text-align:center;margin:0 0 4px}.c{text-align:center;color:#444;font-size:12px;margin-bottom:8px}.r{display:flex;justify-content:space-between;padding:3px 0}.n{font-size:11px;color:#444;padding:0 0 3px 14px}hr{border:0;border-top:1px dashed #000}</style></head><body><h3>${esc(S.name)}</h3><div class="c">${esc(lab(o))} - ${new Date().toLocaleString()}</div>${live(o).map(i=>`<div class="r"><span>${i.q}x ${esc(i.n)}</span><span>${m(i.p*i.q)}</span></div>${i.nt?`<div class="n">${esc(i.nt)}</div>`:""}`).join("")}<hr><div class="r"><span>Subtotal</span><span>${m(c.g)}</span></div>${o.disc?`<div class="r"><span>Discount (${o.disc}%)</span><span>-${m(c.g-c.sub)}</span></div>`:""}<div class="r"><span>Tax</span><span>${m(c.tax)}</span></div><div class="r"><b>Total</b><b>${m(c.total)}</b></div></body></html>`}
+function selX(){const s=V.li;return s&&s.o===V.oid?s.x:-1}
+function selItem(){const x=selX(),o=V.oid&&ord(V.oid),i=o&&o.items[x];return i&&!i.v?i:null}
+function selLine(x){V.li=selX()===x?null:{o:V.oid,x};render()}
+function chipNote(t){const e=$("inn");e.value=(e.value?e.value.replace(/[,\s]+$/,"")+", ":"")+t}
+function saveItemNote(x,clr){const i=ord(V.oid).items[x];if(!i)return;i.nt=clr?"":String($("inn").value||"").replace(/[<>]/g,"").trim().slice(0,120);save();go({modal:null})}
+function setHrs(k){const d=dk(new Date());S.hours=S.hours||{};const h=S.hours[d]=S.hours[d]||{};if(k==="o"){if(!h.o)h.o=Date.now()}else h.c=Date.now()}
+let CP=null,CF=0;
+function catpd(i){CF=0;clearTimeout(CP);CP=setTimeout(()=>{CF=1;setTimeout(()=>{CF=0},1500);go({modal:{t:"cat",i}})},600)}
+function catpu(){clearTimeout(CP)}
+function catTap(i){if(CF){CF=0;return}const c=cats()[i];if(c)go({cat:c.k})}
+function addCat(){const n=cleanName($("cnm").value);if(!n)return;if(cats().some(c=>c.k.toLowerCase()===n.toLowerCase()))return;S.cats=cats().map(x=>({...x}));S.cats.push({k:n,l:n.toUpperCase()});save();go({modal:null})}
+function delCat(i){const a=cats().map(x=>({...x}));if(a.length<2)return;a.splice(i,1);S.cats=a;save();go({modal:null})}
+function addItem(){const n=cleanName($("ni").value),p=+$("np").value;if(!n||!(p>0))return;S.items=S.items||[];S.items.push({id:Date.now(),n,p,c:+$("nc").value||0,st:$("ns").value,cat:V.cat});syncMenu();save();go({modal:null})}
+function gsz(r){const x=S.rooms.find(z=>z.id===(r||V.room));return x&&+x.g>=6?+x.g:24}
+function addTable(){mig();const p=fs();S.tables.push({n:""+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:"",r:V.room,seats:4,gx:p.x,gy:p.y});save();go({edit:true,modal:null})}
+function setGrid(v){v=Math.round(+v);if(!(v>=6))v=6;if(v>160)v=160;const r=S.rooms.find(z=>z.id===V.room);if(!r)return;r.g=v;S.tables.forEach(t=>{if(t.r===r.id){t.gx=Math.round(t.gx/v)*v;t.gy=Math.round(t.gy/v)*v}});save();go({modal:null,edit:true})}
+const RNAME="Black Paradise";
+const PCSS="body{font-family:Arial,Helvetica,sans-serif;color:#000;background:#fff;margin:0;padding:8px;font-size:14px}.rh{text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:16px}.rh h2{margin:0 0 6px;font-size:26px;letter-spacing:3px}.rh .sub{color:#444;margin-top:4px}.rh .tt{font-size:17px;font-weight:700;color:#000}.rtm{display:flex;gap:12px;margin-top:12px}.rtm div{flex:1;border:1px solid #999;padding:8px 12px;text-align:left}.rtm small{display:block;font-size:10px;color:#555;letter-spacing:1px}.rtm b{font-size:16px}.line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #999}.row{display:flex;justify-content:space-between;gap:12px}.mut{color:#555;font-size:12px}h3{margin:20px 0 6px}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;color:#555;padding:8px 6px;border-bottom:1px solid #000}td{padding:9px 6px;border-bottom:1px dashed #999}.num{text-align:right}tfoot td{border-top:2px solid #000;border-bottom:0;font-weight:700}";
+function printReport(t){printHTML(`<!doctype html><html><head><meta charset="utf-8"><title>${RNAME}</title><style>${PCSS}</style></head><body>${rptHTML(t,V.rd||dk(new Date()))}</body></html>`)}
+function dayHours(d){const td=dk(new Date()),h=(S.hours||{})[d]||{},os=S.orders.filter(q=>dk(new Date(q.created||q.paidAt))===d);
+ let o=h.o||(os.length?Math.min(...os.map(q=>q.created||q.paidAt)):0),c=h.c||0;
+ if(!c&&d<td){const p=S.orders.filter(q=>q.paidAt&&dk(new Date(q.paidAt))===d);if(p.length)c=Math.max(...p.map(q=>q.paidAt))}
+ return{o,c,today:d===td}}
+function rptHead(ti,d,hrs){const H=dayHours(d),dt=new Date(d+"T12:00:00").toLocaleDateString([],{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+ return `<div class="rh"><h2>${RNAME}</h2><div class="sub"><span class="tt">${ti}</span></div><div class="sub">${dt}</div>${hrs?`<div class="rtm"><div><small>STORE OPENED</small><b>${H.o?tm(H.o):"Not recorded"}</b></div><div><small>STORE CLOSED</small><b>${H.c?tm(H.c):(H.today?"Still open":"Not recorded")}</b></div></div>`:""}</div>`}
+function rptHTML(t,rd){const td=dk(new Date()),R=(a,b,c)=>`<div class="line row"><span>${a}</span><b ${c?`style="color:${c}"`:""}>${b}</b></div>`,
+  P=S.orders.filter(q=>q.status==="paid"&&dk(new Date(q.paidAt))===rd);
+ if(t==="rp_tills"){const pm={},ct={};P.forEach(q=>(q.pays||[{m:q.method,a:q.total}]).forEach(p=>{pm[p.m]=(pm[p.m]||0)+p.a;ct[p.m]=(ct[p.m]||0)+1}));
+  const cs=pm.Cash||0,po=(S.exp||[]).filter(e=>e.d===rd),pos=po.reduce((a,e)=>a+e.a,0),on=rd===td&&S.till,fl=on?S.till.f:0,all=Object.values(pm).reduce((a,v)=>a+v,0);
+  return rptHead("Tills Summary",rd,1)+R("Till",on?"Open since "+tm(S.till.t):"Not open")+R("Float (incl. cash in)",m(fl))+R("Cash sales",m(cs))+R("Paid out",m(pos),pos?"#fb7185":"")+R("Expected in drawer",m(fl+cs-pos))
+   +`<h3 class="rsec">Payments by method</h3>`+(Object.keys(pm).map(k=>R(esc(k)+" ("+ct[k]+")",m(pm[k]))).join("")||`<div class="mut">No payments.</div>`)+(Object.keys(pm).length?R("Total",m(all)):"")
+   +(po.length?`<h3 class="rsec">Paid outs</h3>`+po.map(e=>R(esc(e.c),m(e.a))).join(""):"")}
+ if(t==="rp_orders"){const s=k=>P.reduce((a,q)=>a+(q[k]||0),0),tk=P.filter(q=>q.takeout).length;
+  const list=[...P].sort((a,b)=>b.paidAt-a.paidAt).map(q=>`<div class="line row"><span>${esc(lab(q))}<div class="mut" style="font-size:12px">${tm(q.paidAt)} - ${esc(q.method||"")}</div></span><b>${m(q.total)}</b></div>`).join("");
+  return rptHead("Orders Summary",rd,1)+R("Paid orders",P.length)+R("Dine-in / Takeaway",(P.length-tk)+" / "+tk)+(rd===td?R("Still open",S.orders.filter(q=>q.status==="open").length):"")+R("Net sales",m(s("sub")))+R("Tax",m(s("tax")))+R("Voids",m(s("vd")))+R("Total",m(s("total")))+R("Average order",m(P.length?s("total")/P.length:0))
+   +`<h3 class="rsec">Orders</h3>`+(list||`<div class="mut">No paid orders.</div>`)}
+ if(t==="rp_mix"){const mx={};P.forEach(q=>q.items.forEach(i=>{if(i.v)return;const e=mx[i.n]=mx[i.n]||{q:0,r:0};e.q+=i.q;e.r+=i.p*i.q}));
+  const L=Object.entries(mx).sort((a,b)=>b[1].q-a[1].q),tq=L.reduce((a,e)=>a+e[1].q,0),tr=L.reduce((a,e)=>a+e[1].r,0);
+  return rptHead("Products Mix",rd,1)+`<table class="rt3"><thead><tr><th>Item</th><th class="num">Quantity</th><th class="num">Sale</th></tr></thead><tbody>${L.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="num">${v.q}</td><td class="num">${m(v.r)}</td></tr>`).join("")||`<tr><td colspan="3" class="mut">Nothing sold on this day.</td></tr>`}</tbody>${L.length?`<tfoot><tr><td>Total</td><td class="num">${tq}</td><td class="num">${m(tr)}</td></tr></tfoot>`:""}</table>`}
+ if(t==="rp_active"){const A=S.orders.filter(q=>q.status==="open").sort((a,b)=>a.created-b.created);
+  return rptHead("Active Orders Summary",td,0)+(A.map(q=>{const it=live(q),sn=it.filter(i=>i.s),rdy=sn.filter(i=>i.done).reduce((a,i)=>a+i.q,0),tot=sn.reduce((a,i)=>a+i.q,0);return `<div class="line row"><span>${esc(lab(q))}<div class="mut" style="font-size:12px">${it.reduce((a,i)=>a+i.q,0)} items - ${tot?rdy+"/"+tot+" ready":"not sent"} - ${Math.floor((Date.now()-q.created)/6e4)} min</div></span><b>${m(calc(q).total)}</b></div>`}).join("")||`<div class="mut">No active orders.</div>`)+(A.length?R("Total",m(A.reduce((a,q)=>a+calc(q).total,0))):"")}
+ return ""}
+let G=24;
+function mig(){if(!S.rooms||!S.rooms.length)S.rooms=[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}];if(!S.gpx){S.tables.forEach(t=>{t.gx=(+t.gx||0)*24;t.gy=(+t.gy||0)*24});S.gpx=1}const seen=new Set();S.tables.forEach(t=>{t.n=String(t.n);if(seen.has(t.n)){t.n=""+(Math.max(0,...S.tables.map(z=>+z.n||0))+1);t.gx=NaN}seen.add(t.n);t.gx=Math.round(+t.gx);t.gy=Math.round(+t.gy);if(!isFinite(t.gx))t.gx=24;if(!isFinite(t.gy))t.gy=24;if(!t.r||!S.rooms.some(r=>r.id===t.r))t.r=S.rooms[0].id});if(!V.room||!S.rooms.some(r=>r.id===V.room))V.room=S.rooms[0].id}
+function fs(r){r=r||V.room;const g=gsz(r);for(let y=g;;y+=g)for(let x=g;x<=900;x+=g)if(!S.tables.some(z=>z.r===r&&Math.abs(z.gx-x)<176&&Math.abs(z.gy-y)<128))return{x,y}}
 function toggleMg(n){const a=V.mg.includes(n)?V.mg.filter(x=>x!==n):[...V.mg,n];go({mg:a})}
 function doMerge(){const sel=V.mg||[];if(sel.length<2)return;const os=[...new Set(sel.map(n=>openFor(n)).filter(Boolean))];
  if(!os.length){go({mg:null,kp:"",modal:{t:"guest",n:sel[0],mt:sel}});return}
@@ -331,19 +410,19 @@ function addRoom(){mig();const id="r"+Date.now().toString(36);S.rooms.push({id,n
 function saveRoom(id){const r=S.rooms.find(z=>z.id===id);r.name=$("rn").value.trim()||r.name;save();go({modal:null})}
 function delRoom(id){if(S.rooms.length<2||S.tables.some(z=>z.r===id))return;S.rooms=S.rooms.filter(z=>z.id!==id);V.room=S.rooms[0].id;save();go({modal:null})}
 function saveTbl(n){const t=S.tables.find(z=>z.n===n);t.name=$("tn").value;const r=$("tr")&&$("tr").value;if(r&&r!==t.r){const p=fs(r);t.r=r;t.gx=p.x;t.gy=p.y;V.room=r}save();go({modal:null})}
-function tablesTab(){mig();
+function tablesTab(){mig();G=gsz();
  const hid=new Set();S.orders.forEach(q=>{if(q.status==="open"&&!q.takeout&&q.tables.length>1){const p=tprim(q.tables);q.tables.forEach(x=>{if(x!==p)hid.add(x)})}});
- const T=S.tables.filter(t=>t.r===V.room&&!hid.has(t.n)).map(t=>{const o=openFor(t.n),k=!o?"g":(o.pr?"y":"r"),g=o&&o.tables.length>1;return `<div class="ft ${k} ${V.edit?"ed":""} ${V.mg&&V.mg.includes(t.n)?"sel":""} ${g?"mrg":""}" data-n="${t.n}" style="left:${t.gx*G}px;top:${t.gy*G}px" onpointerdown="pd(event,'${t.n}')">${g?`<div class="mt">${SV("merge",14)}${[...o.tables].sort(tnum).join(" + ")}</div>`:""}<div class="fn">${esc(tname(t.n))}</div>${o?`<div class="fs">${o.guests} guests - ${m(calc(o).total)}</div>`:""}${o?`<div class="sw" data-sw="${o.created}">${swf(o.created)}</div>`:""}</div>`}).join("");
+ const T=S.tables.filter(t=>t.r===V.room&&!hid.has(t.n)).map(t=>{const o=openFor(t.n),k=!o?"g":(o.pr?"y":"r"),g=o&&o.tables.length>1,w=g?o.tables.length*168+(o.tables.length-1)*8:168;return `<div class="ft ${k} ${V.edit?"ed":""} ${V.mg&&V.mg.includes(t.n)?"sel":""} ${g?"mrg":""}" data-n="${t.n}" style="left:${t.gx}px;top:${t.gy}px;width:${w}px" onpointerdown="pd(event,'${t.n}')">${g?`<div class="mt">${SV("merge",14)}${[...o.tables].sort(tnum).join(" + ")}</div>`:""}<div class="fn">${esc(tname(t.n))}</div>${o?`<div class="fs">${o.guests} guests - ${m(calc(o).total)}</div>`:""}${o?`<div class="sw" data-sw="${o.created}">${swf(o.created)}</div>`:""}</div>`}).join("");
  return `<div class="tp"><div class="row" style="flex-wrap:wrap;margin-bottom:10px"><h2>Tables</h2><span></span>
- ${V.edit?`<span><button onclick="const p=fs();S.tables.push({n:''+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:'',r:V.room,gx:p.x,gy:p.y});save();render()">+ Add table</button> <button class="p" onclick="go({edit:false})">Done</button></span>`:V.mg?`<span class="mut">Tap the tables to merge</span><span><button onclick="go({mg:null})">Cancel</button> <button class="p" ${V.mg.length<2?"disabled":""} onclick="doMerge()">Merge (${V.mg.length})</button></span>`:`<span><button onclick="go({mg:[]})">Merge tables</button></span>`}</div>
- <div id="floor" class="floor sc ${V.edit?"edit":""}">${T}</div>
+ ${V.edit?`<span><button onclick="addTable()">+ Add table</button> <button onclick="go({modal:{t:'grid'}})">Grid</button> <button class="p" onclick="go({edit:false})">Done</button></span>`:V.mg?`<span class="mut">Tap the tables to merge</span><span><button onclick="go({mg:null})">Cancel</button> <button class="p" ${V.mg.length<2?"disabled":""} onclick="doMerge()">Merge (${V.mg.length})</button></span>`:`<span><button class="ib" style="width:44px;min-height:44px" aria-label="More options" title="More" onclick="go({modal:{t:'tmore'}})">${SV("more",22)}</button></span>`}</div>
+ <div id="floor" class="floor sc ${V.edit?"edit":""}" ${V.edit?`style="background-size:${G}px ${G}px;background-position:${-G/2}px ${-G/2}px"`:""}>${T}</div>
  <div class="rb"><div class="seg">${S.rooms.map(r=>`<button class="${r.id===V.room?"on":""}" onpointerdown="rpd('${r.id}')" onpointerup="rpu()" onpointerleave="rpu()" onpointercancel="rpu()" oncontextmenu="return false" onclick="roomTap('${r.id}')">${esc(r.name)}</button>`).join("")}</div></div></div>`}
 let D=null;
 function pd(e,n){e.preventDefault();mig();const t=S.tables.find(z=>String(z.n)===String(n));if(!t)return;D={n,t,el:e.currentTarget,sx:e.clientX,sy:e.clientY,ox:+t.gx,oy:+t.gy,mv:0,lp:0};
  if(!V.edit&&!V.mg)D.timer=setTimeout(()=>{if(D){D.lp=1;V.edit=true;render()}},600)}
 document.addEventListener("pointermove",e=>{if(!D)return;const dx=e.clientX-D.sx,dy=e.clientY-D.sy;if(Math.abs(dx)+Math.abs(dy)>6){D.mv=1;clearTimeout(D.timer)}
- if(V.edit&&D.mv){const f=$("floor"),mx=Math.max(0,Math.floor(f.clientWidth/G)-TW),my=Math.max(0,Math.floor(f.clientHeight/G)-TH),cx=Math.min(mx,Math.max(0,Math.round(D.ox+dx/G))),cy=Math.min(my,Math.max(0,Math.round(D.oy+dy/G)));
-  D.t.gx=cx;D.t.gy=cy;const el=D.el;if(el){el.style.left=cx*G+"px";el.style.top=cy*G+"px";el.style.zIndex=5}}});
+ if(V.edit&&D.mv){const f=$("floor"),ew=D.el?D.el.offsetWidth:168,eh=D.el?D.el.offsetHeight:120,mx=Math.max(0,Math.floor((f.clientWidth-ew)/G)*G),my=Math.max(0,Math.floor((f.clientHeight-eh)/G)*G),cx=Math.min(mx,Math.max(0,Math.round((D.ox+dx)/G)*G)),cy=Math.min(my,Math.max(0,Math.round((D.oy+dy)/G)*G));
+  D.t.gx=cx;D.t.gy=cy;const el=D.el;if(el){el.style.left=cx+"px";el.style.top=cy+"px";el.style.zIndex=5}}});
 document.addEventListener("pointerup",()=>{if(!D)return;clearTimeout(D.timer);const d=D;D=null;if(d.lp)return;if(d.mv){if(V.edit){save();render()}return}
  if(V.mg){toggleMg(d.n);return}
  if(V.edit){go({modal:{t:"tname",n:d.n}});return}
@@ -368,42 +447,36 @@ function ordersTab(){const A=ordersAll(),f=V.of||"all",ty=V.ot||"all",c=k=>A.fil
  <input class="plain" id="oq" placeholder="Search orders" value="${esc(V.oq||"")}" oninput="V.oq=this.value;$('ol').innerHTML=ordersList()" style="width:100%">
  <div class="otabs">${tabs}</div><div class="ol sc" id="ol">${ordersList()}</div></div>`}
 function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
- const W=h=>`<div class="mod" onclick="if(event.target===this)go({modal:null})"><div>${h}<div class="row" style="margin-top:12px"><span></span><button onclick="go({modal:null})">Close</button></div></div></div>`;
+ const W=(h,w)=>`<div class="mod" onclick="if(event.target===this)go({modal:null})"><div${w?' class="wide"':""}>${h}<div class="row" style="margin-top:12px"><span></span><button onclick="go({modal:null})">Close</button></div></div></div>`;
  const td=dk(new Date()),inp=(id,ph,ty)=>`<input class="plain" id="${id}" placeholder="${ph}" ${ty?`type="${ty}" step="0.01"`:""} style="width:100%;margin:6px 0">`;
  const XM=extraModal(M,o,W);if(XM)return XM;
  if(t==="more"){const L=[["receipt","Open Till","till"],["calendar","End of Day ("+new Date().toLocaleDateString()+")","eod"],["drawer","Drawer Operations","drawer"],["card","House Account Payment","house"],["bars","Reports","reports"],["sync","Sync Data","sync"],["pulse","Diagnostics","diag"],["monitor","Devices","dev"],["exit","Exit","exit"]];
   return W(`<h3>More</h3><div style="display:grid;gap:6px">${L.map(l=>`<button class="${l[2]==="exit"?"d":""}" style="text-align:left;display:flex;align-items:center;gap:10px" onclick="more('${l[2]}')">${SV(l[0],18)}${l[1]}</button>`).join("")}</div>`)}
 
- if(t==="reports"||t.startsWith("rp_")){
-  const RW=(ti,h,back)=>`<div class="mod" onclick="if(event.target===this)go({modal:null})"><div><div class="row" style="margin-bottom:10px"><button onclick="${back?"go({modal:{t:'reports'}})":"go({modal:null})"}">${back?"Back":"Close"}</button><b>${ti}</b><span style="width:64px"></span></div>${h}</div></div>`;
-  const rd=V.rd||td,dinp=`<input class="plain" type="date" value="${rd}" max="${td}" onchange="go({rd:this.value||null})" style="width:100%;margin:0 0 10px">`,
-   R=(a,b,c)=>`<div class="line row"><span>${a}</span><b ${c?`style="color:${c}"`:""}>${b}</b></div>`,
-   P=S.orders.filter(q=>q.status==="paid"&&dk(new Date(q.paidAt))===rd);
-  if(t==="reports"){const rows=[["rp_tills","Tills Summary"],["rp_orders","Orders Summary"],["rp_mix","Products Mix"],["rp_active","Active Orders Summary"],["an","Sales Analytics"]];
-   return RW("Reports",rows.map(r=>`<button style="width:100%;text-align:left;border:0;border-bottom:1px solid var(--bd);border-radius:0;background:none;padding:16px 4px;font-size:16px;min-height:0" onclick="${r[0]==="an"?"go({modal:null,tab:'reports'})":`go({modal:{t:'${r[0]}'}})`}">${r[1]}</button>`).join(""))}
-  if(t==="rp_tills"){const pm={},ct={};P.forEach(q=>(q.pays||[{m:q.method,a:q.total}]).forEach(p=>{pm[p.m]=(pm[p.m]||0)+p.a;ct[p.m]=(ct[p.m]||0)+1}));
-   const cs=pm.Cash||0,po=(S.exp||[]).filter(e=>e.d===rd),pos=po.reduce((a,e)=>a+e.a,0),on=rd===td&&S.till,fl=on?S.till.f:0,all=Object.values(pm).reduce((a,v)=>a+v,0);
-   return RW("Tills Summary",dinp+R("Till",on?"Open since "+tm(S.till.t):"Not open")+R("Float (incl. cash in)",m(fl))+R("Cash sales",m(cs))+R("Paid out",m(pos),pos?"#fb7185":"")+R("Expected in drawer",m(fl+cs-pos))
-    +`<h3 style="margin:14px 0 4px">Payments by method</h3>`+(Object.keys(pm).map(k=>R(esc(k)+" ("+ct[k]+")",m(pm[k]))).join("")||`<div class="mut">No payments.</div>`)+(Object.keys(pm).length?R("Total",m(all)):"")
-    +(po.length?`<h3 style="margin:14px 0 4px">Paid outs</h3>`+po.map(e=>R(esc(e.c),m(e.a))).join(""):""),true)}
-  if(t==="rp_orders"){const s=k=>P.reduce((a,q)=>a+(q[k]||0),0),tk=P.filter(q=>q.takeout).length;
-   const list=[...P].sort((a,b)=>b.paidAt-a.paidAt).map(q=>`<div class="line row"><span>${esc(lab(q))}<div class="mut" style="font-size:12px">${tm(q.paidAt)} - ${esc(q.method||"")}</div></span><b>${m(q.total)}</b></div>`).join("");
-   return RW("Orders Summary",dinp+R("Paid orders",P.length)+R("Dine-in / Takeaway",(P.length-tk)+" / "+tk)+(rd===td?R("Still open",S.orders.filter(q=>q.status==="open").length):"")+R("Net sales",m(s("sub")))+R("Tax",m(s("tax")))+R("Voids",m(s("vd")))+R("Total",m(s("total")))+R("Average order",m(P.length?s("total")/P.length:0))
-    +`<h3 style="margin:14px 0 4px">Orders</h3>`+(list||`<div class="mut">No paid orders.</div>`),true)}
-  if(t==="rp_mix"){const mx={};P.forEach(q=>q.items.forEach(i=>{if(i.v)return;const e=mx[i.n]=mx[i.n]||{q:0,r:0};e.q+=i.q;e.r+=i.p*i.q}));
-   const L=Object.entries(mx).sort((a,b)=>b[1].q-a[1].q),tq=L.reduce((a,e)=>a+e[1].q,0),tr=L.reduce((a,e)=>a+e[1].r,0);
-   return RW("Products Mix",dinp+(L.map(([k,v])=>`<div class="line row"><span>${esc(k)}<div class="mut" style="font-size:12px">${v.q} sold - ${tq?Math.round(v.q/tq*100):0}%</div></span><b>${m(v.r)}</b></div>`).join("")||`<div class="mut">Nothing sold.</div>`)+(L.length?R("Total ("+tq+" items)",m(tr)):""),true)}
-  if(t==="rp_active"){const A=S.orders.filter(q=>q.status==="open").sort((a,b)=>a.created-b.created);
-   return RW("Active Orders Summary",(A.map(q=>{const it=live(q),sn=it.filter(i=>i.s),rdy=sn.filter(i=>i.done).reduce((a,i)=>a+i.q,0),tot=sn.reduce((a,i)=>a+i.q,0);return `<div class="line row"><span>${esc(lab(q))}<div class="mut" style="font-size:12px">${it.reduce((a,i)=>a+i.q,0)} items - ${tot?rdy+"/"+tot+" ready":"not sent"} - ${Math.floor((Date.now()-q.created)/6e4)} min</div></span><b>${m(calc(q).total)}</b></div>`}).join("")||`<div class="mut">No active orders.</div>`)+(A.length?R("Total",m(A.reduce((a,q)=>a+calc(q).total,0))):""),true)}
- }
- if(t==="odet"){const q=ord(M.id);if(!q)return W(`<h3>Order not found</h3>`);const R=(a,b,c)=>`<div class="line row"><span>${a}</span><b ${c?`style="color:${c}"`:""}>${b}</b></div>`;
+ const RWD=h=>`<div class="mod" onclick="if(event.target===this)go({modal:null})"><div class="wide">${h}</div></div>`;
+ if(t==="reports"){const rows=[["rp_tills","Tills Summary",1],["rp_orders","Orders Summary",1],["rp_mix","Products Mix",1],["rp_active","Active Orders Summary",0],["an","Sales Analytics",0]];
+  return RWD(`<div class="row" style="margin-bottom:16px"><button onclick="go({modal:null})">Close</button><b style="font-size:18px">Reports</b><span style="width:64px"></span></div><div class="rbl">${rows.map(r=>`<button class="rl" onclick="${r[0]==="an"?"go({modal:null,tab:'reports'})":r[2]?`go({modal:{t:'rpcal',to:'${r[0]}'},rd:null,rcm:new Date()})`:`go({modal:{t:'${r[0]}'}})`}">${r[1]}</button>`).join("")}</div>`)}
+ if(t==="rpcal"){const cm=V.rcm||new Date(),y=cm.getFullYear(),mo=cm.getMonth(),n=new Date(y,mo+1,0).getDate(),first=new Date(y,mo,1).getDay(),sel=V.rd,
+   has=new Set(S.orders.filter(q=>q.status==="paid").map(q=>dk(new Date(q.paidAt))));
+  let cells=["Su","Mo","Tu","We","Th","Fr","Sa"].map(x=>`<div class="h">${x}</div>`).join("")+"<div></div>".repeat(first);
+  for(let i=1;i<=n;i++){const k=dk(new Date(y,mo,i));cells+=`<button class="${k===sel?"on":""} ${k===td?"td":""} ${has.has(k)?"dot":""}" ${k>td?"disabled":""} onclick="go({rd:'${k}'})">${i}</button>`}
+  const nm={rp_tills:"Tills Summary",rp_orders:"Orders Summary",rp_mix:"Products Mix"}[M.to]||"Report";
+  return RWD(`<div class="row" style="margin-bottom:8px"><button onclick="go({modal:{t:'reports'}})">Back</button><b style="font-size:18px">${nm}</b><span style="width:64px"></span></div>
+  <div class="mut" style="text-align:center;margin:12px 0 20px">Select a day</div>
+  <div class="row" style="margin-bottom:16px"><button onclick="go({rcm:new Date(${y},${mo-1},1)})">Previous</button><b>${cm.toLocaleString([],{month:"long",year:"numeric"})}</b><button onclick="go({rcm:new Date(${y},${mo+1},1)})">Next</button></div>
+  <div class="rcal">${cells}</div>
+  ${sel?`<div style="margin-top:24px;text-align:center"><b>${new Date(sel+"T12:00:00").toLocaleDateString([],{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</b></div><div class="rac"><button onclick="go({modal:{t:'${M.to}'}})">${SV("eye",18)} View</button><button class="p" onclick="printReport('${M.to}')">${SV("printer",18)} Print</button></div>`:""}`)}
+ if(t==="rp_tills"||t==="rp_orders"||t==="rp_mix"||t==="rp_active"){
+  const back=t==="rp_active"?"go({modal:{t:'reports'}})":"go({modal:{t:'rpcal',to:'"+t+"'}})";
+  return RWD(`<div class="row" style="margin-bottom:10px"><button onclick="${back}">Back</button><span></span><button class="p" onclick="printReport('${t}')">${SV("printer",18)} Print</button></div>`+rptHTML(t,V.rd||td))}
+  if(t==="odet"){const q=ord(M.id);if(!q)return W(`<h3>Order not found</h3>`);const R=(a,b,c)=>`<div class="line row"><span>${a}</span><b ${c?`style="color:${c}"`:""}>${b}</b></div>`;
   return W(`<h3>Order ${q.id} - ${esc(lab(q))}</h3><div class="mut" style="margin-bottom:6px">${new Date(q.paidAt).toLocaleDateString()} ${tm(q.paidAt)}</div>${live(q).map(i=>R("<b>"+i.q+"x</b> "+esc(i.n),m(i.p*i.q))).join("")}${q.items.filter(i=>i.v).map(i=>R("<b>"+i.q+"x</b> "+esc(i.n)+" (voided: "+esc(i.vr||"")+")",m(i.p*i.q),"var(--bad)")).join("")}${R("Net sales",m(q.sub))}${R("Tax",m(q.tax))}${R("Total",m(q.total))}${R("Payment",esc(q.method||""))}`)}
- if(t==="till")return W(`<h3>Open till</h3><div class="mut">${S.till?"Current float: "+m(S.till.f)+" since "+tm(S.till.t):"Enter the starting cash in the drawer."}</div>${inp("a","Starting cash","number")}<button class="p" onclick="S.till={t:Date.now(),f:+$('a').value||0};save();go({modal:null})">Open till</button>`);
+ if(t==="till")return W(`<h3>Open till</h3><div class="mut">${S.till?"Current float: "+m(S.till.f)+" since "+tm(S.till.t):"Enter the starting cash in the drawer."}</div>${inp("a","Starting cash","number")}<button class="p" onclick="S.till={t:Date.now(),f:+$('a').value||0};setHrs('o');save();go({modal:null})">Open till</button>`);
  if(t==="drawer")return W(`<h3>Drawer operations</h3>${inp("a","Amount","number")}${inp("n","Reason (for example: ice, supplies)")}<div class="row"><button class="p" onclick="cash(1)">Cash in</button><button class="d" onclick="cash(-1)">Paid out (expense)</button></div>`);
  if(t==="house")return W(`<h3>House account payment</h3>${inp("n","Account name")}${inp("a","Amount received","number")}<button class="p" onclick="S.house=S.house||[];S.house.push({d:'${td}',n:$('n').value,a:+$('a').value||0});save();go({modal:null})">Record payment</button>`);
  if(t==="eod"){const P=S.orders.filter(q=>q.status==="paid"&&dk(new Date(q.paidAt))===td),s=k=>P.reduce((a,q)=>a+(q[k]||0),0),cs=P.reduce((a,q)=>a+(q.pays||[{m:q.method,a:q.total}]).filter(p=>p.m==="Cash").reduce((x,p)=>x+p.a,0),0);
   return W(`<h3>End of day ${td}</h3><div class="line row"><span>Orders</span><b>${P.length}</b></div><div class="line row"><span>Net sales</span><b>${m(s("sub"))}</b></div><div class="line row"><span>Tax</span><b>${m(s("tax"))}</b></div><div class="line row"><span>Voids</span><b>${m(s("vd"))}</b></div><div class="line row"><span>Cash sales</span><b>${m(cs)}</b></div><div class="line row"><span>Expected in drawer</span><b>${m(cs+(S.till?S.till.f:0)-(S.exp||[]).filter(e=>e.d===td).reduce((a,e)=>a+e.a,0))}</b></div>
-  <button class="p" style="width:100%;margin-top:10px" onclick="S.till=null;S.closed=S.closed||[];S.closed.push('${td}');save();go({modal:null})">Close the day</button>`)}
+  <button class="p" style="width:100%;margin-top:10px" onclick="S.till=null;S.closed=S.closed||[];S.closed.push('${td}');setHrs('c');save();go({modal:null})">Close the day</button>`)}
  if(t==="sync"){sbPull(false);return W(`<h3>Sync data</h3><div>${SB_ON?"Cloud sync: "+SYNC+". All devices logged in with the same name share this data.":"Supabase is not configured. Data stays on this device."}</div>`)}
  if(t==="diag"){let sz=0;try{sz=(localStorage.getItem(KEY())||"").length}catch(e){}return W(`<h3>Diagnostics</h3><div class="line row"><span>Orders stored</span><b>${S.orders.length}</b></div><div class="line row"><span>Tables</span><b>${S.tables.length}</b></div><div class="line row"><span>Storage used</span><b>${(sz/1024).toFixed(1)} KB</b></div><div class="line row"><span>Menu items</span><b>${MENU.length}</b></div>`)}
  if(t==="dev")return W(`<h3>Devices</h3>${[["Receipt printer","Use Print on the order screen"],["Appetizer Kitchen display","Section screen"],["Main Kitchen display","Section screen"],["Bar display","Section screen"]].map(d=>`<div class="line row"><span>${d[0]}</span><span class="mut">${d[1]}</span></div>`).join("")}`);
@@ -420,7 +493,7 @@ function tag(g){const o=ord(V.oid);o.tags=o.tags||[];const i=o.tags.indexOf(g);i
 function cash(s){const a=+$("a").value||0,n=$("n").value||"Drawer";if(s<0){S.exp=S.exp||[];S.exp.push({d:dk(new Date()),c:n,a})}else if(S.till)S.till.f+=a;save();go({modal:null})}
 function add(id){if(!V.oid){go({tab:"tables"});return}const o=ord(V.oid);o.pr=0;const d=MENU.find(i=>i.id===id),e=o.items.find(i=>i.id===id&&!i.s&&!i.v);
  if(e)e.q++;else o.items.push({k:Math.random(),id,n:d.n,p:d.p,c:d.c,st:d.st,q:1,s:0,done:0,v:0});V.sb=1;save();render()}
-function qty(x,d){const i=ord(V.oid).items[x];i.q+=d;if(i.q<1)ord(V.oid).items.splice(x,1);save();render()}
+function qty(x,d){const i=ord(V.oid).items[x];i.q+=d;if(i.q<1){ord(V.oid).items.splice(x,1);V.li=null}save();render()}
 function send(){const o=ord(V.oid);if(Date.now()<V.armed){o.items.forEach(i=>{if(!i.v&&!i.s){i.s=Date.now()}});V.armed=0;save();render();return}
  V.armed=Date.now()+300000;render();setTimeout(render,300100)}
 function modal0(){const M=V.modal,o=V.oid?ord(V.oid):null;let h="";
@@ -435,7 +508,7 @@ function modal0(){const M=V.modal,o=V.oid?ord(V.oid):null;let h="";
  if(M.t==="pay"){const c=calc(o);h=`<h3>Payment - ${lab(o)}</h3><div style="font-size:30px;font-weight:800;color:var(--ac)">${m(c.total)}</div><div style="display:grid;gap:8px;margin-top:12px">
  <button class="p" onclick="pay('Cash')">Paid by cash</button><button class="p" onclick="pay('Card')">Paid by card</button></div>${x}`}
  return `<div class="mod" onclick="if(event.target===this)go({modal:null})"><div>${h}</div></div>`}
-function doVoid(x,r){const o=ord(V.oid),i=o.items[x];if(i.s){i.v=1;i.vr=r;i.vt=Date.now()}else o.items.splice(x,1);V.modal=null;save();render()}
+function doVoid(x,r){const o=ord(V.oid),i=o.items[x];if(i.s){i.v=1;i.vr=r;i.vt=Date.now()}else{o.items.splice(x,1);V.li=null}V.modal=null;save();render()}
 function setT(n){ord(V.oid).tables=[n];ord(V.oid).takeout=false;V.modal=null;save();render()}
 function addT(n){ord(V.oid).tables.push(n);V.modal=null;save();render()}
 function merge(id){const o=ord(V.oid),q=ord(id);o.tables=[...new Set([...o.tables,...q.tables])];o.items.push(...q.items);o.takeout=false;S.orders=S.orders.filter(z=>z.id!==id);V.modal=null;save();render()}
@@ -456,6 +529,15 @@ function payPage(o){const c=calc(o),ps=o.pays||[],pd=ps.reduce((a,p)=>a+p.a,0),r
  <button class="p" style="width:100%;margin-top:8px" ${rem>0.004||!ps.length?"disabled":""} onclick="finishPay()">Pay</button>
  <div class="row" style="margin-top:12px"><span></span><button onclick="go({tab:'home',ep:null,kp:''})">Back</button></div></div></div></div>`}
 function extraModal(M,o,W){const t=M.t;
+ if(t==="inote"){const i=o&&o.items[M.x];if(!i)return W(`<h3>Item not found</h3>`);
+  return W(`<h3>Note - ${i.q}x ${esc(i.n)}</h3><div class="mut">This note shows on this item only, and on the kitchen ticket.</div><textarea id="inn" rows="3" style="width:100%;font:inherit;padding:10px;border-radius:10px;margin-top:10px" placeholder="e.g. no onions, well done">${esc(i.nt||"")}</textarea><div class="chips">${["No onions","No spice","Extra spicy","Well done","Medium","Rare","Sauce on side","No ice"].map(c=>`<button onclick="chipNote(this.textContent)">${c}</button>`).join("")}</div><div class="row"><button class="d" onclick="saveItemNote(${M.x},1)">Clear note</button><button class="p" onclick="saveItemNote(${M.x})">Save note</button></div>`)}
+ if(t==="tmore")return W(`<h3>Tables</h3><div class="rbl"><button class="rl" onclick="addTable()">+ Add a table</button><button class="rl" onclick="go({modal:null,mg:[]})">Merge tables</button><button class="rl" onclick="go({modal:null,edit:true})">Arrange tables</button><button class="rl" onclick="go({modal:{t:'grid'}})">Grid dots</button></div>`);
+ if(t==="grid"){const g=gsz(),f=$("floor"),fw=(f&&f.clientWidth)||960,fh=(f&&f.clientHeight)||520,P=[[8,"Very fine"],[12,"Fine"],[24,"Normal"],[48,"Wide"],[96,"Very wide"]];
+  return W(`<h3>Grid dots</h3><div class="mut">Choose how many dots the floor has. More dots lets you place tables precisely (curved or any layout). Fewer dots limits the arrangement. Tables snap to the dots.</div><div class="rbl" style="margin-top:14px">${P.map(p=>`<button class="rl ${p[0]===g?"on":""}" onclick="setGrid(${p[0]})">${p[1]} <span style="opacity:.75">- about ${Math.floor(fw/p[0])} x ${Math.floor(fh/p[0])} dots</span></button>`).join("")}</div><div class="row" style="margin-top:16px"><input class="plain in" id="gv" type="number" min="6" max="160" value="${g}" style="width:120px"><button class="p" onclick="setGrid(+$('gv').value)">Apply custom spacing (px)</button></div>`)}
+ if(t==="cat"){const c=cats()[M.i],used=c&&MENU.some(i=>i.cat===c.k);
+  return W(`<h3>New category</h3><div class="mut">Now: ${cats().map(x=>esc(x.l)).join(", ")}</div><input class="plain in" id="cnm" placeholder="Category name (e.g. Desserts)" autocomplete="off" style="margin:12px 0" onkeydown="if(event.key==='Enter')addCat()"><button class="p" style="width:100%" onclick="addCat()">Add category</button>${c?`<div class="row" style="margin-top:16px"><span class="mut">${esc(c.l)}</span><button class="d" ${used?"disabled":""} onclick="delCat(${M.i})">Delete this category</button></div>${used?`<div class="mut" style="font-size:12px;margin-top:6px">Only empty categories can be deleted.</div>`:""}`:""}`)}
+ if(t==="newitem"){const dv=V.cat==="Appetizers"?"app":V.cat==="Drinks"?"bar":"main";
+  return W(`<h3>New item in ${esc(V.cat||"")}</h3><input class="plain in" id="ni" placeholder="Item name" autocomplete="off" style="margin:8px 0"><input class="plain in" id="np" type="number" step="0.01" placeholder="Price" style="margin:8px 0"><input class="plain in" id="nc" type="number" step="0.01" placeholder="Cost (optional)" style="margin:8px 0"><div class="fl">SENT TO</div><select class="plain in" id="ns">${[["main","Main Kitchen"],["app","Appetizer Kitchen"],["bar","Bar"]].map(s=>`<option value="${s[0]}" ${s[0]===dv?"selected":""}>${s[1]}</option>`).join("")}</select><button class="p" style="width:100%;margin-top:14px" onclick="addItem()">Add item</button>`)}
  
  if(t==="guest")return W(`<h3>${esc(tgrp(M.mt||[M.n]))} - Guest</h3><div class="mut">How many people are seated?</div><input class="plain in" placeholder="Customer name (optional)" value="${esc(V.cn||"")}" oninput="V.cn=this.value" style="margin:8px 0"><div class="kd">${V.kp||"0"}</div>${kpad()}<button class="p" style="width:100%;margin-top:8px" onclick="startGuests('${M.n}')">Enter</button>`);
  if(t==="topt"){const q=openFor(M.n);return W(`<h3>${esc(lab(q))}</h3><div class="mut">${q.guests} guests - ${m(calc(q).total)}${q.pr?" - receipt printed":""}</div><div style="display:grid;gap:8px;margin-top:10px"><button class="p" onclick="go({oid:${q.id},tab:'home',modal:null})">View order</button><button onclick="go({oid:${q.id}});printOrder()">Print order</button><button onclick="go({oid:${q.id},modal:{t:'assign'}})">Reassign table</button>${q.tables.length>1?q.tables.filter(x=>x!==tprim(q.tables)).sort(tnum).map(x=>`<button onclick="unmergeT(${q.id},'${x}')">Unmerge ${esc(tname(x))}</button>`).join(""):""}<button class="d" onclick="go({modal:{t:'clr',n:'${M.n}'}})">Clear table</button></div>`)}
@@ -517,7 +599,7 @@ function station(){const s=V.stn,isB=V.role==="bar",tabs=`<button class="${V.fin
  const os=S.orders.map(o=>({o,it:o.items.map((i,x)=>({i,x})).filter(z=>z.i.st===s&&z.i.s&&(V.fin?(z.i.done&&!z.i.v):(!z.i.done&&!z.i.v)))})).filter(z=>z.it.length&&(V.fin||z.o.status==="open"||true));
  os.sort((a,b)=>V.fin?b.it[0].i.done-a.it[0].i.done:a.it[0].i.s-b.it[0].i.s);
  const cards=os.map((z,ix)=>`<div class="card tk ${!V.fin&&ix===0?"first":""}">${!V.fin&&ix===0?`<em class="qf">START FIRST</em>`:""}<div class="row"><span class="qh">${V.fin?"":`<i class="qn">${ix+1}</i>`}<b style="font-size:18px">${lab(z.o)}</b></span>${V.fin?`<span class="mut">${tm(z.it[0].i.s)}</span>`:tmr(z.it[0].i.s)}</div>
- ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${q.i.n}</span>${isB||!V.fin?"":""}${V.fin?`<span class="mut">done ${tm(q.i.done)}</span>`:`<button class="p" onclick="ready(${z.o.id},${q.x})">Ready</button>`}</div></div>`).join("")}</div>`).join("");
+ ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:18px"><b>${q.i.q}x</b> ${q.i.n}${q.i.nt?`<span class="inote" style="display:block;font-size:16px">&#9998; ${esc(q.i.nt)}</span>`:""}</span>${isB||!V.fin?"":""}${V.fin?`<span class="mut">done ${tm(q.i.done)}</span>`:`<button class="p" onclick="ready(${z.o.id},${q.x})">Ready</button>`}</div></div>`).join("")}</div>`).join("");
  const vd=!V.fin?S.orders.flatMap(o=>o.items.filter(i=>i.st===s&&i.v&&i.s&&!i.done&&Date.now()-i.vt<600000).map(i=>`<div class="card" style="border-color:var(--bad);color:var(--bad)">VOIDED: ${i.q}x ${i.n} (${lab(o)})</div>`)).join(""):"";
  return `<div class="pg">`+head(STN[s],tabs)+`<div class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${vd}${cards}</div>${cards||vd?"":`<div class="mut" style="padding:30px;text-align:center">${V.fin?"Nothing finished yet.":"No active tickets. New orders appear here when the counter sends them."}</div>`}</div></div>`}
 function serve(){const now=Date.now();
@@ -529,7 +611,7 @@ function serve(){const now=Date.now();
   return `<div class="card tk ${p?"":"rdy"}"><div class="row"><b style="font-size:16px">${esc(lab(z.o))}</b>${p?tmr(z.t):`<span class="tag rd">ALL READY</span>`}</div>
  <div class="mut" style="margin:2px 0 6px;font-size:12px">${tot-sum}/${tot} ready</div>
  ${p?`<div class="sm"><b>Still missing:</b> ${z.miss.map(q=>q.i.q+"x "+esc(q.i.n)).join(", ")}</div>`:""}
- ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:14px"><b>${q.i.q}x</b> ${esc(q.i.n)}</span><span class="tag ${q.i.done?"rd":"pr2"}">${q.i.done?"Ready":({app:"Appetizer",main:"Kitchen",bar:"Bar"}[q.i.st]||"Preparing")}</span></div></div>`).join("")}
+ ${z.it.map(q=>`<div class="line"><div class="row"><span style="font-size:14px"><b>${q.i.q}x</b> ${esc(q.i.n)}${q.i.nt?`<span class="inote" style="display:block">&#9998; ${esc(q.i.nt)}</span>`:""}</span><span class="tag ${q.i.done?"rd":"pr2"}">${q.i.done?"Ready":({app:"Appetizer",main:"Kitchen",bar:"Bar"}[q.i.st]||"Preparing")}</span></div></div>`).join("")}
  ${z.dn.length?`<button class="p" style="width:100%;margin-top:8px" onclick="served(${z.o.id})">Served</button>`:""}</div>`}).join("");
  return `<div class="pg">`+head("Serve","")+`<div class="wrap"><div class="grid sr" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${cards}</div>${cards?"":`<div class="mut" style="padding:30px;text-align:center">Nothing being prepared right now.</div>`}</div></div>`}
 function served(oid){const o=ord(oid);if(!o)return;o.items.forEach(i=>{if(i.s&&i.done&&!i.v&&!i.sv)i.sv=Date.now()});save();render()}
