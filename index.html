@@ -132,6 +132,17 @@ table.t{width:100%;border-collapse:collapse}.t th{position:sticky;top:0;backgrou
 .tk{padding:12px}.tk .line{padding:8px 0}.tk .row{gap:10px}.tk .line .row span:first-child{min-width:0}
 .tk button{border-radius:5px;min-height:38px;padding:6px 14px}
 .sm{margin:0 0 6px;font-size:13px}.sr .tag{font-size:11px}
+
+.orh{display:flex;gap:10px;justify-content:flex-end}
+.otabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--bd)}
+.otb{background:none!important;border:0;border-radius:0;border-bottom:3px solid transparent;color:var(--mut);font-size:15px;font-weight:700;letter-spacing:.5px;padding:12px 4px;min-height:0;box-shadow:none}
+.otb.on{color:#fff;border-bottom-color:#e11d48}
+.ol{flex:1;min-height:0;overflow:auto;border:1px solid var(--bd);border-radius:14px;background:var(--card)}
+.orw{display:grid;grid-template-columns:100px 1fr auto;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px dashed var(--bd)}
+.orn{font-size:16px;font-weight:700}
+.orm,.ore{display:flex;flex-direction:column;gap:4px;font-size:16px}.ore{align-items:flex-end}
+.orm span,.ore span{color:var(--mut);font-size:16px}.ore b{letter-spacing:1px;font-size:16px}
+.st-active{color:#fbbf24}.st-pending{color:#b49aa2}.st-done{color:#34d399}
 </style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
@@ -342,9 +353,20 @@ function kp(k){let s=V.kp||"";const g=V.modal&&V.modal.t==="guest";if(k==="⌫")
 function startGuests(n){const g=parseInt(V.kp);if(!g)return;const mt=V.modal&&V.modal.mt;newOrder(mt&&mt.length?mt:[n],false,g,V.cn)}
 function saveCust(){ord(V.oid).cust=cleanName($("cn").value);save();go({modal:null})}
 function newOrder(t,to,g,c){const o={id:S.seq++,tables:t,takeout:!!to,guests:g||0,items:[],status:"open",created:Date.now(),pays:[]};if(cleanName(c))o.cust=cleanName(c);V.cn="";S.orders.push(o);save();go({oid:o.id,tab:"home",modal:null})}
-function ordersTab(){const op=S.orders.filter(o=>o.status==="open").sort((a,b)=>a.created-b.created);
- const rows=op.map(o=>`<tr class="cl" onclick="go({oid:${o.id},tab:'home'})"><td><b>${esc(lab(o))}</b></td><td>${o.takeout?"-":o.guests||"-"}</td><td>${live(o).reduce((a,i)=>a+i.q,0)}</td><td>${tmr(o.created)}</td><td class="num">${m(calc(o).total)}</td></tr>`).join("")||`<tr><td colspan="5" class="mut">None open.</td></tr>`;
- return `<div class="oc"><div class="os"><h2>Open orders</h2><div class="tw sc" id="tw1"><table class="t"><thead><tr><th>Order</th><th>Guests</th><th>Items</th><th>Time</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table></div></div>`+history()+`</div>`}
+const OSTAT=o=>o.status==="paid"?"DONE":(live(o).some(i=>i.s)?"ACTIVE":"PENDING");
+const ordersAll=()=>S.orders.filter(o=>o.status==="open"||o.status==="paid");
+function ordersList(){const f=V.of||"all",ty=V.ot||"all",q=(V.oq||"").trim().toLowerCase(),td=dk(new Date());
+ const L=ordersAll().filter(o=>(f==="all"||OSTAT(o).toLowerCase()===f)&&(ty==="all"||(ty==="takeaway")===!!o.takeout)&&(!q||(o.id+" "+lab(o)+" "+(o.cust||"")).toLowerCase().includes(q))).sort((a,b)=>(b.paidAt||b.created)-(a.paidAt||a.created)).slice(0,300);
+ return L.map(o=>{const st=OSTAT(o),pd=o.status==="paid",t=pd?o.paidAt:o.created,
+  kind=o.takeout?"TAKEAWAY"+(o.cust?" ("+esc(o.cust)+")":""):"DINE IN"+(o.tables.length?" ("+esc(tname(tprim(o.tables)))+(o.tables.length>1?" - "+[...o.tables].sort(tnum).join(" + "):"")+")":""),
+  when=(pd&&dk(new Date(t))!==td?new Date(t).toLocaleDateString()+" ":"")+tm(t)+(pd?"":" - "+Math.floor((Date.now()-o.created)/6e4)+" min");
+  return `<div class="orw cl" onclick="${pd?`go({modal:{t:'odet',id:${o.id}}})`:`go({oid:${o.id},tab:'home'})`}"><div class="orn">${o.id}</div><div class="orm"><b>${kind}</b><span>${when}</span></div><div class="ore"><b class="st-${st.toLowerCase()}">${st}</b><span>${m(pd?o.total:calc(o).total)}</span></div></div>`}).join("")||`<div class="mut" style="padding:24px">No orders.</div>`}
+function ordersTab(){const A=ordersAll(),f=V.of||"all",ty=V.ot||"all",c=k=>A.filter(o=>OSTAT(o).toLowerCase()===k).length;
+ const tabs=[["all","ALL ("+A.length+")"],["active","ACTIVE ("+c("active")+")"],["pending","PENDING ("+c("pending")+")"],["done","DONE ("+c("done")+")"]].map(x=>`<button class="otb ${f===x[0]?"on":""}" onclick="go({of:'${x[0]}'})">${x[1]}</button>`).join(""),
+  nt={all:"dine",dine:"takeaway",takeaway:"all"},lbl={all:"Filter",dine:"Dine in",takeaway:"Takeaway"}[ty];
+ return `<div class="oc"><div class="orh"><button class="${ty==="all"?"":"on"}" onclick="go({ot:'${nt[ty]}'})">${lbl}</button><button onclick="sbPull(true)">Sync</button></div>
+ <input class="plain" id="oq" placeholder="Search orders" value="${esc(V.oq||"")}" oninput="V.oq=this.value;$('ol').innerHTML=ordersList()" style="width:100%">
+ <div class="otabs">${tabs}</div><div class="ol sc" id="ol">${ordersList()}</div></div>`}
 function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  const W=h=>`<div class="mod" onclick="if(event.target===this)go({modal:null})"><div>${h}<div class="row" style="margin-top:12px"><span></span><button onclick="go({modal:null})">Close</button></div></div></div>`;
  const td=dk(new Date()),inp=(id,ph,ty)=>`<input class="plain" id="${id}" placeholder="${ph}" ${ty?`type="${ty}" step="0.01"`:""} style="width:100%;margin:6px 0">`;
@@ -374,6 +396,8 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
   if(t==="rp_active"){const A=S.orders.filter(q=>q.status==="open").sort((a,b)=>a.created-b.created);
    return RW("Active Orders Summary",(A.map(q=>{const it=live(q),sn=it.filter(i=>i.s),rdy=sn.filter(i=>i.done).reduce((a,i)=>a+i.q,0),tot=sn.reduce((a,i)=>a+i.q,0);return `<div class="line row"><span>${esc(lab(q))}<div class="mut" style="font-size:12px">${it.reduce((a,i)=>a+i.q,0)} items - ${tot?rdy+"/"+tot+" ready":"not sent"} - ${Math.floor((Date.now()-q.created)/6e4)} min</div></span><b>${m(calc(q).total)}</b></div>`}).join("")||`<div class="mut">No active orders.</div>`)+(A.length?R("Total",m(A.reduce((a,q)=>a+calc(q).total,0))):""),true)}
  }
+ if(t==="odet"){const q=ord(M.id);if(!q)return W(`<h3>Order not found</h3>`);const R=(a,b,c)=>`<div class="line row"><span>${a}</span><b ${c?`style="color:${c}"`:""}>${b}</b></div>`;
+  return W(`<h3>Order ${q.id} - ${esc(lab(q))}</h3><div class="mut" style="margin-bottom:6px">${new Date(q.paidAt).toLocaleDateString()} ${tm(q.paidAt)}</div>${live(q).map(i=>R("<b>"+i.q+"x</b> "+esc(i.n),m(i.p*i.q))).join("")}${q.items.filter(i=>i.v).map(i=>R("<b>"+i.q+"x</b> "+esc(i.n)+" (voided: "+esc(i.vr||"")+")",m(i.p*i.q),"var(--bad)")).join("")}${R("Net sales",m(q.sub))}${R("Tax",m(q.tax))}${R("Total",m(q.total))}${R("Payment",esc(q.method||""))}`)}
  if(t==="till")return W(`<h3>Open till</h3><div class="mut">${S.till?"Current float: "+m(S.till.f)+" since "+tm(S.till.t):"Enter the starting cash in the drawer."}</div>${inp("a","Starting cash","number")}<button class="p" onclick="S.till={t:Date.now(),f:+$('a').value||0};save();go({modal:null})">Open till</button>`);
  if(t==="drawer")return W(`<h3>Drawer operations</h3>${inp("a","Amount","number")}${inp("n","Reason (for example: ice, supplies)")}<div class="row"><button class="p" onclick="cash(1)">Cash in</button><button class="d" onclick="cash(-1)">Paid out (expense)</button></div>`);
  if(t==="house")return W(`<h3>House account payment</h3>${inp("n","Account name")}${inp("a","Amount received","number")}<button class="p" onclick="S.house=S.house||[];S.house.push({d:'${td}',n:$('n').value,a:+$('a').value||0});save();go({modal:null})">Record payment</button>`);
