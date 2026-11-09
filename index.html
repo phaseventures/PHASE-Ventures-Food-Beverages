@@ -425,14 +425,17 @@ async function savePDF(html,name,pad){
   r.innerHTML="<style>#pdfroot :where(*:not(svg):not(svg *)){all:revert}"+pdfCSS(css)+"</style>"+bd;document.body.appendChild(r);
   await Promise.all([...r.querySelectorAll("img")].map(im=>im.complete?0:new Promise(z=>{im.addEventListener("load",z);im.addEventListener("error",z)})));
   r.querySelectorAll("img").forEach(im=>{if(!im.naturalWidth)im.style.display="none"});
+  try{await Promise.all([document.fonts.load('700 21px "Chakra Petch"'),document.fonts.load('500 11px "Chakra Petch"')])}catch(e){}
   await new Promise(z=>setTimeout(z,250));
   const SC=2,top0=r.getBoundingClientRect().top,
    br=[...r.querySelectorAll("tr,h3.s,.two,.sig,.hero,.meta,.empty,.sum")].filter(e=>!(e.matches("tr")&&(e.closest("thead")||e.closest(".two")||e.parentElement.tagName==="TBODY"&&e.parentElement.firstElementChild===e))&&!(e.matches("h3.s")&&e.closest(".two"))).map(e=>Math.round((e.getBoundingClientRect().top-top0)*SC)).sort((a,b)=>a-b),
+   fb=[...r.querySelectorAll(".pbk")].map(e=>Math.round((e.getBoundingClientRect().top-top0)*SC)).sort((a,b)=>a-b),
    cv=await html2canvas(r,{scale:SC,useCORS:true,backgroundColor:"#ffffff",width:794,windowWidth:794,scrollX:0,scrollY:0}),
    W=cv.width,H=cv.height,pxm=W/210,bottom=Math.floor(281*pxm),off2=Math.floor(19*pxm),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
   let y=0,pg=0;
   while(y<H-2){const off=pg?off2:0,cap=bottom-off;let end=Math.min(H,y+cap);
-   if(end<H){const c=br.filter(b=>b>y+cap*.35&&b<=y+cap);if(c.length)end=c[c.length-1]}
+   const fk=fb.filter(b=>b>y+cap*.25&&b<=y+cap)[0];
+   if(fk)end=fk;else if(end<H){const c=br.filter(b=>b>y+cap*.35&&b<=y+cap);if(c.length)end=c[c.length-1]}
    const hh=end-y,pc=document.createElement("canvas");pc.width=W;pc.height=hh;const cx=pc.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,W,hh);cx.drawImage(cv,0,y,W,hh,0,0,W,hh);
    if(pg)doc.addPage();doc.addImage(pc.toDataURL("image/jpeg",.95),"JPEG",0,off/pxm,210,hh/pxm);y=end;pg++}
   for(let i=1;i<=pg;i++){doc.setPage(i);
@@ -685,46 +688,52 @@ function reports(){
 /* ===== PHASE print template ===== */
 const PHCSS=`@page{size:A4 portrait;margin:0 0 16mm 0;@bottom-right{content:"Page " counter(page) " of " counter(pages);font:9px Arial;color:#777;margin-right:14mm}@bottom-left{content:"PHASE Ventures | Confidential";font:9px Arial;color:#777;margin-left:14mm}}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box}
-body{margin:0;font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:#1a1114;font-size:11.5px;line-height:1.4;background:#fff}
-.lh{background:#14070b;color:#fff;padding:9mm 14mm 7mm;display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #d81f2d}
-.lh .br{display:flex;align-items:center;gap:14px}.lh img{height:44px;width:auto;max-width:130px;object-fit:contain}
-.lh .co b{display:block;font-size:17px;letter-spacing:0}.lh .co span{font-size:11px;color:#c9a9b1}
-.lh .ti{text-align:right}.lh .ti b{display:block;font-size:21px;letter-spacing:0}.lh .ti span{display:block;font-size:12px;color:#e8c9d0;letter-spacing:0}
-.pg{padding:5mm 14mm 4mm}
-.meta{display:flex;border:1px solid #e3d6da;border-radius:6px;margin-bottom:3.5mm}
-.meta div{flex:1;padding:5px 12px;border-right:1px solid #e3d6da}.meta div:last-child{border:0}
-.meta small{display:block;font-size:9.5px;color:#7a6168}.meta b{font-size:12px}
-.hero{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;gap:8px;margin-bottom:3.5mm}
-.hero div{border:1px solid #e3d6da;border-radius:6px;padding:8px 12px}
-.hero small{display:block;font-size:10px;color:#7a6168;margin-bottom:2px}.hero b{font-size:17px}
-.hero .np{background:#14070b;border-color:#14070b;color:#fff}.hero .np small{color:#c9a9b1}.hero .np b{font-size:22px;color:#5eead4}.hero .np.neg b{color:#fda4af}
-.hero em{display:block;font-style:normal;font-size:10px;color:#7a6168;margin-top:1px}.hero .np em{color:#c9a9b1}
-.sum{border-left:3px solid #d81f2d;background:#fcf6f7;padding:7px 12px;margin-bottom:3mm;font-size:11.5px;line-height:1.5}
-.cm{margin-top:2mm;padding:2px 0 2px 9px;border-left:2px solid #e6c9cf;color:#4a3a40;font-size:10.5px;line-height:1.45}
-h3.s{font-size:12.5px;margin:4mm 0 1.5mm;padding-bottom:3px;border-bottom:2px solid #d81f2d;display:flex;justify-content:space-between;align-items:baseline}
+body{margin:0;font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:#1a1114;font-size:11.5px;line-height:1.45;background:#fff}
+.lh{background:#14070b;color:#fff;height:42mm;padding:0 14mm;display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #d81f2d}
+.lh .br{display:flex;align-items:center;gap:20px}.lh img{height:44px;width:auto;max-width:130px;object-fit:contain}
+.lh .co b{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:700;font-size:17px;line-height:1.25;letter-spacing:0}
+.lh .co span{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:500;font-size:10px;line-height:1.3;color:#c9a9b1;margin-top:3px}
+.lh .ti{display:flex;flex-direction:column;align-items:flex-end;gap:26px}
+.lh .ti b{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:700;font-size:21px;line-height:1.15;letter-spacing:.2px}
+.lh .ti span{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:500;font-size:11px;line-height:1.2;color:#e8c9d0;letter-spacing:4px}
+.pg{padding:8mm 14mm 4mm}
+.meta{display:flex;border:1px solid #e3d6da;border-radius:6px;margin-bottom:6mm}
+.meta div{flex:1;padding:8px 14px;border-right:1px solid #e3d6da}.meta div:last-child{border:0}
+.meta small{display:block;font-size:9.5px;color:#7a6168;margin-bottom:1px}.meta b{font-size:12px}
+.hero{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;gap:10px;margin-bottom:6mm}
+.hero div{border:1px solid #e3d6da;border-radius:6px;padding:12px 14px}
+.hero small{display:block;font-size:10px;color:#7a6168;margin-bottom:4px}.hero b{font-size:18px}
+.hero .np{background:#14070b;border-color:#14070b;color:#fff}.hero .np small{color:#c9a9b1}.hero .np b{font-size:23px;color:#5eead4}.hero .np.neg b{color:#fda4af}
+.hero em{display:block;font-style:normal;font-size:10px;color:#7a6168;margin-top:3px}.hero .np em{color:#c9a9b1}
+.sum{border-left:3px solid #d81f2d;background:#fcf6f7;padding:12px 16px;margin-bottom:2mm;font-size:12px;line-height:1.65}
+.cm{margin-top:3.5mm;padding:3px 0 3px 11px;border-left:2px solid #e6c9cf;color:#4a3a40;font-size:10.5px;line-height:1.55}
+h3.s{font-size:13px;margin:8mm 0 3mm;padding-bottom:4px;border-bottom:2px solid #d81f2d;display:flex;justify-content:space-between;align-items:baseline}
 h3.s span{font-weight:400;font-size:10px;color:#7a6168}
-table{width:100%;border-collapse:collapse}th{text-align:left;font-size:10px;color:#7a6168;font-weight:600;padding:4px 6px;border-bottom:1px solid #1a1114;background:#faf5f6}
-td{padding:4px 6px;border-bottom:1px solid #eee3e6}.n,.num{text-align:right;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:10px;color:#7a6168;font-weight:600;padding:7px 8px;border-bottom:1px solid #1a1114;background:#faf5f6}
+td{padding:7px 8px;border-bottom:1px solid #eee3e6}.n,.num{text-align:right;font-variant-numeric:tabular-nums}
 tr{page-break-inside:avoid}tbody tr:nth-child(even) td{background:#fcf9fa}
 tfoot td{border-top:2px solid #1a1114;border-bottom:0;font-weight:700;background:#fff!important}
 tr.sub td{color:#5c464d}tr.tot td{font-weight:700;border-top:1.5px solid #1a1114}tr.res td{font-weight:800;font-size:13px;border-top:2px solid #1a1114;background:#faf5f6!important}
 .pos{color:#0f766e}.neg{color:#be123c}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:7mm}.avoid{page-break-inside:avoid}
-.bar{height:6px;background:#efe4e7;border-radius:3px;overflow:hidden;min-width:60px;padding:0;border:0;display:block}.bar i{display:block;height:100%;background:#d81f2d}
-.note{color:#7a6168;font-size:10px;margin-top:4px}
-.line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid #eee3e6}.row{display:flex;justify-content:space-between;gap:12px}.mut{color:#7a6168;font-size:10px}
-.rsec{font-size:12.5px;margin:4mm 0 1.5mm;padding-bottom:3px;border-bottom:2px solid #d81f2d}
-.sig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9mm;margin-top:6mm}
-.sig div{border-top:1px solid #1a1114;margin-top:11mm;padding-top:4px}
-.sig small{display:block;font-size:9px;color:#7a6168}.sig b{display:block;font-size:12px;margin-top:1px}.sig span{font-size:10.5px;color:#4a3a40}
-.empty{padding:12px;text-align:center;color:#7a6168;border:1px dashed #d9c8cd;border-radius:6px}`;
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10mm}.avoid{page-break-inside:avoid}
+.pbk{break-before:page;page-break-before:always}
+.bar{height:6px;background:#efe4e7;border-radius:3px;overflow:hidden;min-width:60px;padding:0;border:0;display:block;margin-top:5px}.bar i{display:block;height:100%;background:#d81f2d}
+.note{color:#7a6168;font-size:10px;margin-top:6px}
+.line{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #eee3e6}.row{display:flex;justify-content:space-between;gap:12px}.mut{color:#7a6168;font-size:10px}
+.rsec{font-size:13px;margin:8mm 0 3mm;padding-bottom:4px;border-bottom:2px solid #d81f2d}
+.sig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10mm;margin-top:10mm}
+.sig div{border-top:1px solid #1a1114;margin-top:14mm;padding-top:8px}
+.sig small{display:block;font-size:9.5px;line-height:1.2;color:#7a6168;margin-bottom:9px}
+.sig b{display:block;font-size:12.5px;line-height:1.15;margin:0}
+.sig span{display:block;font-size:10.5px;line-height:1.15;margin-top:2px;color:#4a3a40}
+.empty{padding:16px;text-align:center;color:#7a6168;border:1px dashed #d9c8cd;border-radius:6px}`;
 /* Optional: paste your logo as a data:image/png;base64,... string here so it always appears in saved PDFs */
 const PH_LOGO_DATA="";
 function phLogo(){if(PH_LOGO_DATA)return PH_LOGO_DATA;const im=document.querySelector("img.logo");if(!im||!im.naturalWidth)return LG[0];try{const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);return c.toDataURL("image/png")}catch(e){return im.currentSrc||im.src}}
 const PH_SIGN=[["Prepared by","Japheth James","Restaurant Manager"],["Reviewed by","Faith Fatima","Finance Department"],["Noted by","Japheth James","Phase Ventures CEO"]];
 const cm=t=>t?`<div class="cm">${t}</div>`:"";
 function phaseDoc(title,sub,body){const now=new Date();
- return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)} - ${esc(sub)}</title><style>${PHCSS}</style></head><body>
+ return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)} - ${esc(sub)}</title><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&display=swap" rel="stylesheet"><style>${PHCSS}</style></head><body>
  <div class="lh"><div class="br"><img src="${phLogo()}" alt="PHASE" onerror="this.style.display='none'"><div class="co"><b>PHASE Ventures</b><span>Food &amp; Beverages</span></div></div><div class="ti"><b>${esc(title)}</b><span>${esc(sub)}</span></div></div>
  <div class="pg"><div class="meta"><div><small>Outlet</small><b>${esc(RNAME)}</b></div><div><small>Currency</small><b>Saudi Riyal (SAR)</b></div><div><small>Generated</small><b>${now.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})} ${tm(now.getTime())}</b></div><div><small>Prepared by</small><b>${esc(PH_SIGN[0][1])}</b></div></div>${body}
  <div class="sig">${PH_SIGN.map(x=>`<div><small>${x[0]}</small><b>${esc(x[1])}</b><span>${esc(x[2])}</span></div>`).join("")}</div></div></body></html>`}
@@ -754,7 +763,7 @@ function printMonthly(){const d=V.cal,y=d.getFullYear(),mo=d.getMonth(),pre=y+"-
  day=Array.from({length:n},()=>({o:0,sub:0,tax:0,rev:0})),pay={},pm={},cat={},MC={};MENU.forEach(i=>MC[i.n]=i.cat);
  P.forEach(o=>{const t=new Date(o.paidAt).getDate()-1,D=day[t];D.o++;D.sub+=o.sub;D.tax+=o.tax;D.rev+=o.total;(o.pays||[{m:o.method,a:o.total}]).forEach(p=>pay[p.m]=(pay[p.m]||0)+p.a);
   live(o).forEach(i=>{const e=pm[i.n]=pm[i.n]||{q:0,r:0};e.q+=i.q;e.r+=i.p*i.q;const c=MC[i.n]||"Other";cat[c]=(cat[c]||0)+i.p*i.q})});
- const mx=Math.max(1,...day.map(z=>z.rev)),W=700,H=130,bw=(W-40)/n,
+ const mx=Math.max(1,...day.map(z=>z.rev)),W=700,H=165,bw=(W-40)/n,
  chart=`<svg viewBox="0 -8 ${W} ${H+32}" style="width:100%">${[0,.5,1].map(f=>`<line x1="40" x2="${W}" y1="${H-f*H}" y2="${H-f*H}" stroke="#d9c8cd" stroke-width="${f?.6:1}" ${f?'stroke-dasharray="3 3"':""}/><text x="34" y="${H-f*H+3}" font-size="9" text-anchor="end" fill="#7a6168">${Math.round(mx*f)}</text>`).join("")}${day.map((z,i)=>`<rect x="${40+i*bw+bw*.15}" y="${H-z.rev/mx*H}" width="${bw*.7}" height="${z.rev/mx*H}" fill="#d81f2d" rx="1.5"/>`).join("")}${day.map((z,i)=>(i+1)%2===0?"":`<text x="${40+i*bw+bw/2}" y="${H+14}" font-size="9" text-anchor="middle" fill="#7a6168">${i+1}</text>`).join("")}</svg>`,
  rows=day.map((z,i)=>z.o?`<tr><td>${new Date(y,mo,i+1).toLocaleDateString([],{weekday:"short",day:"numeric",month:"short"})}</td><td class="n">${z.o}</td><td class="n">${m(z.sub)}</td><td class="n">${m(z.tax)}</td><td class="n">${m(z.rev)}</td><td class="n">${m(z.rev/z.o)}</td></tr>`:"").join(""),
  pl=Object.entries(pm).sort((a,b)=>b[1].q-a[1].q),pt=pl.reduce((a,e)=>a+e[1].r,0),pq=pl.reduce((a,e)=>a+e[1].q,0),
@@ -764,11 +773,11 @@ function printMonthly(){const d=V.cal,y=d.getFullYear(),mo=d.getMonth(),pre=y+"-
  body=`<div class="hero"><div class="np ${np<0?"neg":""}"><small>Net profit</small><b>${m(np)}</b><em>${pc(np,inc)} of income</em></div><div><small>Net sales</small><b>${m(sub)}</b></div><div><small>Orders</small><b>${P.length}</b><em>Avg. ${m(P.length?rev/P.length:0)}</em></div><div><small>Gross margin</small><b>${pc(gi,sub)}</b><em>${m(gi)} gross income</em></div></div>
  <div class="sum">${N.sum}</div>
  <h3 class="s">Daily revenue <span>${mn}, incl. tax</span></h3>${P.length?chart:`<div class="empty">No paid orders in ${mn}.</div>`}${cm(N.chart)}
- <div class="two avoid"><div><h3 class="s">Income statement</h3><table><tbody>
+ <div class="two avoid pbk"><div><h3 class="s">Income statement</h3><table><tbody>
  ${IS("Revenue (incl. tax)",m(rev))}${IS("Less: tax collected","-"+m(tax),"sub")}${IS("Net sales",m(sub),"tot")}${IS("Less: cost of goods","-"+m(cogs),"sub")}${IS("Gross income",m(gi),"tot")}${IS("House payments received","+"+m(hsum),"sub")}${IS("Less: other expenses","-"+m(exsum),"sub")}${IS("Net profit",`<span class="${np<0?"neg":"pos"}">${m(np)}</span>`,"res")}</tbody></table>${cm(N.is)}<div class="note">Voided items this month: ${m(vd)} (not included above).</div></div>
  <div><h3 class="s">Payments by method</h3>${Object.keys(pay).length?`<table><thead><tr><th>Method</th><th class="n">Amount</th><th class="n">Share</th></tr></thead><tbody>${Object.entries(pay).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${m(v)}</td><td class="n">${pc(v,payt)}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${m(payt)}</td><td></td></tr></tfoot></table>`:`<div class="empty">No payments.</div>`}${cm(N.pay)}</div></div>
  <h3 class="s">Daily sales <span>${rows?"Days with trading only":""}</span></h3>${rows?`<table><thead><tr><th>Date</th><th class="n">Orders</th><th class="n">Net sales</th><th class="n">Tax</th><th class="n">Revenue</th><th class="n">Avg. order</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Total</td><td class="n">${P.length}</td><td class="n">${m(sub)}</td><td class="n">${m(tax)}</td><td class="n">${m(rev)}</td><td class="n">${m(P.length?rev/P.length:0)}</td></tr></tfoot></table>`:`<div class="empty">No trading days.</div>`}${cm(N.days)}
- <div class="two"><div class="avoid"><h3 class="s">Top products <span>by quantity</span></h3>${pl.length?`<table><thead><tr><th>Item</th><th class="n">Qty</th><th class="n">Sales</th></tr></thead><tbody>${pl.slice(0,10).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v.q}</td><td class="n">${m(v.r)}</td></tr>`).join("")}</tbody><tfoot><tr><td>All products</td><td class="n">${pq}</td><td class="n">${m(pt)}</td></tr></tfoot></table>`:`<div class="empty">Nothing sold.</div>`}${cm(N.prod)}</div>
+ <div class="two pbk"><div class="avoid"><h3 class="s">Top products <span>by quantity</span></h3>${pl.length?`<table><thead><tr><th>Item</th><th class="n">Qty</th><th class="n">Sales</th></tr></thead><tbody>${pl.slice(0,10).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v.q}</td><td class="n">${m(v.r)}</td></tr>`).join("")}</tbody><tfoot><tr><td>All products</td><td class="n">${pq}</td><td class="n">${m(pt)}</td></tr></tfoot></table>`:`<div class="empty">Nothing sold.</div>`}${cm(N.prod)}</div>
  <div class="avoid"><h3 class="s">Sales by category</h3>${Object.keys(cat).length?`<table><tbody>${Object.entries(cat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}<div class="bar"><i style="width:${v/ct*100}%"></i></div></td><td class="n">${m(v)}<br><span class="note">${pc(v,ct)}</span></td></tr>`).join("")}</tbody></table>`:`<div class="empty">No category data.</div>`}${cm(N.cat)}</div></div>
  <h3 class="s avoid">Expenses <span>Cost of goods ${m(cogs)} + other ${m(exsum)}</span></h3>${ex.length?`<table><thead><tr><th>Date</th><th>Description</th><th class="n">Amount</th></tr></thead><tbody>${ex.slice().sort((a,b)=>a.d<b.d?-1:1).map(e=>`<tr><td>${e.d}</td><td>${esc(e.c)}</td><td class="n">${m(e.a)}</td></tr>`).join("")}</tbody><tfoot><tr><td colspan="2">Total other expenses</td><td class="n">${m(exsum)}</td></tr></tfoot></table>`:`<div class="empty">No other expenses recorded for ${mn}.</div>`}${cm(N.exp)}`;
  savePDF(phaseDoc("Sales Summary Report",mn,body),"PHASE-Sales-Summary-"+pre+".pdf")}
