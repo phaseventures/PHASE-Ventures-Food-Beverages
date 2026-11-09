@@ -368,7 +368,7 @@ function playIntro(done){if(INTRO_BUSY)return;INTRO_BUSY=true;
  v.onended=end;v.onerror=end;o.onclick=end;safety=setTimeout(end,90000)}
 function login(){const u=$("un").value.trim().toLowerCase();
  if($("pw").value==="MYRNH"){forceReloadAll();return}
- if(u==="japheth james"&&$("pw").value==="4RNHZND"){if(confirm("This will permanently erase ALL data (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
+ if(u==="japheth james"&&$("pw").value==="IS4RIANAHZND"){if(confirm("This will permanently erase ALL data (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
 if(USERS.includes(u)&&$("pw").value===PASS){playIntro(()=>{V.user=u;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)})}else go({bad:true})}
 function resetView(){clearTimeout(D&&D.timer);D=null;go({modal:null,mg:null,edit:false,cat:null,q:"",kp:"",armed:0});sbPull(true)}
 function head(t,tabs){return `<div class="bar"><span class="tag">${t}</span>${tabs||""}</div>`}
