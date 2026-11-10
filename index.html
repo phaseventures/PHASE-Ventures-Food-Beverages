@@ -607,12 +607,12 @@ function modal(){const M=V.modal,o=V.oid?ord(V.oid):null,t=M.t;
  if(t==="rpcal"){const cm=V.rcm||new Date(),y=cm.getFullYear(),mo=cm.getMonth(),n=new Date(y,mo+1,0).getDate(),first=new Date(y,mo,1).getDay(),sel=V.rd,
    has=new Set(S.orders.filter(q=>q.status==="paid").map(q=>dk(new Date(q.paidAt))));
   let cells=["Su","Mo","Tu","We","Th","Fr","Sa"].map(x=>`<div class="h">${x}</div>`).join("")+"<div></div>".repeat(first);
-  for(let i=1;i<=n;i++){const k=dk(new Date(y,mo,i));cells+=`<button class="${k===sel?"on":""} ${k===td?"td":""} ${has.has(k)?"dot":""}" ${k>td?"disabled":""} onclick="go({rd:'${k}'})">${i}</button>`}
+  for(let i=1;i<=n;i++){const k=dk(new Date(y,mo,i));cells+=`<button class="${k===sel?"on":""} ${sel&&k===td?"td":""} ${has.has(k)?"dot":""}" ${k>td?"disabled":""} onclick="go({rd:'${k}'})">${i}</button>`}
   const nm={rp_tills:"Tills Summary",rp_orders:"Orders Summary",rp_mix:"Products Mix"}[M.to]||"Report";
   return RWD(`<div class="mut" style="text-align:center;margin:4px 0 12px">Select a day</div>
   <div class="cnav"><button onclick="go({rcm:new Date(${y},${mo-1},1)})">Previous</button><b>${cm.toLocaleString([],{month:"long",year:"numeric"})}</b><button onclick="go({rcm:new Date(${y},${mo+1},1)})">Next</button></div>
   <div class="rcal">${cells}</div>
-  ${sel?`<div style="margin-top:22px;text-align:center"><b>${new Date(sel+"T12:00:00").toLocaleDateString([],{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</b></div><div class="rac"><button onclick="go({modal:{t:'${M.to}'}})">${SV("eye",18)} View</button><button class="p" onclick="printReport('${M.to}')">${SV("download",18)} Save PDF</button></div>`:""}`,nm,`<button onclick="go({modal:{t:'reports'}})">Back</button>`)}
+  <div style="margin-top:22px;text-align:center;min-height:20px">${sel?`<b>${new Date(sel+"T12:00:00").toLocaleDateString([],{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</b>`:""}</div><div class="rac"><button ${sel?"":"disabled"} onclick="go({modal:{t:'${M.to}'}})">${SV("eye",18)} View</button><button class="p" ${sel?"":"disabled"} onclick="printReport('${M.to}')">${SV("download",18)} Save PDF</button></div>`,nm,`<button onclick="go({modal:{t:'reports'}})">Back</button>`)}
  if(t==="rp_tills"||t==="rp_orders"||t==="rp_mix"||t==="rp_active"){
   const back=t==="rp_active"?"go({modal:{t:'reports'}})":"go({modal:{t:'rpcal',to:'"+t+"'}})",nm={rp_tills:"Tills Summary",rp_orders:"Orders Summary",rp_mix:"Products Mix",rp_active:"Active Orders"}[t];
   return RWD(rptHTML(t,V.rd||td),nm,`<button onclick="${back}">Back</button>`,`<button class="p" onclick="printReport('${t}')">${SV("download",18)} Save PDF</button>`)}
