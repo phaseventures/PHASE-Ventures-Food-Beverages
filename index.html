@@ -59,7 +59,10 @@ button.p,button.on{background:linear-gradient(135deg,#e11d2e,#5a0b14)!important;
 button.big{width:100%;margin-top:26px;padding:15px;font-family:"Chakra Petch",sans-serif;letter-spacing:3px;font-size:15px}.er{color:var(--bad);min-height:24px;text-align:center;margin-top:12px;font-size:14px}
 html.bp{background-color:#0e0403;background-image:radial-gradient(ellipse 95% 85% at 78% 55%,rgba(168,115,12,.5) 0%,rgba(161,76,10,.42) 28%,rgba(122,28,8,.36) 58%,rgba(58,9,5,.3) 100%);background-repeat:no-repeat;background-attachment:fixed}
 html.bp .top{background:rgba(24,8,4,.82)}
-html.bp .top #hl .logo{margin:0;height:46px;width:auto;max-width:60px}
+.top .logo{height:38px!important;margin-top:7px!important}
+#hm{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + var(--hh)/2);transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;pointer-events:none}
+#hm img{height:66px;width:auto;max-width:220px;object-fit:contain}
+#hu{border-radius:4px;padding:6px 14px;font-size:13px;font-weight:700;margin-right:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);letter-spacing:.3px}#hu:empty{display:none}
 .sec{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}.sec .sb{width:200px;flex:none}.sb{width:200px;height:110px;font-size:20px;font-weight:700;text-align:center;justify-content:center}
 @media(max-width:700px){.sec,.sec[style]{grid-template-columns:200px!important}}
 .floor{position:relative;height:calc(100vh - 290px);min-height:420px;border:1px dashed var(--bd);border-radius:14px;background:rgba(255,255,255,.03)}
@@ -223,7 +226,7 @@ table.rt3{width:100%;border-collapse:collapse;margin-top:4px}
 .lrs{gap:0}.lr{background:none!important;border:0!important;border-bottom:1px solid var(--bd)!important;border-radius:0!important;padding:16px 4px;min-height:0}
 .lr:hover{background:rgba(255,255,255,.05)!important}.lr svg{flex:none;opacity:.9}
 .lr.d,.lr.ex{color:var(--bad)}.lrs .lr:last-child{border-bottom:0!important}
-</style></head><body><header class="top" id="hdr"><span id="hl"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
+</style></head><body><header class="top" id="hdr"><span id="hl"></span><span id="hm"></span><b id="hn"></b><span style="flex:1"></span><span class="tag" id="hu"></span><button id="hsw" class="hb ib" style="display:none" aria-label="Switch section" title="Switch section" onclick="go({role:null,stn:null,oid:null,modal:null,mg:null,edit:false})"></button></header><div id="app"></div><div id="intro"><video id="introv" src="phaseintro.mp4" playsinline preload="auto"></video></div>
 <script>
 const SB_URL="https://ianegbyfvwhcaxfbvnon.supabase.co",SB_KEY="sb_publishable_rHIbZk0iTyxvuch7P3FHQA_6tbovsS2";
 const SB_ON=!SB_URL.startsWith("PASTE");
@@ -240,7 +243,7 @@ async function sbPull(first){if(!SB_ON||!V.auth||PUSHING||DIRTY)return;
   const row=a[0];if(+row.rev>REV){const busy=V.modal||D||(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName));if(busy&&!first){return}
    S=row.data;REV=+row.rev;norm();try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}render()}
   sbBadge()}catch(e){SYNC="offline";sbBadge()}}
-function sbBadge(){const e=document.getElementById("hu");if(e&&V.user)e.textContent=V.user+(SB_ON?" \u2022 "+SYNC:" \u2022 local only")}
+function sbBadge(){const e=document.getElementById("hu");if(e&&V.user)e.textContent=SHOPNAME()+(SB_ON&&SYNC!=="live"?" \u2022 "+SYNC:"")}
 const PASS="PH1S3",CUR="SR ",TAX=0.10;
 const MENU=[
 {id:1,n:"Spring Rolls",p:6,c:2,st:"app",cat:"Appetizers"},{id:2,n:"Garlic Bread",p:5,c:1.2,st:"app",cat:"Appetizers"},
@@ -295,7 +298,7 @@ const tfmt=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return k<60?k+
 const tmr=t=>`<span class="tm ${tcl(t)}" data-t="${t}">${tfmt(t)}</span>`;
 const swf=t=>{const k=Math.max(0,Math.floor((Date.now()-t)/6e4));return Math.floor(k/60)+"hrs "+k%60+"min"};
 function render(){const k={};const kl={};document.querySelectorAll(".sc[id]").forEach(e=>{k[e.id]=e.scrollTop;kl[e.id]=e.scrollLeft});const a=$("app");k.app=a.scrollTop;render0();
- document.body.classList.toggle("nohd",V.splash||!V.auth||V.role==="display");$("hn").textContent=TO()?"PHASE Ventures | Black Paradise":S.name;$("hu").textContent=V.user||"";$("hsw").style.display=(V.auth&&V.role&&V.role!=="display")?"inline-flex":"none";$("hsw").innerHTML=SV("refresh",18);sbBadge();
+ document.body.classList.toggle("nohd",V.splash||!V.auth||V.role==="display");$("hn").textContent=S.name;$("hu").textContent=SHOPNAME();$("hsw").style.display=(V.auth&&V.role&&V.role!=="display")?"inline-flex":"none";$("hsw").innerHTML=SV("refresh",18);sbBadge();
  a.scrollTop=k.app;document.querySelectorAll(".sc[id]").forEach(e=>{if(k[e.id]!=null)e.scrollTop=k[e.id];if(kl[e.id])e.scrollLeft=kl[e.id]});if(V.sb){const e=$("ls");if(e)e.scrollTop=e.scrollHeight;V.sb=0}}
 let CT=null,CL=0,XT=null,DSIG="";
 function cpd(){CL=0;clearTimeout(CT);CT=setTimeout(()=>{CL=1;go({role:"display",modal:null})},700)}
@@ -325,7 +328,7 @@ function render0(){
  const a=$("app");
  if(V.auth&&TO()&&V.tab==="tables")V.tab="home";
  document.documentElement.classList.toggle("bp",!!V.auth&&TO());
- {const hl=$("hl"),k=V.auth&&TO()?"b":"p";if(hl&&hl.dataset.k!==k){hl.dataset.k=k;hl.innerHTML=k==="b"?`<img class="logo" src="rebrandlogo.png" alt="Black Paradise">`:LOGO()}}
+ {const hm=$("hm"),k=V.auth&&SHOPS[V.user]?SHOPS[V.user].logo:"";if(hm&&hm.dataset.k!==k){hm.dataset.k=k;hm.innerHTML=k?`<img src="${k}" alt="" onerror="this.style.display='none'">`:""}}
  if(V.splash){a.innerHTML=`<div class="c">${LOGO()}<h1 class="ti">PHASE VENTURES</h1></div>`;setTimeout(()=>{V.splash=false;render()},1600);return}
  if(!V.auth){a.innerHTML=`<div class="c"><div class="lw">${LOGO()}
  <label class="fl">CODE</label><input class="in" id="un" placeholder="Enter code" autocomplete="off" autocapitalize="off">
@@ -426,7 +429,8 @@ function gsz(r){const x=S.rooms.find(z=>z.id===(r||V.room));return x&&+x.g>=6?+x
 function addTable(){mig();const p=fs();S.tables.push({n:""+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:"",r:V.room,seats:4,gx:p.x,gy:p.y});save();go({edit:true,modal:null})}
 function setFW(d){const r=S.rooms.find(z=>z.id===V.room),f=$("floor"),fw=(f&&f.clientWidth)||960;if(!r)return;let w=(r.w||fw)+d*Math.round(fw/2);if(w<=fw)w=0;if(w>8000)w=8000;r.w=w;save();go({modal:{t:"grid"}})}
 function setGrid(v){v=Math.round(+v);if(!(v>=6))v=6;if(v>160)v=160;const r=S.rooms.find(z=>z.id===V.room);if(!r)return;r.g=v;S.tables.forEach(t=>{if(t.r===r.id){t.gx=Math.round(t.gx/v)*v;t.gy=Math.round(t.gy/v)*v}});save();go({modal:null,edit:true})}
-const RNAMES={"0031":"Black Paradise"},DEFRNAME="n/a";
+const SHOPS={"0010":{name:"n/a",logo:"shop-0010.png"},"0031":{name:"Black Paradise",logo:"rebrandlogo.png"},"0027":{name:"n/a",logo:"shop-0027.png"},"103127":{name:"n/a",logo:"shop-103127.png"}},DEFRNAME="n/a",RNAMES={};
+Object.keys(SHOPS).forEach(k=>RNAMES[k]=SHOPS[k].name);const SHOPNAME=()=>(SHOPS[V.user]||{}).name||"";
 let RNAME=DEFRNAME;
 const PCSS="@page{size:A4 portrait;margin:14mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Arial,Helvetica,sans-serif;color:#000;background:#fff;margin:0;padding:0;font-size:13px}.rh{text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:16px}.rh h2{margin:0 0 6px;font-size:26px;letter-spacing:3px}.rh .sub{color:#444;margin-top:4px}.rh .tt{font-size:17px;font-weight:700;color:#000}.rtm{display:flex;gap:12px;margin-top:12px}.rtm div{flex:1;border:1px solid #999;padding:8px 12px;text-align:left}.rtm small{display:block;font-size:10px;color:#555;letter-spacing:1px}.rtm b{font-size:16px}.line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #999}.row{display:flex;justify-content:space-between;gap:12px}.mut{color:#555;font-size:12px}h3{margin:20px 0 6px}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;color:#555;padding:8px 6px;border-bottom:1px solid #000}td{padding:9px 6px;border-bottom:1px dashed #999}.num{text-align:right}tfoot td{border-top:2px solid #000;border-bottom:0;font-weight:700}";
 
@@ -737,6 +741,7 @@ const PHCSS=`@page{size:A4 portrait;margin:0 0 16mm 0;@bottom-right{content:"Pag
 body{margin:0;font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:#1a1114;font-size:11.5px;line-height:1.45;background:#fff}
 .lh{background:#14070b;color:#fff;height:42mm;padding:0 14mm;display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #d81f2d}
 .lh .br{display:flex;align-items:center;gap:20px}.lh img{height:44px;width:auto;max-width:130px;object-fit:contain}
+.lh .shw{display:flex;align-items:center;gap:22px;margin-left:8px}.lh .dv{display:block;width:1px;height:48px;background:rgba(255,255,255,.28)}.lh .br img.sh{height:64px;width:auto;max-width:120px;object-fit:contain}
 .lh .co b{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:700;font-size:17px;line-height:1.25;letter-spacing:0}
 .lh .co span{display:block;font-family:"Chakra Petch","Segoe UI",Arial,sans-serif;font-weight:500;font-size:10px;line-height:1.3;color:#c9a9b1;margin-top:3px}
 .lh .ti{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
@@ -775,12 +780,16 @@ tr.sub td{color:#5c464d}tr.tot td{font-weight:700;border-top:1.5px solid #1a1114
 .empty{padding:16px;text-align:center;color:#7a6168;border:1px dashed #d9c8cd;border-radius:6px}`;
 /* Optional: paste your logo as a data:image/png;base64,... string here so it always appears in saved PDFs */
 const PH_LOGO_DATA="";
+function shopLogoHTML(){const sh=SHOPS[V.user];if(!sh||!sh.logo)return"";const im=document.querySelector("#hm img");let src;
+ if(im&&im.complete&&!im.naturalWidth)return"";
+ if(im&&im.naturalWidth){try{const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);src=c.toDataURL("image/png")}catch(e){src=im.currentSrc||im.src}}else src=new URL(sh.logo,location.href).href;
+ return `<span class="shw"><i class="dv"></i><img class="sh" src="${src}" alt="" onerror="this.parentNode.style.display='none'"></span>`}
 function phLogo(){if(PH_LOGO_DATA)return PH_LOGO_DATA;const im=document.querySelector("img.logo");if(!im||!im.naturalWidth)return LG[0];try{const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);return c.toDataURL("image/png")}catch(e){return im.currentSrc||im.src}}
 const PH_SIGN=[["Prepared by","Japheth James","Restaurant Manager"],["Reviewed by","Faith Fatima","Finance Department"],["Noted by","Japheth James","Phase Ventures CEO"]];
 const cm=t=>t?`<div class="cm">${t}</div>`:"";
 function phaseDoc(title,sub,body){const now=new Date();
  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)} - ${esc(sub)}</title><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&display=swap" rel="stylesheet"><style>${PHCSS}</style></head><body>
- <div class="lh"><div class="br"><img src="${phLogo()}" alt="PHASE" onerror="this.style.display='none'"><div class="co"><b>PHASE Ventures</b><span>Food &amp; Beverages</span></div></div><div class="ti"><b>${esc(title)}</b><span>${esc(sub)}</span></div></div>
+ <div class="lh"><div class="br"><img src="${phLogo()}" alt="PHASE" onerror="this.style.display='none'"><div class="co"><b>PHASE Ventures</b><span>Food &amp; Beverages</span></div>${shopLogoHTML()}</div><div class="ti"><b>${esc(title)}</b><span>${esc(sub)}</span></div></div>
  <div class="pg"><div class="meta"><div><small>Outlet</small><b>${esc(RNAME)}</b></div><div><small>Currency</small><b>Saudi Riyal (SAR)</b></div><div><small>Generated</small><b>${now.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})} ${tm(now.getTime())}</b></div><div><small>Prepared by</small><b>${esc(PH_SIGN[0][1])}</b></div></div>${body}
  <div class="sig">${PH_SIGN.map(x=>`<div><small>${x[0]}</small><b>${esc(x[1])}</b><span>${esc(x[2])}</span></div>`).join("")}</div></div></body></html>`}
 function monthNarr(c){const{P,day,pay,pm,cat,y,mo,n,mn,rev,sub,tax,cogs,vd,hsum,exsum,inc,expn,np,gi,payt,pt,pl,ex}=c,pc=(a,b)=>b?Math.round(a/b*100):0,dn=i=>new Date(y,mo,i+1).toLocaleDateString([],{weekday:"long",day:"numeric",month:"long"}),
