@@ -57,9 +57,9 @@ button.p,button.on{background:linear-gradient(135deg,#e11d2e,#5a0b14)!important;
 .in{width:100%;letter-spacing:0!important;text-align:left!important;font-size:16px!important;font-family:Inter,system-ui,sans-serif;background:#0b0b0b;border:1px solid #2a2a2e;border-radius:12px;padding:15px 16px}
 .pwb{position:relative}.pwb .eye{position:absolute;right:6px;top:4px;border:0;background:none;color:#9ca3af;font-size:18px}
 button.big{width:100%;margin-top:26px;padding:15px;font-family:"Chakra Petch",sans-serif;letter-spacing:3px;font-size:15px}.er{color:var(--bad);min-height:24px;text-align:center;margin-top:12px;font-size:14px}
-html.bp{background:#1a0a05 radial-gradient(ellipse at 82% 58%,rgba(150,105,8,.5) 0%,rgba(150,70,8,.28) 32%,transparent 68%) no-repeat fixed,linear-gradient(180deg,#3d0e08 0%,#2e1206 55%,#130904 100%) no-repeat fixed}
-html.bp .top{background:rgba(44,15,7,.85)}
-html.bp #hl{position:absolute;left:50%;top:env(safe-area-inset-top,0px);bottom:0;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}html.bp .top #hl .logo{margin-top:0;height:56px;max-width:200px}
+html.bp{background-color:#180604;background-image:radial-gradient(ellipse 95% 85% at 78% 55%,#a8730c 0%,#a14c0a 28%,#7a1c08 58%,#3a0905 100%);background-repeat:no-repeat;background-attachment:fixed}
+html.bp .top{background:rgba(44,15,7,.8)}
+html.bp .top #hl .rb{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + var(--hh)/2);transform:translate(-50%,-50%);height:56px;width:auto;max-width:200px;margin:0;pointer-events:none}
 .sec{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}.sec .sb{width:200px;flex:none}.sb{width:200px;height:110px;font-size:20px;font-weight:700;text-align:center;justify-content:center}
 @media(max-width:700px){.sec,.sec[style]{grid-template-columns:200px!important}}
 .floor{position:relative;height:calc(100vh - 290px);min-height:420px;border:1px dashed var(--bd);border-radius:14px;background:rgba(255,255,255,.03)}
@@ -324,7 +324,7 @@ setInterval(()=>{if(V.auth&&V.role==="display"){const g=JSON.stringify(dispData(
 function render0(){
  const a=$("app");
  document.documentElement.classList.toggle("bp",!!V.auth&&TO());
- {const hl=$("hl"),k=V.auth&&TO()?"b":"p";if(hl&&hl.dataset.k!==k){hl.dataset.k=k;hl.innerHTML=k==="b"?`<img class="logo" src="rebrandlogo.png" alt="Black Paradise">`:LOGO()}}
+ {const hl=$("hl"),k=V.auth&&TO()?"b":"p";if(hl&&hl.dataset.k!==k){hl.dataset.k=k;hl.innerHTML=LOGO()+(k==="b"?`<img class="logo rb" src="rebrandlogo.png" alt="Black Paradise">`:"")}}
  if(V.splash){a.innerHTML=`<div class="c">${LOGO()}<h1 class="ti">PHASE VENTURES</h1></div>`;setTimeout(()=>{V.splash=false;render()},1600);return}
  if(!V.auth){a.innerHTML=`<div class="c"><div class="lw">${LOGO()}
  <label class="fl">CODE</label><input class="in" id="un" placeholder="Enter code" autocomplete="off" autocapitalize="off">
