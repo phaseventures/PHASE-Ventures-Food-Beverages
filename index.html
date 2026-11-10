@@ -249,16 +249,21 @@ const MENU=[
 {id:13,n:"Coffee",p:3.5,c:0.4,st:"bar",cat:"Drinks"},{id:14,n:"Mocktail",p:7,c:1.8,st:"bar",cat:"Drinks"}];
 const STN={app:"Appetizer Kitchen",main:"Main Kitchen",bar:"Bar"};
 const DEFCATS=[{k:"Mains",l:"MAIN"},{k:"Appetizers",l:"APPETIZER"},{k:"Drinks",l:"DRINKS"}];
-const BASEN=MENU.length;
-function syncMenu(){MENU.length=BASEN;(S.items||[]).forEach(i=>MENU.push(i))}
-function norm(){S.exp=S.exp||[];S.house=S.house||[];S.hours=S.hours||{};S.items=S.items||[];if(!S.cats||!S.cats.length)S.cats=DEFCATS.map(x=>({...x}));syncMenu()}
+const BASE=MENU.slice();
+function syncMenu(){MENU.length=0;if(V.user!=="resto2")BASE.forEach(i=>MENU.push(i));(S.items||[]).forEach(i=>MENU.push(i))}
+function norm(){seedResto2();S.exp=S.exp||[];S.house=S.house||[];S.hours=S.hours||{};S.items=S.items||[];if(!S.cats||!S.cats.length)S.cats=DEFCATS.map(x=>({...x}));syncMenu()}
+const R2CATS=[{k:"Pastry",l:"PASTRY"},{k:"Drinks",l:"DRINKS"}];
+const R2ITEMS=(()=>{let id=2001;const m=(cat,st,a)=>a.map(([n,p,c])=>({id:id++,n,p,c,st,cat}));
+ return[...m("Pastry","app",[["Donuts",7,0],["Cookies",7,0],["Croissant",7,0]]),
+ ...m("Drinks","bar",[["Americano",10,0],["Cream Latte",14,3.1],["Vanilla Latte",14,3.2],["Ice Cream Latte",16,3.2],["Coffee Latte",12,2.5],["Strawberry Latte",14,2.2],["Vanilla Iceblend",15,2.3],["Oreo Iceblend",15,2.45],["Nestea Lemon Ice Tea",9,1.35]])]})();
+function seedResto2(){if(V.user!=="resto2"||S.seed2===2)return;if(!S.seed2)S.cats=R2CATS.map(x=>({...x}));S.items=(S.items||[]).filter(i=>!(i.id>=2001&&i.id<2100)).concat(R2ITEMS.map(x=>({...x})));S.seed2=2}
 const cats=()=>S.cats&&S.cats.length?S.cats:DEFCATS;
 const fresh=()=>({rooms:[{id:"r1",name:"Room 1"},{id:"r2",name:"Room 2"}],tables:[1,2,3,4,5,6,7,8].map((n,i)=>({n:""+n,name:"",r:"r1",seats:4,gx:48+(i%4)*216,gy:48+Math.floor(i/4)*168})),gpx:1,hours:{},cats:DEFCATS.map(x=>({...x})),items:[],orders:[],seq:1,name:"PHASE Ventures | Food & Beverages",exp:[],house:[]});
 let S=fresh();
 const KEY=()=>"dpos_"+(V.user||"x");
 function loadS(){S=fresh();try{const x=localStorage.getItem(KEY());if(x)S=JSON.parse(x)}catch(e){}S.tables.forEach((t,i)=>{if(t.gx==null){t.gx=2+(i%4)*9;t.gy=2+Math.floor(i/4)*7}});norm()}
 const save=()=>{try{localStorage.setItem(KEY(),JSON.stringify(S))}catch(e){}sbQueue()};
-const USERS=["resto1","resto2"];
+const USERS=["resto1","resto2","resto3","resto4"];
 const tname=n=>{const t=S.tables.find(z=>z.n===n);return t&&t.name?t.name:"Table "+n};
 let V={auth:false,splash:false,role:null,stn:null,tab:"home",user:null,edit:false,kp:"",pm:"Cash",oid:null,cat:null,q:"",rt:"summary",armed:0,fin:false,modal:null,cal:new Date(),sel:null,bad:false};
 const $=s=>document.getElementById(s),m=v=>CUR+(+v).toFixed(2);
@@ -369,7 +374,7 @@ function playIntro(done){if(INTRO_BUSY)return;INTRO_BUSY=true;
 function login(){const u=$("un").value.trim().toLowerCase();
  if($("pw").value==="MYRNH"){forceReloadAll();return}
  if(u==="japheth james"&&$("pw").value==="IS4RIANAHZND"){if(confirm("This will permanently erase ALL data (orders, tables, reports, expenses) for every login on every device. Continue?"))resetAll();return}
-if(USERS.includes(u)&&$("pw").value===PASS){playIntro(()=>{V.user=u;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)})}else go({bad:true})}
+if(USERS.includes(u)&&$("pw").value===PASS){playIntro(()=>{V.user=u;RNAME=RNAMES[u]||DEFRNAME;loadS();REV=+(S.rev||0);go({auth:true,bad:false});sbPull(true)})}else go({bad:true})}
 function resetView(){clearTimeout(D&&D.timer);D=null;go({modal:null,mg:null,edit:false,cat:null,q:"",kp:"",armed:0});sbPull(true)}
 function head(t,tabs){return `<div class="bar"><span class="tag">${t}</span>${tabs||""}</div>`}
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -415,7 +420,8 @@ function gsz(r){const x=S.rooms.find(z=>z.id===(r||V.room));return x&&+x.g>=6?+x
 function addTable(){mig();const p=fs();S.tables.push({n:""+(Math.max(0,...S.tables.map(t=>+t.n||0))+1),name:"",r:V.room,seats:4,gx:p.x,gy:p.y});save();go({edit:true,modal:null})}
 function setFW(d){const r=S.rooms.find(z=>z.id===V.room),f=$("floor"),fw=(f&&f.clientWidth)||960;if(!r)return;let w=(r.w||fw)+d*Math.round(fw/2);if(w<=fw)w=0;if(w>8000)w=8000;r.w=w;save();go({modal:{t:"grid"}})}
 function setGrid(v){v=Math.round(+v);if(!(v>=6))v=6;if(v>160)v=160;const r=S.rooms.find(z=>z.id===V.room);if(!r)return;r.g=v;S.tables.forEach(t=>{if(t.r===r.id){t.gx=Math.round(t.gx/v)*v;t.gy=Math.round(t.gy/v)*v}});save();go({modal:null,edit:true})}
-const RNAME="Black Paradise";
+const RNAMES={resto2:"Black Paradise"},DEFRNAME="Black Paradise";
+let RNAME=DEFRNAME;
 const PCSS="@page{size:A4 portrait;margin:14mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Arial,Helvetica,sans-serif;color:#000;background:#fff;margin:0;padding:0;font-size:13px}.rh{text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:16px}.rh h2{margin:0 0 6px;font-size:26px;letter-spacing:3px}.rh .sub{color:#444;margin-top:4px}.rh .tt{font-size:17px;font-weight:700;color:#000}.rtm{display:flex;gap:12px;margin-top:12px}.rtm div{flex:1;border:1px solid #999;padding:8px 12px;text-align:left}.rtm small{display:block;font-size:10px;color:#555;letter-spacing:1px}.rtm b{font-size:16px}.line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #999}.row{display:flex;justify-content:space-between;gap:12px}.mut{color:#555;font-size:12px}h3{margin:20px 0 6px}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;color:#555;padding:8px 6px;border-bottom:1px solid #000}td{padding:9px 6px;border-bottom:1px dashed #999}.num{text-align:right}tfoot td{border-top:2px solid #000;border-bottom:0;font-weight:700}";
 
 function ldJS(u,g){return new Promise((ok,no)=>{if(g())return ok();const e=document.createElement("script");e.src=u;e.onload=()=>g()?ok():no();e.onerror=no;document.head.appendChild(e)})}
