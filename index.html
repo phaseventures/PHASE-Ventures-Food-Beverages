@@ -322,9 +322,9 @@ function render0(){
  const a=$("app");
  if(V.splash){a.innerHTML=`<div class="c">${LOGO()}<h1 class="ti">PHASE VENTURES</h1></div>`;setTimeout(()=>{V.splash=false;render()},1600);return}
  if(!V.auth){a.innerHTML=`<div class="c"><div class="lw">${LOGO()}
- <label class="fl">NAME</label><input class="in" id="un" placeholder="Enter name" autocomplete="off" autocapitalize="off">
+ <label class="fl">CODE</label><input class="in" id="un" placeholder="Enter code" autocomplete="off" autocapitalize="off">
  <label class="fl">PASSWORD</label><div class="pwb"><input class="in" id="pw" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"><button class="eye" onclick="const p=$('pw');p.type=p.type==='password'?'text':'password'">${SV('eye',20)}</button></div>
- <button class="p big" onclick="login()">ENTER POS</button><div class="er">${V.bad===2?"All data has been reset.":V.bad?"Wrong name or password.":""}</div></div></div>`;setTimeout(()=>$("un")&&$("un").focus(),0);return}
+ <button class="p big" onclick="login()">ENTER POS</button><div class="er">${V.bad===2?"All data has been reset.":V.bad?"Wrong code or password.":""}</div></div></div>`;setTimeout(()=>$("un")&&$("un").focus(),0);return}
  if(V.role==="display"){if(!$("dsrv"))a.innerHTML=dispPage();dispFill();return}
  if(!V.role){a.innerHTML=`<div class="c"><h2>Choose your section</h2><div class="sec">
  <button class="sb" onpointerdown="cpd()" onpointerup="cpu()" onpointerleave="cpu()" onpointercancel="cpu()" oncontextmenu="return false" onclick="cclick()">Counter</button>${TO()?"":`<button class="sb" onclick="go({role:'kitchen'})">Kitchen</button>`}<button class="sb" onclick="go({role:'bar',stn:'bar'})">${STN.bar}</button>${TO()?"":`<button class="sb" onclick="go({role:'serve'})">Serve</button>`}</div>
